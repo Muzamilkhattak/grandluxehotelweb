@@ -27,31 +27,13 @@ export async function createRoomAction(formData: FormData) {
   // Prepend total_rooms tag for persistent schema-independent availability tracking
   amenities = [`total_rooms:${total_rooms}`, ...amenities.filter(a => !a.startsWith("total_rooms:"))];
 
-  const imageFiles = formData.getAll("images") as File[];
+  const imageUrlsStr = formData.get("imageUrls") as string;
   let imageUrls: string[] = [];
-
-  // Create bucket if it doesn't exist
-  const { data: buckets } = await supabase.storage.listBuckets();
-  if (!buckets?.find(b => b.name === 'room-images')) {
-    await supabase.storage.createBucket('room-images', { public: true });
-  }
-
-  for (const file of imageFiles) {
-    if (file.size > 0) {
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
-      const { data, error } = await supabase.storage
-        .from('room-images')
-        .upload(fileName, file);
-      
-      if (!error && data) {
-        const { data: publicUrlData } = supabase.storage
-          .from('room-images')
-          .getPublicUrl(data.path);
-        imageUrls.push(publicUrlData.publicUrl);
-      } else {
-        console.error("Upload error:", error);
-      }
+  if (imageUrlsStr) {
+    try {
+      imageUrls = JSON.parse(imageUrlsStr);
+    } catch (e) {
+      console.error("Failed to parse imageUrls", e);
     }
   }
 

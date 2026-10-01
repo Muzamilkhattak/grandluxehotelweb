@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, ImagePlus, Trash2, Star, CheckCircle, AlertCircle } from "lucide-react";
 import { createRoomAction } from "@/app/actions/admin-rooms";
+import { createClient } from "@/utils/supabase/client";
 
 export default function NewRoomPage() {
   const router = useRouter();
@@ -39,19 +40,53 @@ export default function NewRoomPage() {
     setErrorMsg("");
 
     const formData = new FormData(e.currentTarget);
+    const supabase = createClient();
+    let imageUrls: string[] = [];
     
-    // Clear out default file input entry and append state files
-    formData.delete("images");
-    files.forEach(file => {
-      formData.append("images", file);
-    });
+    try {
+      // First, ensure the bucket exists (in case it wasn't created yet)
+      const { data: buckets } = await supabase.storage.listBuckets();
+      if (!buckets?.find(b => b.name === 'room-images')) {
+        await supabase.storage.createBucket('room-images', { public: true });
+      }
 
-    const res = await createRoomAction(formData);
+      // Upload each file and collect URLs
+      for (const file of files) {
+        if (file.size > 0) {
+          const fileExt = file.name.split('.').pop();
+          const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+          const { data, error } = await supabase.storage
+            .from('room-images')
+            .upload(fileName, file);
+          
+          if (error) {
+            console.error("Upload error:", error);
+            throw new Error(`Failed to upload image: ${file.name}`);
+          }
+          
+          if (data) {
+            const { data: publicUrlData } = supabase.storage
+              .from('room-images')
+              .getPublicUrl(data.path);
+            imageUrls.push(publicUrlData.publicUrl);
+          }
+        }
+      }
+      
+      // Clear out default file input entry and append imageUrls JSON string
+      formData.delete("images");
+      formData.append("imageUrls", JSON.stringify(imageUrls));
 
-    if (res.success) {
-      router.push("/admin/rooms");
-    } else {
-      setErrorMsg(res.error || "Failed to create room accommodation");
+      const res = await createRoomAction(formData);
+
+      if (res.success) {
+        router.push("/admin/rooms");
+      } else {
+        setErrorMsg(res.error || "Failed to create room accommodation");
+      }
+    } catch (err: any) {
+      setErrorMsg(err.message || "An error occurred during room creation.");
+    } finally {
       setLoading(false);
     }
   };
