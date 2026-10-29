@@ -39,3 +39,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# local rate limit runtime store
+src/data/rate-limit-store.json
+

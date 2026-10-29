@@ -37,41 +37,41 @@ export default function HomeGallery() {
   }
 
   return (
-    <section className="py-24 bg-[#FAF8F5] text-[#1A1A1A] relative overflow-hidden border-t border-[#EAEAEA]">
+    <section id="gallery" className="py-14 sm:py-20 md:py-24 bg-[#FFFFFF] text-[#1A1A1A] relative overflow-hidden border-t border-[#EAEAEA] scroll-mt-20">
       <div className="max-w-[1400px] mx-auto px-4 md:px-8 relative z-10">
         
         {/* Header */}
-        <div className="flex flex-col md:flex-row items-center justify-between gap-6 mb-12 max-w-7xl mx-auto">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-4 sm:gap-6 mb-8 sm:mb-12 max-w-7xl mx-auto">
           <div>
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#362618]/5 border border-[#362618]/10 mb-3">
-              <Sparkles size={14} className="text-[#C97A4F]" />
-              <span className="font-vogue text-[#7E652E] tracking-[0.25em] uppercase text-[11px] font-bold">
+            <div className="inline-flex items-center gap-2 px-3.5 sm:px-4 py-1.5 rounded-full bg-[#000000]/5 border border-[#000000]/10 mb-2 sm:mb-3">
+              <Sparkles size={13} className="text-[#d7b56d]" />
+              <span className="font-vogue text-[#d7b56d] tracking-[0.25em] uppercase text-[10.5px] sm:text-[11px] font-bold">
                 Visual Journey
               </span>
-              <Sparkles size={14} className="text-[#C97A4F]" />
+              <Sparkles size={13} className="text-[#d7b56d]" />
             </div>
             
-            <h2 className="font-marcellus text-[36px] md:text-[48px] text-[#362618] leading-[1.15] font-medium tracking-wide">
+            <h2 className="font-marcellus text-2xl sm:text-3xl md:text-[48px] text-[#000000] leading-[1.15] font-medium tracking-wide">
               Our Luxury Gallery
             </h2>
           </div>
 
           {/* Navigation Controls */}
           {images.length > 1 && (
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2.5 sm:gap-3">
               <button
                 id="gallery-prev"
-                className="w-12 h-12 rounded-full border border-[#362618]/20 bg-white text-[#362618] flex items-center justify-center hover:bg-[#362618] hover:text-white transition-all duration-300 shadow-sm cursor-pointer"
+                className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border border-[#000000]/20 bg-white text-[#000000] flex items-center justify-center hover:bg-[#000000] hover:text-white transition-all duration-300 shadow-sm cursor-pointer"
                 aria-label="Previous Slide"
               >
-                <ChevronLeft size={20} />
+                <ChevronLeft size={18} className="sm:w-5 sm:h-5" />
               </button>
               <button
                 id="gallery-next"
-                className="w-12 h-12 rounded-full border border-[#362618]/20 bg-white text-[#362618] flex items-center justify-center hover:bg-[#362618] hover:text-white transition-all duration-300 shadow-sm cursor-pointer"
+                className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border border-[#000000]/20 bg-white text-[#000000] flex items-center justify-center hover:bg-[#000000] hover:text-white transition-all duration-300 shadow-sm cursor-pointer"
                 aria-label="Next Slide"
               >
-                <ChevronRight size={20} />
+                <ChevronRight size={18} className="sm:w-5 sm:h-5" />
               </button>
             </div>
           )}
@@ -95,7 +95,7 @@ export default function HomeGallery() {
             }}
             pagination={{
               clickable: true,
-              bulletActiveClass: "!bg-[#C97A4F] !w-6",
+              bulletActiveClass: "!bg-[#d7b56d] !w-6",
               bulletClass: "inline-block w-2.5 h-2.5 rounded-full bg-gray-300 transition-all duration-300 cursor-pointer mx-1",
             }}
             breakpoints={{
@@ -118,7 +118,7 @@ export default function HomeGallery() {
                 >
                   <Image
                     src={img.url}
-                    alt="Oslo Elite Hotel Gallery"
+                    alt="Signature Art Hotel Gallery"
                     fill
                     sizes="(max-width: 768px) 100vw, 33vw"
                     className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
@@ -126,10 +126,10 @@ export default function HomeGallery() {
                   />
 
                   {/* Overlay */}
-                  <div className="absolute inset-0 bg-[#362618]/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  <div className="absolute inset-0 bg-[#000000]/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
                   {/* Zoom Button */}
-                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/90 backdrop-blur-md text-[#362618] border border-white/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-[#C97A4F] hover:text-white hover:scale-110 shadow-lg">
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/90 backdrop-blur-md text-[#000000] border border-white/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-[#d7b56d] hover:text-white hover:scale-110 shadow-lg">
                     <Maximize2 size={18} />
                   </div>
                 </div>
@@ -157,7 +157,7 @@ export default function HomeGallery() {
             >
               <Image
                 src={selectedImage.url}
-                alt="Oslo Elite Hotel Gallery"
+                alt="Signature Art Hotel Gallery"
                 fill
                 className="object-contain bg-black"
                 unoptimized={selectedImage.url.startsWith('/uploads/')}

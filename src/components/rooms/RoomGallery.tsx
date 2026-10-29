@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import Image from "next/image";
@@ -32,7 +32,7 @@ export default function RoomGallery({ images, title }: RoomGalleryProps) {
   return (
     <div className="w-full flex flex-col gap-4">
       {/* Main Image View */}
-      <div className="relative w-full h-[450px] md:h-[550px] bg-black/5 rounded-none overflow-hidden group border border-[#7E652E]/20 shadow-lg">
+      <div className="relative w-full h-[450px] md:h-[550px] bg-black/5 rounded-none overflow-hidden group border border-[#d7b56d]/20 shadow-lg">
         <Image
           src={currentImage}
           alt={`${title} - Photo ${activeIndex + 1}`}
@@ -43,8 +43,8 @@ export default function RoomGallery({ images, title }: RoomGalleryProps) {
         <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-60" />
 
         {/* Counter Badge */}
-        <div className="absolute top-4 left-4 bg-[#362618]/80 backdrop-blur-md text-[#FAF8F5] text-[11px] font-jost uppercase tracking-[0.2em] px-4 py-2 border border-[#7E652E]/30 flex items-center gap-2">
-          <Sparkles size={12} className="text-[#C97A4F]" />
+        <div className="absolute top-4 left-4 bg-[#000000]/80 backdrop-blur-md text-[#FFFFFF] text-[11px] font-jost uppercase tracking-[0.2em] px-4 py-2 border border-[#d7b56d]/30 flex items-center gap-2">
+          <Sparkles size={12} className="text-[#d7b56d]" />
           <span>Photo {activeIndex + 1} of {galleryImages.length}</span>
         </div>
 
@@ -53,14 +53,14 @@ export default function RoomGallery({ images, title }: RoomGalleryProps) {
           <>
             <button
               onClick={handlePrev}
-              className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-[#362618]/70 hover:bg-[#362618] text-white flex items-center justify-center transition-all opacity-80 group-hover:opacity-100 hover:scale-105 border border-[#7E652E]/40"
+              className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-[#000000]/70 hover:bg-[#000000] text-white flex items-center justify-center transition-all opacity-80 group-hover:opacity-100 hover:scale-105 border border-[#d7b56d]/40"
               aria-label="Previous Image"
             >
               <ChevronLeft size={24} />
             </button>
             <button
               onClick={handleNext}
-              className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-[#362618]/70 hover:bg-[#362618] text-white flex items-center justify-center transition-all opacity-80 group-hover:opacity-100 hover:scale-105 border border-[#7E652E]/40"
+              className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-[#000000]/70 hover:bg-[#000000] text-white flex items-center justify-center transition-all opacity-80 group-hover:opacity-100 hover:scale-105 border border-[#d7b56d]/40"
               aria-label="Next Image"
             >
               <ChevronRight size={24} />
@@ -71,14 +71,14 @@ export default function RoomGallery({ images, title }: RoomGalleryProps) {
 
       {/* Thumbnails Row / Grid */}
       {galleryImages.length > 1 && (
-        <div className="flex items-center gap-3 overflow-x-auto pb-2 pt-1 scrollbar-thin scrollbar-thumb-[#7E652E]/30">
+        <div className="flex items-center gap-3 overflow-x-auto pb-2 pt-1 scrollbar-thin scrollbar-thumb-[#d7b56d]/30">
           {galleryImages.map((img, index) => (
             <button
               key={index}
               onClick={() => setActiveIndex(index)}
               className={`relative flex-shrink-0 w-24 h-20 md:w-32 md:h-24 overflow-hidden border-2 transition-all cursor-pointer ${
                 activeIndex === index
-                  ? "border-[#C97A4F] scale-[1.02] shadow-md ring-2 ring-[#C97A4F]/20"
+                  ? "border-[#d7b56d] scale-[1.02] shadow-md ring-2 ring-[#d7b56d]/20"
                   : "border-transparent opacity-60 hover:opacity-100"
               }`}
             >
@@ -89,7 +89,7 @@ export default function RoomGallery({ images, title }: RoomGalleryProps) {
                 className="object-cover"
               />
               {activeIndex === index && (
-                <div className="absolute inset-0 bg-[#C97A4F]/10" />
+                <div className="absolute inset-0 bg-[#d7b56d]/10" />
               )}
             </button>
           ))}

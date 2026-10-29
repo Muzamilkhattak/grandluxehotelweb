@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useMemo } from "react";
 import { 
@@ -169,11 +169,11 @@ export default function GuestsManager({ guests }: { guests: GuestProfile[] }) {
         <div className="bg-white border border-[#c3c4c7] shadow-sm">
           <div className="px-4 py-2.5 border-b border-[#c3c4c7] flex justify-between items-center bg-[#f6f7f7]">
             <h3 className="text-[13px] font-semibold text-[#1d2327]">Avg. Lifetime Value</h3>
-            <DollarSign size={18} className="text-[#2271b1]" />
+            <span className="text-[11px] font-bold text-[#2271b1] px-1 border border-[#2271b1]/40 rounded">PKR</span>
           </div>
           <div className="p-4">
-            <div className="text-[26px] font-normal text-[#1d2327] mb-1">${avgLtv.toLocaleString()}</div>
-            <div className="text-[12px] text-[#50575e]">Total ${totalRevenue.toLocaleString()} volume</div>
+            <div className="text-[26px] font-normal text-[#1d2327] mb-1">PKR {avgLtv.toLocaleString()}</div>
+            <div className="text-[12px] text-[#50575e]">Total PKR {totalRevenue.toLocaleString()} volume</div>
           </div>
         </div>
       </div>
@@ -298,7 +298,7 @@ export default function GuestsManager({ guests }: { guests: GuestProfile[] }) {
                       <span
                         className={`inline-flex items-center gap-1 px-2.5 py-0.5 text-[11.5px] rounded-[3px] font-medium border ${
                           guest.status === "VIP"
-                            ? "bg-[#fcf8e3] text-[#8a6d3b] border-[#faebcc]"
+                            ? "bg-[#fcf8e3] text-[#000000] border-[#faebcc]"
                             : guest.status === "Returning"
                             ? "bg-[#e5f5fa] text-[#006ba1] border-[#bce8f1]"
                             : "bg-[#f0f0f1] text-[#50575e] border-[#c3c4c7]"
@@ -316,7 +316,7 @@ export default function GuestsManager({ guests }: { guests: GuestProfile[] }) {
 
                     {/* Total Spend */}
                     <td className="px-4 py-3 align-top font-semibold text-[#1d2327]">
-                      ${guest.totalSpent.toLocaleString()}
+                      PKR {guest.totalSpent.toLocaleString()}
                     </td>
 
                     {/* Last Stay */}
@@ -424,7 +424,7 @@ export default function GuestsManager({ guests }: { guests: GuestProfile[] }) {
                   <div className="grid grid-cols-2 gap-2 text-[13px]">
                     <div>
                       <span className="text-[#8c8f94] block text-[11px]">Total Revenue</span>
-                      <strong className="text-[#00a32a] text-[15px]">${selectedGuest.totalSpent.toLocaleString()}</strong>
+                      <strong className="text-[#00a32a] text-[15px]">PKR {selectedGuest.totalSpent.toLocaleString()}</strong>
                     </div>
                     <div>
                       <span className="text-[#8c8f94] block text-[11px]">Total Stays</span>
@@ -437,11 +437,11 @@ export default function GuestsManager({ guests }: { guests: GuestProfile[] }) {
               {/* Special Guest Notes & Preferences */}
               {selectedGuest.notes.length > 0 && (
                 <div className="bg-[#fff8e5] border-l-4 border-[#dba617] p-4 space-y-1.5">
-                  <div className="flex items-center gap-1.5 text-[#8a6d3b] font-semibold text-[13px]">
+                  <div className="flex items-center gap-1.5 text-[#000000] font-semibold text-[13px]">
                     <FileText size={15} />
                     <span>Special Requests & Guest Notes</span>
                   </div>
-                  <ul className="list-disc list-inside text-[13px] text-[#66512c] space-y-1 pl-1">
+                  <ul className="list-disc list-inside text-[13px] text-[#000000] space-y-1 pl-1">
                     {selectedGuest.notes.map((note, idx) => (
                       <li key={idx}>{note}</li>
                     ))}
@@ -474,7 +474,7 @@ export default function GuestsManager({ guests }: { guests: GuestProfile[] }) {
 
                         <div className="text-right">
                           <span className="font-semibold text-[14px] text-[#1d2327] block">
-                            ${booking.totalAmount?.toLocaleString() || 0}
+                            PKR {booking.totalAmount?.toLocaleString() || 0}
                           </span>
                           <span
                             className={`inline-block px-2 py-0.2 text-[10.5px] rounded-[2px] font-medium uppercase border ${

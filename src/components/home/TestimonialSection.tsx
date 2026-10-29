@@ -14,7 +14,7 @@ const testimonials = [
   },
   {
     id: 2,
-    quote: "The Michelin dining experience while overlooking the skyline was unforgettable. Oslo Elite has set a new standard for luxury. Every interaction was flawlessly executed.",
+    quote: "The dining experience while overlooking the skyline was unforgettable. Signature Art Hotel has set a new standard for luxury. Every interaction was flawlessly executed.",
     name: "Marcus Sterling",
     title: "CEO, Sterling Global"
   },
@@ -49,7 +49,7 @@ export default function TestimonialSection() {
   };
 
   return (
-    <section className="relative py-32 w-full overflow-hidden flex items-center justify-center min-h-[800px]">
+    <section className="relative py-16 sm:py-24 md:py-32 w-full overflow-hidden flex items-center justify-center min-h-[580px] sm:min-h-[680px] md:min-h-[750px]">
       {/* Background Image & Overlays */}
       <div className="absolute inset-0 z-0">
         <Image 
@@ -58,18 +58,18 @@ export default function TestimonialSection() {
           fill
           className="object-cover"
         />
-        <div className="absolute inset-0 bg-[#362618]/90 mix-blend-multiply"></div>
+        <div className="absolute inset-0 bg-[#000000]/90 mix-blend-multiply"></div>
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/40"></div>
       </div>
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 w-full flex flex-col items-center">
         
-        <div className="text-center mb-16">
+        <div className="text-center mb-10 sm:mb-16">
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="font-vogue text-[#C97A4F] tracking-[0.2em] uppercase text-[12px] mb-4"
+            className="font-vogue text-[#d7b56d] tracking-[0.2em] uppercase text-[11px] sm:text-[12px] mb-3 sm:mb-4"
           >
             Guest Chronicles
           </motion.div>
@@ -78,7 +78,7 @@ export default function TestimonialSection() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.2 }}
-            className="font-marcellus text-[40px] md:text-[56px] text-[#FAF8F5] leading-tight"
+            className="font-marcellus text-3xl sm:text-4xl md:text-[56px] text-[#FFFFFF] leading-tight"
           >
             Whispers of Excellence
           </motion.h2>
@@ -86,12 +86,12 @@ export default function TestimonialSection() {
 
         <div className="relative w-full max-w-4xl mx-auto">
           {/* Quote Icon Background */}
-          <div className="absolute -top-16 -left-12 text-[#C97A4F]/10 z-0 hidden md:block">
+          <div className="absolute -top-16 -left-12 text-[#d7b56d]/10 z-0 hidden md:block">
             <Quote size={180} className="transform rotate-180" strokeWidth={0.5} />
           </div>
 
           {/* Slider Container */}
-          <div className="relative h-[350px] md:h-[300px] w-full perspective-[1000px]">
+          <div className="relative min-h-[360px] sm:h-[320px] md:h-[300px] w-full perspective-[1000px]">
             <AnimatePresence mode="wait">
               <motion.div
                 key={currentIndex}
@@ -99,19 +99,19 @@ export default function TestimonialSection() {
                 animate={{ opacity: 1, x: 0, rotateY: 0 }}
                 exit={{ opacity: 0, x: -50, rotateY: 10 }}
                 transition={{ duration: 0.6, ease: "easeOut" }}
-                className="absolute inset-0 bg-white/5 backdrop-blur-md border border-white/10 p-8 md:p-14 flex flex-col items-center justify-center text-center shadow-[0_32px_64px_rgba(0,0,0,0.4)]"
+                className="absolute inset-0 bg-white/5 backdrop-blur-md border border-white/10 p-6 sm:p-8 md:p-14 flex flex-col items-center justify-center text-center shadow-[0_32px_64px_rgba(0,0,0,0.4)]"
               >
-                <div className="flex gap-1 text-[#C97A4F] mb-6">
-                  {[...Array(5)].map((_, i) => <Star key={i} size={16} fill="currentColor" />)}
+                <div className="flex gap-1 text-[#d7b56d] mb-4 sm:mb-6">
+                  {[...Array(5)].map((_, i) => <Star key={i} size={15} fill="currentColor" />)}
                 </div>
-                <p className="font-marcellus text-[20px] md:text-[28px] leading-[1.6] text-[#FAF8F5] mb-8 italic">
+                <p className="font-marcellus text-[16px] sm:text-[20px] md:text-[26px] leading-[1.6] text-[#FFFFFF] mb-6 sm:mb-8 italic">
                   "{testimonials[currentIndex].quote}"
                 </p>
                 <div className="flex flex-col items-center">
-                  <h4 className="font-jost font-medium text-[16px] uppercase tracking-[0.2em] text-[#FAF8F5]">
+                  <h4 className="font-jost font-medium text-[14px] sm:text-[16px] uppercase tracking-[0.2em] text-[#FFFFFF]">
                     {testimonials[currentIndex].name}
                   </h4>
-                  <span className="font-vogue text-[10px] uppercase tracking-[0.2em] text-[#C97A4F] mt-3">
+                  <span className="font-vogue text-[10px] uppercase tracking-[0.2em] text-[#d7b56d] mt-2 sm:mt-3">
                     {testimonials[currentIndex].title}
                   </span>
                 </div>
@@ -123,7 +123,7 @@ export default function TestimonialSection() {
           <div className="flex items-center justify-center gap-6 mt-16 relative z-20">
             <button 
               onClick={handlePrev}
-              className="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center text-white hover:bg-white hover:text-[#362618] transition-colors"
+              className="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center text-white hover:bg-white hover:text-[#000000] transition-colors"
             >
               <ChevronLeft size={20} strokeWidth={1} />
             </button>
@@ -136,7 +136,7 @@ export default function TestimonialSection() {
                     setCurrentIndex(idx);
                   }}
                   className={`transition-all duration-500 rounded-full ${
-                    idx === currentIndex ? "w-8 h-1 bg-[#C97A4F]" : "w-2 h-1 bg-white/30 hover:bg-white/60"
+                    idx === currentIndex ? "w-8 h-1 bg-[#d7b56d]" : "w-2 h-1 bg-white/30 hover:bg-white/60"
                   }`}
                   aria-label={`Go to testimonial ${idx + 1}`}
                 />
@@ -144,7 +144,7 @@ export default function TestimonialSection() {
             </div>
             <button 
               onClick={handleNext}
-              className="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center text-white hover:bg-white hover:text-[#362618] transition-colors"
+              className="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center text-white hover:bg-white hover:text-[#000000] transition-colors"
             >
               <ChevronRight size={20} strokeWidth={1} />
             </button>

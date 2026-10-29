@@ -30,7 +30,18 @@ export async function middleware(request: NextRequest) {
   }
 
   // Refresh Supabase auth session for public routes if needed
-  return createClient(request);
+  const { supabase, supabaseResponse } = createClient(request);
+
+  // Protect /profile route
+  if (pathname.startsWith("/profile")) {
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) {
+      return NextResponse.redirect(new URL("/login", request.url));
+    }
+  }
+
+  return supabaseResponse;
 }
 
 export const config = {

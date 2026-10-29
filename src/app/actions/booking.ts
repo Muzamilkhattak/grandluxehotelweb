@@ -21,6 +21,8 @@ export async function createBookingAction(payload: BookingPayload) {
     const cookieStore = await cookies();
     const supabase = await createClient(cookieStore);
 
+    const { data: { user } } = await supabase.auth.getUser();
+
     const { roomId, guestName, guestEmail, guestPhone, checkIn, checkOut, notes } = payload;
 
     // Validation: Required fields
@@ -77,7 +79,7 @@ export async function createBookingAction(payload: BookingPayload) {
     if (overlappingBookings && overlappingBookings.length >= totalAvailableRooms) {
       return { 
         success: false, 
-        error: `All ${totalAvailableRooms} available room(s) of this suite type are already booked for the selected dates. Please select different dates or another accommodation.` 
+        error: `This room is not available for the selected dates (${checkIn} to ${checkOut}). It is already booked. Please choose different dates.` 
       };
     }
 
@@ -101,6 +103,7 @@ export async function createBookingAction(payload: BookingPayload) {
         total_amount: totalAmount,
         status: "confirmed",
         payment_status: "pay_on_arrival",
+        user_id: user ? user.id : null,
       })
       .select()
       .single();
@@ -141,3 +144,112 @@ export async function createBookingAction(payload: BookingPayload) {
     return { success: false, error: "An unexpected error occurred." };
   }
 }
+
+export type AvailabilityResult = {
+  available: boolean;
+  error?: string;
+  totalRooms?: number;
+  bookedCount?: number;
+};
+
+export async function checkRoomAvailabilityAction(
+  roomId: string,
+  checkIn: string,
+  checkOut: string
+): Promise<AvailabilityResult> {
+  try {
+    if (!roomId) {
+      return { available: false, error: "Room identifier is required." };
+    }
+    if (!checkIn || !checkOut) {
+      return { available: false, error: "Both check-in and check-out dates are required." };
+    }
+
+    const inDate = new Date(checkIn);
+    const outDate = new Date(checkOut);
+
+    if (isNaN(inDate.getTime()) || isNaN(outDate.getTime())) {
+      return { available: false, error: "Please enter valid dates." };
+    }
+
+    if (outDate <= inDate) {
+      return { available: false, error: "Check-out date must be strictly after the check-in date." };
+    }
+
+    const cookieStore = await cookies();
+    const supabase = await createClient(cookieStore);
+
+    const { data: room, error: roomError } = await supabase
+      .from("rooms")
+      .select("id, title, total_rooms, quantity, amenities")
+      .eq("id", roomId)
+      .single();
+
+    if (roomError || !room) {
+      return { available: false, error: "Room not found." };
+    }
+
+    const totalAvailable = getRoomTotalCount(room);
+
+    const { data: overlappingBookings, error: overlapError } = await supabase
+      .from("bookings")
+      .select("id, check_in, check_out")
+      .eq("room_id", roomId)
+      .neq("status", "cancelled")
+      .lt("check_in", checkOut)
+      .gt("check_out", checkIn);
+
+    if (overlapError) {
+      console.error("Availability query error:", overlapError);
+      return { available: false, error: "Could not verify room schedule availability." };
+    }
+
+    const bookedCount = overlappingBookings ? overlappingBookings.length : 0;
+
+    if (bookedCount >= totalAvailable) {
+      return {
+        available: false,
+        totalRooms: totalAvailable,
+        bookedCount,
+        error: `This room is not available for the selected dates (${checkIn} to ${checkOut}). It is already booked. Please choose different dates.`
+      };
+    }
+
+    return {
+      available: true,
+      totalRooms: totalAvailable,
+      bookedCount
+    };
+  } catch (err: any) {
+    console.error("checkRoomAvailabilityAction error:", err);
+    return { available: false, error: "Unable to verify availability." };
+  }
+}
+
+export async function getRoomBookedDatesAction(roomId: string) {
+  try {
+    const cookieStore = await cookies();
+    const supabase = await createClient(cookieStore);
+
+    const today = new Date().toISOString().split("T")[0];
+
+    const { data: bookings, error } = await supabase
+      .from("bookings")
+      .select("check_in, check_out")
+      .eq("room_id", roomId)
+      .neq("status", "cancelled")
+      .gte("check_out", today)
+      .order("check_in", { ascending: true });
+
+    if (error) {
+      console.error("Error fetching booked dates:", error);
+      return [];
+    }
+
+    return bookings || [];
+  } catch (err) {
+    console.error("Failed to get booked dates:", err);
+    return [];
+  }
+}
+

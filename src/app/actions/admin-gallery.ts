@@ -46,6 +46,7 @@ export async function uploadGalleryImageAction(formData: FormData) {
     await fs.writeFile(filePath, buffer);
 
     revalidatePath("/admin/gallery");
+    revalidatePath("/gallery");
     revalidatePath("/");
 
     return { success: true, fileName };
@@ -66,6 +67,7 @@ export async function deleteGalleryImageAction(fileName: string) {
     await fs.unlink(filePath);
 
     revalidatePath("/admin/gallery");
+    revalidatePath("/gallery");
     revalidatePath("/");
 
     return { success: true };

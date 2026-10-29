@@ -30,9 +30,9 @@ export default async function AdminDashboardPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <WPWidgetCard 
           title="Total Revenue" 
-          value={`$${totalRevenue.toLocaleString()}`} 
+          value={`PKR ${totalRevenue.toLocaleString()}`} 
           trend="+14% vs last month" 
-          icon={<DollarSign size={20} className="text-[#2271b1]" />} 
+          icon={<span className="text-[12px] font-bold text-[#2271b1] px-1 py-0.5 border border-[#2271b1]/40 rounded">PKR</span>} 
           positive 
         />
         <WPWidgetCard 

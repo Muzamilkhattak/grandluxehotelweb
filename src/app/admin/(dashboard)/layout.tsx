@@ -1,5 +1,6 @@
-import AdminSidebar from "@/components/admin/AdminSidebar";
+﻿import AdminSidebar from "@/components/admin/AdminSidebar";
 import Link from "next/link";
+import Image from "next/image";
 import { Montserrat } from "next/font/google";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
@@ -37,8 +38,15 @@ export default async function AdminDashboardLayout({
             <Link 
               href="/" 
               target="_blank"
-              className="hover:text-white hover:bg-[#2c3338] px-2.5 py-1 -ml-2 rounded-sm transition-colors flex items-center gap-1.5 font-medium"
+              className="hover:text-white hover:bg-[#2c3338] px-2.5 py-1 -ml-2 rounded-sm transition-colors flex items-center gap-2 font-medium"
             >
+              <Image 
+                src="/images/logo/signaturearthotellogo.webp" 
+                alt="Signature Art Hotel Logo" 
+                width={24} 
+                height={16} 
+                className="h-4 w-auto object-contain brightness-125" 
+              />
               <span>View Site</span>
               <ExternalLink size={12} className="opacity-70" />
             </Link>
@@ -54,7 +62,7 @@ export default async function AdminDashboardLayout({
             
             <div className="text-white/90 px-3 h-full flex items-center text-[13px] font-medium border-l border-[#2c3338]/60">
               <span className="text-white/50 mr-1.5">Logged in as:</span>
-              <span className="text-[#c5a880] font-semibold">{session.u}</span>
+              <span className="text-[#d7b56d] font-semibold">{session.u}</span>
             </div>
 
             <form action={logoutAdminAction} className="h-full flex items-center">

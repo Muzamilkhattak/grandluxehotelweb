@@ -1,10 +1,11 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { BedDouble, ShowerHead, Sun, Wifi, Search, SlidersHorizontal, Users } from "lucide-react";
+import { Search, SlidersHorizontal, Users } from "lucide-react";
 import BookingModal from "@/components/booking/BookingModal";
+import { getAmenityIcon } from "@/components/ui/AmenityIcon";
 
 export type Room = {
   id: string;
@@ -53,14 +54,14 @@ export default function AccommodationsClient({ initialRooms }: { initialRooms: R
             placeholder="Search suites..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-11 pr-4 py-3 bg-[#FAF5F1] border border-faint rounded-none font-jost text-[16px] text-primary focus:outline-none focus:border-primary transition-colors"
+            className="w-full pl-11 pr-4 py-3 bg-[#FFFFFF] border border-faint rounded-none font-jost text-[16px] text-primary focus:outline-none focus:border-primary transition-colors"
           />
         </div>
 
         {/* Filter Controls */}
         <div className="flex flex-wrap items-center gap-4 w-full md:w-auto">
           {/* Guests Filter */}
-          <div className="flex items-center gap-2 bg-[#FAF5F1] border border-faint px-4 py-3 rounded-none font-jost text-[15px] text-primary">
+          <div className="flex items-center gap-2 bg-[#FFFFFF] border border-faint px-4 py-3 rounded-none font-jost text-[15px] text-primary">
             <Users size={16} className="text-accent" />
             <select
               value={minGuests}
@@ -76,7 +77,7 @@ export default function AccommodationsClient({ initialRooms }: { initialRooms: R
           </div>
 
           {/* Sort By */}
-          <div className="flex items-center gap-2 bg-[#FAF5F1] border border-faint px-4 py-3 rounded-none font-jost text-[15px] text-primary">
+          <div className="flex items-center gap-2 bg-[#FFFFFF] border border-faint px-4 py-3 rounded-none font-jost text-[15px] text-primary">
             <SlidersHorizontal size={16} className="text-accent" />
             <select
               value={sortBy}
@@ -113,20 +114,24 @@ export default function AccommodationsClient({ initialRooms }: { initialRooms: R
                   <div className="w-full h-full bg-[#f0f0f1] flex items-center justify-center text-gray-400 font-jost">No Image</div>
                 )}
                 <div className="absolute top-4 left-4 bg-primary text-white px-3 py-1 font-jost text-[14px]">
-                  {room.bed_type || "Luxury Suite"}
+                  Luxury Suite
                 </div>
               </div>
               <div className="p-[32px] flex flex-col flex-1">
-                <div className="font-jost text-[16px] text-muted mb-2">From ${room.price_per_night} / night • {room.size_sqft || 80} sqm</div>
+                <div className="font-jost text-[16px] text-muted mb-2">From PKR {room.price_per_night} / night</div>
                 <h3 className="font-marcellus text-[32px] text-primary mb-4 leading-[1.3]">{room.title}</h3>
                 <p className="font-jost text-[18px] text-muted mb-8 leading-[1.66] line-clamp-3">
                   {room.description || "Experience refined elegance and modern comfort in our signature luxury suites."}
                 </p>
                 <div className="flex flex-wrap items-center gap-5 text-accent mb-10">
-                  <BedDouble size={24} strokeWidth={1} />
-                  <ShowerHead size={24} strokeWidth={1} />
-                  <Sun size={24} strokeWidth={1} />
-                  <Wifi size={24} strokeWidth={1} />
+                  {room.amenities
+                      ?.filter((a: string) => !a.startsWith("total_rooms:"))
+                      .slice(0, 4)
+                      .map((amenity: string, idx: number) => (
+                        <div key={idx} title={amenity}>
+                          {getAmenityIcon(amenity, 24)}
+                        </div>
+                  ))}
                 </div>
                 <div className="mt-auto flex flex-col gap-4">
                   <button 
@@ -135,7 +140,7 @@ export default function AccommodationsClient({ initialRooms }: { initialRooms: R
                   >
                     Instant Reserve
                   </button>
-                  <Link href={`/rooms/${room.slug || room.id}`} className="w-full bg-[#FAF5F1] text-primary font-jost font-medium text-[16px] h-[56px] rounded-full hover:bg-[#EAEAEA] transition-colors flex items-center justify-center font-jost font-medium text-[16px]">
+                  <Link href={`/rooms/${room.slug || room.id}`} className="w-full bg-[#FFFFFF] text-primary font-jost font-medium text-[16px] h-[56px] rounded-full hover:bg-[#EAEAEA] transition-colors flex items-center justify-center font-jost font-medium text-[16px]">
                     Explore Suite
                   </Link>
                 </div>

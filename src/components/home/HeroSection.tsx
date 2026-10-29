@@ -27,7 +27,7 @@ export default function HeroSection() {
   };
 
   return (
-    <section suppressHydrationWarning className="relative h-[90vh] w-full flex flex-col items-center justify-center overflow-hidden">
+    <section suppressHydrationWarning className="relative h-[85vh] sm:h-[90vh] min-h-[500px] w-full flex flex-col items-center justify-center overflow-hidden">
       <div className="absolute inset-0 z-0 bg-black">
         <video
           autoPlay
@@ -38,22 +38,22 @@ export default function HeroSection() {
           className="w-full h-full object-cover"
           src="/for-website.webm"
         />
-        {/* Subtle black gradient fade with low opacity */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/20 to-black/10 z-10"></div>
+        {/* Full-coverage cinematic black fade overlay across the entire hero video */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/45 to-black/70 z-10 pointer-events-none" />
       </div>
 
       {/* Hero Content */}
       <motion.div
-        className="relative z-10 flex flex-col items-center text-center px-4 mt-20 max-w-5xl"
+        className="relative z-10 flex flex-col items-center text-center px-4 mt-12 sm:mt-16 md:mt-20 max-w-5xl"
         variants={containerVariants}
         initial="hidden"
         animate="visible"
       >
         <motion.h1
           variants={itemVariants}
-          className="font-marcellus text-[50px] md:text-[88px] text-white font-light leading-[1.1] md:leading-[0.95]"
+          className="font-marcellus text-4xl sm:text-5xl md:text-[76px] lg:text-[88px] text-white font-light leading-[1.1] md:leading-[0.95]"
         >
-          The Art Of <br className="hidden md:block" /> Elite Hospitality
+          A Signature OF <br className="hidden md:block" /> Luxury Living
         </motion.h1>
       </motion.div>
     </section>

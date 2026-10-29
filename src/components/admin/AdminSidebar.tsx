@@ -1,8 +1,8 @@
-"use client";
+﻿"use client";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, CalendarDays, KeySquare, PlusCircle, Users, Settings, LogOut, UserCircle, ImageIcon } from "lucide-react";
-
+import { LayoutDashboard, CalendarDays, KeySquare, PlusCircle, Users, Settings, LogOut, UserCircle, ImageIcon, UtensilsCrossed } from "lucide-react";
 import { logoutAdminAction } from "@/app/actions/admin-auth";
 
 export default function AdminSidebar() {
@@ -13,6 +13,7 @@ export default function AdminSidebar() {
     { href: "/admin/bookings", icon: <CalendarDays size={18} />, label: "Reservations" },
     { href: "/admin/rooms", icon: <KeySquare size={18} />, label: "Accommodations", exact: true },
     { href: "/admin/rooms/new", icon: <PlusCircle size={18} />, label: "Add New Room" },
+    { href: "/admin/restaurant", icon: <UtensilsCrossed size={18} />, label: "Restaurant & Menu" },
     { href: "/admin/gallery", icon: <ImageIcon size={18} />, label: "Gallery" },
     { href: "/admin/guests", icon: <Users size={18} />, label: "Guests" },
     { href: "/admin/settings", icon: <Settings size={18} />, label: "Settings" },
@@ -20,23 +21,29 @@ export default function AdminSidebar() {
 
   return (
     <aside className="w-[200px] md:w-[240px] bg-[#1d2327] text-[#f0f0f1] flex flex-col z-20 shrink-0 select-none">
-      <div className="p-4 flex items-center gap-3 bg-[#1d2327] border-b border-[#2c3338]/40">
-        <div className="w-8 h-8 bg-gradient-to-br from-[#c5a880] to-[#997a4d] rounded flex items-center justify-center text-[#111] font-bold text-base shadow-sm">
-          Ø
-        </div>
-        <div>
-          <h2 className="font-semibold text-[14px] tracking-wide text-white leading-tight">Oslo Elite</h2>
-          <span className="text-[11px] text-[#c5a880] font-medium">Hotel Management</span>
-        </div>
+      <div className="px-3 sm:px-4 py-5 bg-[#181d20] border-b border-[#2c3338]/60 flex flex-col items-center text-center">
+        <Link href="/admin" className="flex flex-col items-center gap-1.5 group py-1" aria-label="Signature Art Hotel Admin">
+          <Image
+            src="/images/logo/signaturearthotellogo.webp"
+            alt="Signature Art Hotel"
+            width={220}
+            height={130}
+            priority
+            className="h-20 md:h-24 w-auto object-contain transition-transform group-hover:scale-105 duration-200 drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)]"
+          />
+          <span className="text-[10.5px] tracking-[0.24em] uppercase font-semibold text-[#d7b56d]/90 mt-1">
+            Management Portal
+          </span>
+        </Link>
       </div>
       
       <nav className="flex-1 py-3 flex flex-col gap-0.5 overflow-y-auto">
-        {navItems.map((item, idx) => {
+        {navItems.map((item) => {
           const isActive = item.exact ? pathname === item.href : pathname?.startsWith(item.href);
           
           return (
             <div key={item.href}>
-              {idx === 6 && <div className="my-2 border-t border-[#2c3338]/60" />}
+              {item.href === "/admin/gallery" && <div className="my-2 border-t border-[#2c3338]/60" />}
               <Link 
                 href={item.href} 
                 className={`flex items-center gap-3 px-4 py-2.5 text-[14px] transition-colors relative ${isActive ? 'bg-[#2271b1] text-white font-semibold' : 'text-[#a7aaad] hover:text-[#72aee6] hover:bg-[#2c3338] font-medium'}`}
@@ -44,7 +51,7 @@ export default function AdminSidebar() {
                 <div className={`${isActive ? 'text-white' : 'text-[#a7aaad] group-hover:text-[#72aee6]'}`}>
                   {item.icon}
                 </div>
-                <span>{item.label}</span>
+                <span className="flex-1">{item.label}</span>
               </Link>
             </div>
           );
@@ -53,7 +60,7 @@ export default function AdminSidebar() {
 
       <div className="p-3.5 bg-[#171c1f] border-t border-[#2c3338] flex items-center justify-between">
         <div className="flex items-center gap-2.5 min-w-0">
-          <div className="w-7 h-7 rounded-full bg-[#2c3338] flex items-center justify-center text-[#c5a880] border border-[#c5a880]/30 shrink-0">
+          <div className="w-7 h-7 rounded-full bg-[#2c3338] flex items-center justify-center text-[#d7b56d] border border-[#d7b56d]/30 shrink-0">
             <UserCircle size={18} strokeWidth={1.8} />
           </div>
           <div className="flex flex-col min-w-0 truncate">

@@ -1,4 +1,4 @@
-import { createClient } from "@/utils/supabase/server";
+﻿import { createClient } from "@/utils/supabase/server";
 import { cookies } from "next/headers";
 import RecentBookingsTable from "@/components/admin/RecentBookingsTable";
 
@@ -20,7 +20,7 @@ export default async function BookingsPage() {
 
   return (
     <div>
-      <h1 className="font-marcellus text-[44px] text-[#362618] mb-8">All Reservations</h1>
+      <h1 className="font-marcellus text-[44px] text-[#000000] mb-8">All Reservations</h1>
       <RecentBookingsTable initialBookings={bookings || []} />
     </div>
   );

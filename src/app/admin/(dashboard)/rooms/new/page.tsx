@@ -12,26 +12,31 @@ export default function NewRoomPage() {
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
   
-  // Image upload handling
-  const [files, setFiles] = useState<File[]>([]);
-  const [previews, setPreviews] = useState<string[]>([]);
+  const [featuredFile, setFeaturedFile] = useState<File | null>(null);
+  const [featuredPreview, setFeaturedPreview] = useState<string | null>(null);
 
-  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      const selectedFiles = Array.from(e.target.files);
-      const newFiles = [...files, ...selectedFiles];
-      setFiles(newFiles);
+  const [galleryFiles, setGalleryFiles] = useState<File[]>([]);
+  const [galleryPreviews, setGalleryPreviews] = useState<string[]>([]);
 
-      const newPreviews = selectedFiles.map(file => URL.createObjectURL(file));
-      setPreviews([...previews, ...newPreviews]);
+  const handleFeaturedSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setFeaturedFile(file);
+      setFeaturedPreview(URL.createObjectURL(file));
     }
   };
 
-  const handleRemoveImage = (index: number) => {
-    const updatedFiles = files.filter((_, i) => i !== index);
-    const updatedPreviews = previews.filter((_, i) => i !== index);
-    setFiles(updatedFiles);
-    setPreviews(updatedPreviews);
+  const handleGallerySelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const selectedFiles = Array.from(e.target.files);
+      setGalleryFiles([...galleryFiles, ...selectedFiles]);
+      setGalleryPreviews([...galleryPreviews, ...selectedFiles.map(f => URL.createObjectURL(f))]);
+    }
+  };
+
+  const handleRemoveGalleryImage = (index: number) => {
+    setGalleryFiles(galleryFiles.filter((_, i) => i !== index));
+    setGalleryPreviews(galleryPreviews.filter((_, i) => i !== index));
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -44,38 +49,52 @@ export default function NewRoomPage() {
     let imageUrls: string[] = [];
     
     try {
-      // First, ensure the bucket exists (in case it wasn't created yet)
-      const { data: buckets } = await supabase.storage.listBuckets();
-      if (!buckets?.find(b => b.name === 'room-images')) {
-        await supabase.storage.createBucket('room-images', { public: true });
+      // Safely ensure bucket exists (if client has permissions; otherwise created via SQL)
+      try {
+        const { data: buckets } = await supabase.storage.listBuckets();
+        if (buckets && !buckets.find(b => b.name === 'room-images')) {
+          await supabase.storage.createBucket('room-images', { public: true });
+        }
+      } catch (bucketErr) {
+        // Ignored: bucket is provisioned via Supabase SQL setup
       }
 
-      // Upload each file and collect URLs
-      for (const file of files) {
+      // Upload Featured Image
+      let featuredUrl = "";
+      if (featuredFile) {
+        const fileExt = featuredFile.name.split('.').pop();
+        const fileName = `${Date.now()}-feat-${Math.random().toString(36).substring(7)}.${fileExt}`;
+        const { data, error } = await supabase.storage.from('room-images').upload(fileName, featuredFile);
+        if (error) throw new Error("Failed to upload featured image");
+        if (data) {
+          const { data: publicUrlData } = supabase.storage.from('room-images').getPublicUrl(data.path);
+          featuredUrl = publicUrlData.publicUrl;
+        }
+      }
+
+      // Upload Gallery Images
+      let galleryUrls: string[] = [];
+      for (const file of galleryFiles) {
         if (file.size > 0) {
           const fileExt = file.name.split('.').pop();
-          const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
-          const { data, error } = await supabase.storage
-            .from('room-images')
-            .upload(fileName, file);
+          const fileName = `${Date.now()}-gal-${Math.random().toString(36).substring(7)}.${fileExt}`;
+          const { data, error } = await supabase.storage.from('room-images').upload(fileName, file);
           
-          if (error) {
-            console.error("Upload error:", error);
-            throw new Error(`Failed to upload image: ${file.name}`);
-          }
+          if (error) throw new Error(`Failed to upload gallery image: ${file.name}`);
           
           if (data) {
-            const { data: publicUrlData } = supabase.storage
-              .from('room-images')
-              .getPublicUrl(data.path);
-            imageUrls.push(publicUrlData.publicUrl);
+            const { data: publicUrlData } = supabase.storage.from('room-images').getPublicUrl(data.path);
+            galleryUrls.push(publicUrlData.publicUrl);
           }
         }
       }
       
+      const combinedUrls = featuredUrl ? [featuredUrl, ...galleryUrls] : galleryUrls;
+      
       // Clear out default file input entry and append imageUrls JSON string
       formData.delete("images");
-      formData.append("imageUrls", JSON.stringify(imageUrls));
+      formData.delete("featured");
+      formData.append("imageUrls", JSON.stringify(combinedUrls));
 
       const res = await createRoomAction(formData);
 
@@ -149,13 +168,13 @@ export default function NewRoomPage() {
             </div>
             <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="flex flex-col gap-1.5">
-                <label className="text-[13px] font-semibold text-[#1d2327]">Nightly Rate ($)</label>
+                <label className="text-[13px] font-semibold text-[#1d2327]">Nightly Rate (PKR)</label>
                 <input 
                   name="price_per_night" 
                   type="number" 
                   required 
                   min={0}
-                  placeholder="e.g. 850"
+                  placeholder="e.g. 15000"
                   className="w-full bg-white border border-[#8c8f94] rounded-[3px] px-3 py-1.5 text-[13px] text-[#3c434a] focus:outline-none focus:border-[#2271b1] focus:ring-1 focus:ring-[#2271b1]"
                 />
               </div>
@@ -168,31 +187,6 @@ export default function NewRoomPage() {
                   required 
                   min={1}
                   defaultValue={2}
-                  className="w-full bg-white border border-[#8c8f94] rounded-[3px] px-3 py-1.5 text-[13px] text-[#3c434a] focus:outline-none focus:border-[#2271b1] focus:ring-1 focus:ring-[#2271b1]"
-                />
-              </div>
-
-              <div className="flex flex-col gap-1.5">
-                <label className="text-[13px] font-semibold text-[#1d2327]">Bed Configuration</label>
-                <select 
-                  name="bed_type"
-                  className="w-full bg-white border border-[#8c8f94] rounded-[3px] px-3 py-1.5 text-[13px] text-[#3c434a] focus:outline-none focus:border-[#2271b1] focus:ring-1 focus:ring-[#2271b1]"
-                >
-                  <option value="King">King Size Bed</option>
-                  <option value="Queen">Queen Size Bed</option>
-                  <option value="Twin">Twin Beds</option>
-                  <option value="Double">Double Bed</option>
-                </select>
-              </div>
-
-              <div className="flex flex-col gap-1.5">
-                <label className="text-[13px] font-semibold text-[#1d2327]">Floor Area (sqft)</label>
-                <input 
-                  name="size_sqft" 
-                  type="number" 
-                  required 
-                  min={1}
-                  placeholder="e.g. 750"
                   className="w-full bg-white border border-[#8c8f94] rounded-[3px] px-3 py-1.5 text-[13px] text-[#3c434a] focus:outline-none focus:border-[#2271b1] focus:ring-1 focus:ring-[#2271b1]"
                 />
               </div>
@@ -263,34 +257,73 @@ export default function NewRoomPage() {
             </div>
           </div>
 
+          {/* Featured Image Metabox */}
+          <div className="bg-white border border-[#c3c4c7] shadow-sm rounded-sm overflow-hidden">
+            <div className="bg-[#f6f7f7] border-b border-[#c3c4c7] px-3 py-2 text-[14px] font-semibold text-[#1d2327]">
+              Featured Image
+            </div>
+            <div className="p-3 space-y-3">
+              {featuredPreview && (
+                <div className="relative aspect-video rounded-[3px] overflow-hidden border border-gray-300 bg-white">
+                  <img src={featuredPreview} alt="Featured Preview" className="w-full h-full object-cover" />
+                  <span className="absolute top-2 left-2 bg-[#2271b1] text-white text-[10px] px-2 py-0.5 rounded font-medium flex items-center gap-1 shadow-sm">
+                    <Star size={12} className="fill-white" /> Featured
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => { setFeaturedFile(null); setFeaturedPreview(null); }}
+                    className="absolute top-2 right-2 bg-red-600 hover:bg-red-700 text-white p-1.5 rounded transition-colors shadow-md"
+                    title="Remove Image"
+                  >
+                    <Trash2 size={14} />
+                  </button>
+                </div>
+              )}
+              
+              {!featuredPreview && (
+                <div className="border-2 border-dashed border-[#8c8f94] bg-[#f6f7f7] p-4 text-center rounded-[3px] relative overflow-hidden group hover:bg-[#f0f0f1] hover:border-[#2271b1] transition-colors cursor-pointer">
+                  <input 
+                    name="featured"
+                    type="file" 
+                    accept="image/*"
+                    onChange={handleFeaturedSelect}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                    required
+                  />
+                  <div className="flex flex-col items-center justify-center gap-1.5">
+                    <ImagePlus size={24} className="text-[#2271b1]" />
+                    <span className="text-[13px] text-[#2271b1] font-medium underline">
+                      Set Featured Image
+                    </span>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
           {/* Room Gallery / Images Metabox */}
           <div className="bg-white border border-[#c3c4c7] shadow-sm rounded-sm overflow-hidden">
             <div className="bg-[#f6f7f7] border-b border-[#c3c4c7] px-3 py-2 text-[14px] font-semibold text-[#1d2327] flex justify-between items-center">
-              <span>Room Images & Gallery</span>
+              <span>Room Gallery</span>
               <span className="text-[11px] font-normal bg-[#2271b1] text-white px-2 py-0.5 rounded-full">
-                {files.length} {files.length === 1 ? 'image' : 'images'}
+                {galleryFiles.length} {galleryFiles.length === 1 ? 'image' : 'images'}
               </span>
             </div>
             
             <div className="p-3 space-y-3">
               {/* Image Preview Grid */}
-              {previews.length > 0 && (
+              {galleryPreviews.length > 0 && (
                 <div className="grid grid-cols-2 gap-2 max-h-[320px] overflow-y-auto p-1 border border-[#c3c4c7] rounded-[3px] bg-gray-50">
-                  {previews.map((src, index) => (
+                  {galleryPreviews.map((src, index) => (
                     <div key={index} className="relative group aspect-square rounded-[3px] overflow-hidden border border-gray-300 bg-white">
                       <img 
                         src={src} 
-                        alt={`Preview ${index + 1}`} 
+                        alt={`Gallery ${index + 1}`} 
                         className="w-full h-full object-cover"
                       />
-                      {index === 0 && (
-                        <span className="absolute top-1 left-1 bg-[#2271b1] text-white text-[9px] px-1.5 py-0.5 rounded font-medium flex items-center gap-0.5 shadow-sm">
-                          <Star size={10} className="fill-white" /> Featured
-                        </span>
-                      )}
                       <button
                         type="button"
-                        onClick={() => handleRemoveImage(index)}
+                        onClick={() => handleRemoveGalleryImage(index)}
                         className="absolute top-1 right-1 bg-red-600 hover:bg-red-700 text-white p-1 rounded transition-colors opacity-90 group-hover:opacity-100 shadow-md"
                         title="Remove Image"
                       >
@@ -307,16 +340,13 @@ export default function NewRoomPage() {
                   type="file" 
                   accept="image/*"
                   multiple
-                  onChange={handleImageSelect}
+                  onChange={handleGallerySelect}
                   className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                 />
                 <div className="flex flex-col items-center justify-center gap-1.5">
                   <ImagePlus size={24} className="text-[#2271b1]" />
                   <span className="text-[13px] text-[#2271b1] font-medium underline">
-                    {previews.length === 0 ? "Upload Room Images" : "Add More Images"}
-                  </span>
-                  <span className="text-[11px] text-[#646970]">
-                    PNG, JPG, WEBP (Multiple allowed)
+                    {galleryPreviews.length === 0 ? "Upload Gallery Images" : "Add More Images"}
                   </span>
                 </div>
               </div>

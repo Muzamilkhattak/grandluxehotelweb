@@ -1,14 +1,14 @@
 @import "tailwindcss";
 
 :root {
-  --color-primary: #362618;
-  --color-accent: #C97A4F;
+  --color-primary: #000000;
+  --color-accent: #d7b56d;
   --color-canvas: #FFFFFF;
-  --color-surface-alt: #442D1D;
-  --color-body: #333333;
+  --color-surface-alt: #0a0a0a;
+  --color-body: #111111;
   --color-muted: #555E63;
   --color-faint: #EAEAEA;
-  --color-link: #69727D;
+  --color-link: #d7b56d;
 }
 
 @theme inline {
@@ -30,4 +30,31 @@ body {
   background: var(--color-canvas);
   color: var(--color-body);
   font-family: var(--font-jost), sans-serif;
+}
+
+/* Elegant refined scrollbars */
+.custom-scroll::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+.custom-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scroll::-webkit-scrollbar-thumb {
+  background: rgba(215, 181, 109, 0.35);
+  border-radius: 9999px;
+}
+.custom-scroll::-webkit-scrollbar-thumb:hover {
+  background: #d7b56d;
+}
+
+/* Progressive Text Fill on Scroll */
+.reveal-text {
+  background: linear-gradient(to right, #000000 50%, #d1d5db 50%);
+  background-size: 200% 100%;
+  background-position: 100% 0%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  display: inline;
 }

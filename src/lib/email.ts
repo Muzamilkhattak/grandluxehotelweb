@@ -1,4 +1,4 @@
-import { Resend } from 'resend';
+﻿import { Resend } from 'resend';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -32,25 +32,25 @@ export async function sendGuestConfirmation(data: BookingEmailData) {
     <html>
     <head>
       <meta charset="utf-8">
-      <title>Reservation Confirmed - Oslo Elite Hotel</title>
+      <title>Reservation Confirmed - Signature Art Hotel</title>
     </head>
     <body style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #F7F5F0; margin: 0; padding: 30px 15px; color: #2E2620;">
-      <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; background-color: #FFFFFF; border: 1px solid #E5DFD5; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+      <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; background-color: #FFFFFF; border: 1px solid #d7b56d; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
         
         <!-- Header Banner -->
         <tr>
-          <td style="background-color: #24180E; padding: 35px 30px; text-align: center; border-bottom: 3px solid #C97A4F;">
-            <h1 style="color: #FFFFFF; font-size: 26px; font-weight: 300; letter-spacing: 5px; margin: 0; text-transform: uppercase;">Grand Luxe</h1>
-            <p style="color: #C97A4F; font-size: 11px; letter-spacing: 3px; text-transform: uppercase; margin: 8px 0 0 0;">Oslo Elite Hotel & Suites</p>
+          <td style="background-color: #000000; padding: 35px 30px; text-align: center; border-bottom: 3px solid #d7b56d;">
+            <h1 style="color: #FFFFFF; font-size: 26px; font-weight: 300; letter-spacing: 5px; margin: 0; text-transform: uppercase;">Signature</h1>
+            <p style="color: #d7b56d; font-size: 11px; letter-spacing: 3px; text-transform: uppercase; margin: 8px 0 0 0;">Signature Art Hotel</p>
           </td>
         </tr>
 
         <!-- Greeting & Confirmation -->
         <tr>
           <td style="padding: 35px 30px 20px 30px;">
-            <p style="font-size: 16px; margin: 0 0 15px 0; color: #24180E;">Dear <strong>${data.guestName}</strong>,</p>
+            <p style="font-size: 16px; margin: 0 0 15px 0; color: #000000;">Dear <strong>${data.guestName}</strong>,</p>
             <p style="font-size: 14.5px; line-height: 1.6; color: #4A4036; margin: 0 0 20px 0;">
-              Thank you for choosing Oslo Elite. Your luxury reservation has been confirmed and registered in our guest directory. We look forward to welcoming you.
+              Thank you for choosing Signature Art Hotel. Your luxury reservation has been confirmed and registered in our guest directory. We look forward to welcoming you.
             </p>
           </td>
         </tr>
@@ -58,44 +58,44 @@ export async function sendGuestConfirmation(data: BookingEmailData) {
         <!-- Booking Details Card -->
         <tr>
           <td style="padding: 0 30px 30px 30px;">
-            <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #FAF8F5; border: 1px solid #E5DFD5; border-left: 4px solid #C97A4F;">
+            <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #FFFFFF; border: 1px solid #d7b56d; border-left: 4px solid #d7b56d;">
               <tr>
                 <td style="padding: 20px;">
-                  <h3 style="margin: 0 0 15px 0; font-size: 16px; text-transform: uppercase; letter-spacing: 1.5px; color: #24180E;">Reservation Folio</h3>
+                  <h3 style="margin: 0 0 15px 0; font-size: 16px; text-transform: uppercase; letter-spacing: 1.5px; color: #000000;">Reservation Folio</h3>
                   
-                  <table width="100%" cellpadding="6" cellspacing="0" style="font-size: 13.5px; color: #362618;">
+                  <table width="100%" cellpadding="6" cellspacing="0" style="font-size: 13.5px; color: #000000;">
                     <tr>
-                      <td style="width: 40%; color: #73695F; border-bottom: 1px solid #EFEAE3;"><strong>Confirmation ID:</strong></td>
-                      <td style="border-bottom: 1px solid #EFEAE3; font-family: monospace; font-size: 14px; font-weight: bold; color: #24180E;">${data.bookingId}</td>
+                      <td style="width: 40%; color: #000000; border-bottom: 1px solid #FFFFFF;"><strong>Confirmation ID:</strong></td>
+                      <td style="border-bottom: 1px solid #FFFFFF; font-family: monospace; font-size: 14px; font-weight: bold; color: #000000;">${data.bookingId}</td>
                     </tr>
                     <tr>
-                      <td style="color: #73695F; border-bottom: 1px solid #EFEAE3;"><strong>Suite / Accommodation:</strong></td>
-                      <td style="border-bottom: 1px solid #EFEAE3; font-weight: bold; color: #24180E;">${data.roomName}</td>
+                      <td style="color: #000000; border-bottom: 1px solid #FFFFFF;"><strong>Suite / Accommodation:</strong></td>
+                      <td style="border-bottom: 1px solid #FFFFFF; font-weight: bold; color: #000000;">${data.roomName}</td>
                     </tr>
                     <tr>
-                      <td style="color: #73695F; border-bottom: 1px solid #EFEAE3;"><strong>Check-In Date:</strong></td>
-                      <td style="border-bottom: 1px solid #EFEAE3;">${data.checkIn} <span style="color: #8C827A; font-size: 12px;">(From 3:00 PM)</span></td>
+                      <td style="color: #000000; border-bottom: 1px solid #FFFFFF;"><strong>Check-In Date:</strong></td>
+                      <td style="border-bottom: 1px solid #FFFFFF;">${data.checkIn} <span style="color: #000000; font-size: 12px;">(From 3:00 PM)</span></td>
                     </tr>
                     <tr>
-                      <td style="color: #73695F; border-bottom: 1px solid #EFEAE3;"><strong>Check-Out Date:</strong></td>
-                      <td style="border-bottom: 1px solid #EFEAE3;">${data.checkOut} <span style="color: #8C827A; font-size: 12px;">(Until 11:00 AM)</span></td>
+                      <td style="color: #000000; border-bottom: 1px solid #FFFFFF;"><strong>Check-Out Date:</strong></td>
+                      <td style="border-bottom: 1px solid #FFFFFF;">${data.checkOut} <span style="color: #000000; font-size: 12px;">(Until 11:00 AM)</span></td>
                     </tr>
                     <tr>
-                      <td style="color: #73695F; border-bottom: 1px solid #EFEAE3;"><strong>Contact Phone:</strong></td>
-                      <td style="border-bottom: 1px solid #EFEAE3;">${data.guestPhone}</td>
+                      <td style="color: #000000; border-bottom: 1px solid #FFFFFF;"><strong>Contact Phone:</strong></td>
+                      <td style="border-bottom: 1px solid #FFFFFF;">${data.guestPhone}</td>
                     </tr>
                     <tr>
-                      <td style="color: #73695F; border-bottom: 1px solid #EFEAE3;"><strong>Payment Status:</strong></td>
-                      <td style="border-bottom: 1px solid #EFEAE3; color: #008060; font-weight: bold;">Pay upon Arrival</td>
+                      <td style="color: #000000; border-bottom: 1px solid #FFFFFF;"><strong>Payment Status:</strong></td>
+                      <td style="border-bottom: 1px solid #FFFFFF; color: #008060; font-weight: bold;">Pay upon Arrival</td>
                     </tr>
                     <tr>
-                      <td style="color: #73695F; padding-top: 12px;"><strong>Total Amount:</strong></td>
-                      <td style="padding-top: 12px; font-size: 18px; font-weight: bold; color: #C97A4F;">$${data.totalAmount.toLocaleString()}</td>
+                      <td style="color: #000000; padding-top: 12px;"><strong>Total Amount:</strong></td>
+                      <td style="padding-top: 12px; font-size: 18px; font-weight: bold; color: #d7b56d;">$${data.totalAmount.toLocaleString()}</td>
                     </tr>
                   </table>
 
                   ${data.notes ? `
-                    <div style="margin-top: 15px; padding-top: 12px; border-top: 1px dashed #E5DFD5; font-size: 12.5px; color: #73695F;">
+                    <div style="margin-top: 15px; padding-top: 12px; border-top: 1px dashed #d7b56d; font-size: 12.5px; color: #000000;">
                       <strong>Special Request:</strong> "${data.notes}"
                     </div>
                   ` : ''}
@@ -108,21 +108,21 @@ export async function sendGuestConfirmation(data: BookingEmailData) {
         <!-- Included Hotel Amenities -->
         <tr>
           <td style="padding: 0 30px 25px 30px; font-size: 13px; color: #594F45; line-height: 1.5;">
-            <p style="margin: 0 0 8px 0; font-weight: bold; color: #24180E;">Your Stay Includes:</p>
-            <ul style="margin: 0; padding-left: 20px; color: #66584B;">
+            <p style="margin: 0 0 8px 0; font-weight: bold; color: #000000;">Your Stay Includes:</p>
+            <ul style="margin: 0; padding-left: 20px; color: #000000;">
               <li>Complimentary High-Speed Wi-Fi & Valet Parking</li>
               <li>Signature Welcome Beverage upon arrival</li>
-              <li>Access to Oslo Elite Spa & Wellness Centre</li>
+              <li>Access to Signature Spa & Wellness Centre</li>
             </ul>
           </td>
         </tr>
 
         <!-- Concierge Contact & Address -->
         <tr>
-          <td style="background-color: #FAF8F5; padding: 25px 30px; border-top: 1px solid #E5DFD5; font-size: 12.5px; color: #73695F; text-align: center; line-height: 1.6;">
-            <strong style="color: #24180E;">Oslo Elite Hotel & Spa</strong><br>
-            Karl Johans gate 37, 0162 Oslo, Norway<br>
-            Direct Concierge: <a href="tel:+4722000000" style="color: #C97A4F; text-decoration: none;">+47 22 00 00 00</a> &bull; Email: <a href="mailto:concierge@grandluxe.com" style="color: #C97A4F; text-decoration: none;">concierge@grandluxe.com</a>
+          <td style="background-color: #FFFFFF; padding: 25px 30px; border-top: 1px solid #d7b56d; font-size: 12.5px; color: #000000; text-align: center; line-height: 1.6;">
+            <strong style="color: #000000;">Signature Art Hotel</strong><br>
+            F-8, Islamabad, Pakistan<br>
+            Direct Concierge: <a href="tel:+4722000000" style="color: #d7b56d; text-decoration: none;">+47 22 00 00 00</a> &bull; Email: <a href="mailto:concierge@grandluxe.com" style="color: #d7b56d; text-decoration: none;">concierge@grandluxe.com</a>
           </td>
         </tr>
 
@@ -133,9 +133,9 @@ export async function sendGuestConfirmation(data: BookingEmailData) {
 
   try {
     const result = await resend.emails.send({
-      from: `Oslo Elite Hotel <${FROM_EMAIL}>`,
+      from: `Signature Art Hotel <${FROM_EMAIL}>`,
       to: recipient,
-      subject: `Reservation Confirmed: ${data.roomName} - Oslo Elite (${data.bookingId.slice(0, 8)})`,
+      subject: `Reservation Confirmed: ${data.roomName} - Signature Art Hotel (${data.bookingId.slice(0, 8)})`,
       html,
     });
 
@@ -146,7 +146,7 @@ export async function sendGuestConfirmation(data: BookingEmailData) {
       if (result.error.message?.includes("only send testing emails") || (result.error as any).statusCode === 403) {
         console.log(`[Resend Sandbox Notice]: Forwarding guest confirmation to registered Resend account email: ${ADMIN_EMAIL}`);
         const fallbackResult = await resend.emails.send({
-          from: `Oslo Elite Hotel <${FROM_EMAIL}>`,
+          from: `Signature Art Hotel <${FROM_EMAIL}>`,
           to: ADMIN_EMAIL,
           subject: `[Test Mode - Guest Folio: ${recipient}] Reservation Confirmed: ${data.roomName} (${data.bookingId.slice(0, 8)})`,
           html: `
@@ -181,7 +181,7 @@ export async function sendAdminAlert(data: BookingEmailData) {
 
   const html = `
     <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: 0 auto; border: 1px solid #ddd; padding: 20px;">
-      <h2 style="color: #C97A4F; border-bottom: 1px solid #ddd; padding-bottom: 10px; margin-top: 0;">New Reservation Received</h2>
+      <h2 style="color: #d7b56d; border-bottom: 1px solid #ddd; padding-bottom: 10px; margin-top: 0;">New Reservation Received</h2>
       <p>A new reservation has been placed by <strong>${data.guestName}</strong>.</p>
       <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 14px;">
         <tr><td style="padding: 10px; border-bottom: 1px solid #eee; width: 35%;"><strong>Confirmation ID:</strong></td><td style="padding: 10px; border-bottom: 1px solid #eee;">${data.bookingId}</td></tr>
@@ -191,17 +191,17 @@ export async function sendAdminAlert(data: BookingEmailData) {
         <tr><td style="padding: 10px; border-bottom: 1px solid #eee;"><strong>Suite:</strong></td><td style="padding: 10px; border-bottom: 1px solid #eee;">${data.roomName}</td></tr>
         <tr><td style="padding: 10px; border-bottom: 1px solid #eee;"><strong>Check-In:</strong></td><td style="padding: 10px; border-bottom: 1px solid #eee;">${data.checkIn}</td></tr>
         <tr><td style="padding: 10px; border-bottom: 1px solid #eee;"><strong>Check-Out:</strong></td><td style="padding: 10px; border-bottom: 1px solid #eee;">${data.checkOut}</td></tr>
-        <tr><td style="padding: 10px; border-bottom: 1px solid #eee;"><strong>Total Revenue:</strong></td><td style="padding: 10px; border-bottom: 1px solid #eee; font-weight: bold; color: #C97A4F;">$${data.totalAmount.toLocaleString()}</td></tr>
+        <tr><td style="padding: 10px; border-bottom: 1px solid #eee;"><strong>Total Revenue:</strong></td><td style="padding: 10px; border-bottom: 1px solid #eee; font-weight: bold; color: #d7b56d;">$${data.totalAmount.toLocaleString()}</td></tr>
       </table>
       <div style="text-align: center; margin-top: 25px;">
-        <a href="https://osloelitehotel.com/admin/bookings" style="display: inline-block; padding: 12px 24px; background-color: #24180E; color: #ffffff; text-decoration: none; border-radius: 2px; font-weight: bold;">View Reservation in Admin Dashboard</a>
+        <a href="https://osloelitehotel.com/admin/bookings" style="display: inline-block; padding: 12px 24px; background-color: #000000; color: #ffffff; text-decoration: none; border-radius: 2px; font-weight: bold;">View Reservation in Admin Dashboard</a>
       </div>
     </div>
   `;
 
   try {
     const result = await resend.emails.send({
-      from: `Oslo Elite System <${FROM_EMAIL}>`,
+      from: `Signature Art Hotel System <${FROM_EMAIL}>`,
       to: ADMIN_EMAIL,
       subject: `[New Reservation] ${data.roomName} - ${data.guestName}`,
       html,

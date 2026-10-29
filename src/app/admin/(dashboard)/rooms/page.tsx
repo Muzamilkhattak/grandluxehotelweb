@@ -1,12 +1,18 @@
-import { createClient } from "@/utils/supabase/server";
-import { cookies } from "next/headers";
-import Image from "next/image";
-import Link from "next/link";
-import { getRoomTotalCount } from "@/utils/room-inventory";
+﻿import Link from "next/link";
+import { Plus } from "lucide-react";
+import RoomsListClient from "@/components/admin/RoomsListClient";
+
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export default async function RoomsAdminPage() {
-  const cookieStore = await cookies();
-  const supabase = await createClient(cookieStore);
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!;
+  
+  const { createClient: createSupabaseClient } = await import('@supabase/supabase-js');
+  const supabase = createSupabaseClient(supabaseUrl, serviceKey, {
+    auth: { persistSession: false }
+  });
 
   const { data: rooms, error } = await supabase
     .from("rooms")
@@ -14,61 +20,33 @@ export default async function RoomsAdminPage() {
     .order("created_at", { ascending: false });
 
   if (error) {
-    return <div className="text-red-500 font-jost">Failed to load rooms: {error.message}</div>;
+    return (
+      <div className="p-6 bg-red-50 border border-red-200 text-red-700 font-jost rounded-md">
+        Failed to load rooms: {error.message}
+      </div>
+    );
   }
 
   return (
-    <div>
-      <div className="flex justify-between items-center mb-8">
+    <div className="max-w-7xl mx-auto">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
         <div>
-          <h1 className="font-marcellus text-[44px] text-[#362618]">Accommodations & Rooms</h1>
-          <p className="font-jost text-sm text-[#555E63]">Manage physical room inventory and suite pricing.</p>
+          <h1 className="font-marcellus text-[36px] sm:text-[44px] text-[#000000] leading-tight">
+            Accommodations & Rooms
+          </h1>
+          <p className="font-jost text-sm text-[#555E63]">
+            Manage physical room inventory, suite amenities, and nightly pricing.
+          </p>
         </div>
-        <Link href="/admin/rooms/new" className="bg-[#362618] text-white font-jost font-medium text-[16px] px-[30px] py-[15px] rounded-full hover:bg-[#323232] transition-colors shadow-sm">
-          Add New Room
+        <Link 
+          href="/admin/rooms/new" 
+          className="inline-flex items-center gap-2 bg-[#000000] text-white font-jost font-medium text-[15px] sm:text-[16px] px-6 sm:px-[30px] py-3 sm:py-[15px] rounded-full hover:bg-[#d7b56d] transition-all shadow-sm active:scale-95"
+        >
+          <Plus size={18} /> Add New Room
         </Link>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[24px]">
-        {rooms?.map((room) => {
-          const totalQty = getRoomTotalCount(room);
-
-          return (
-            <div key={room.id} className="flex flex-col bg-white border border-[#EAEAEA] rounded-none overflow-hidden shadow-sm">
-              <div className="relative h-[200px] w-full">
-                <Image 
-                  src={room.image_url || "https://images.unsplash.com/photo-1611892440504-42a792e24d32?q=80&w=800&auto=format&fit=crop"} 
-                  alt={room.title}
-                  fill
-                  className="object-cover"
-                />
-                <div className="absolute top-3 right-3 bg-[#362618] text-white text-[12px] font-jost px-3 py-1 font-medium shadow-md">
-                  Inventory: {totalQty} {totalQty === 1 ? 'Room' : 'Rooms'}
-                </div>
-              </div>
-              <div className="p-[24px] flex flex-col flex-1">
-                <h3 className="font-marcellus text-[24px] text-[#362618] mb-2">{room.title}</h3>
-                <div className="font-jost text-[14px] text-[#555E63] mb-4 space-y-1">
-                  <div>${room.price_per_night} / night</div>
-                  <div>Up to {room.capacity} Guests • {room.bed_type} Bed</div>
-                </div>
-                <div className="mt-auto pt-4 border-t border-[#EAEAEA] flex justify-between items-center">
-                  <span className="text-[12px] uppercase text-[#C97A4F] tracking-widest font-semibold">Active</span>
-                  <button className="text-[12px] text-[#362618] border-b border-[#362618] hover:text-[#C97A4F] hover:border-[#C97A4F] transition-colors font-medium">
-                    Edit
-                  </button>
-                </div>
-              </div>
-            </div>
-          );
-        })}
-
-        {(!rooms || rooms.length === 0) && (
-          <div className="col-span-full py-12 text-center text-[#555E63] font-jost">
-            No rooms found. Click "Add New Room" to create one.
-          </div>
-        )}
-      </div>
+      <RoomsListClient initialRooms={rooms || []} />
     </div>
   );
 }

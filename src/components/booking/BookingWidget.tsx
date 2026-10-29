@@ -1,31 +1,53 @@
 "use client";
 
-import { useState, useRef } from "react";
-import { createBookingAction } from "@/app/actions/booking";
+import { useState, useRef, useEffect } from "react";
+import { 
+  createBookingAction, 
+  checkRoomAvailabilityAction, 
+  getRoomBookedDatesAction 
+} from "@/app/actions/booking";
 import { 
   CheckCircle, 
+  AlertTriangle,
   Calendar as CalendarIcon, 
   User, 
   Mail, 
   Phone, 
-  ShieldCheck, 
-  Sparkles, 
-  ArrowRight,
+  ChevronDown,
   Loader2,
-  Lock
+  Sparkles,
+  Lock,
+  ArrowRight
 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function BookingWidget({ room }: { room: any }) {
   const [checkIn, setCheckIn] = useState("");
   const [checkOut, setCheckOut] = useState("");
+  const [adults, setAdults] = useState("1");
+  const [childrenCount, setChildrenCount] = useState("0");
   const [guestName, setGuestName] = useState("");
   const [guestEmail, setGuestEmail] = useState("");
   const [guestPhone, setGuestPhone] = useState("");
+  const [showGuestDetails, setShowGuestDetails] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [isCheckingDates, setIsCheckingDates] = useState(false);
+  const [availability, setAvailability] = useState<{ checked: boolean; available: boolean; message?: string } | null>(null);
+  const [upcomingBookings, setUpcomingBookings] = useState<{ check_in: string; check_out: string }[]>([]);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const checkInRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (room?.id) {
+      getRoomBookedDatesAction(room.id).then((dates) => {
+        if (dates && dates.length > 0) {
+          setUpcomingBookings(dates);
+        }
+      });
+    }
+  }, [room?.id]);
 
   const calculateNights = () => {
     if (!checkIn || !checkOut) return 0;
@@ -39,12 +61,118 @@ export default function BookingWidget({ room }: { room: any }) {
   const totalAmount = nights > 0 ? nights * room.price_per_night : 0;
   const today = new Date().toISOString().split("T")[0];
 
+  const verifyAvailability = async (inVal: string, outVal: string) => {
+    if (!inVal || !outVal) {
+      setAvailability(null);
+      return;
+    }
+    const start = new Date(inVal);
+    const end = new Date(outVal);
+    if (end <= start) {
+      setAvailability(null);
+      return;
+    }
+
+    setIsCheckingDates(true);
+    setError(null);
+    try {
+      const res = await checkRoomAvailabilityAction(room.id, inVal, outVal);
+      if (!res.available) {
+        setAvailability({ checked: true, available: false, message: res.error });
+        setError(res.error || "This room is not available for the selected dates.");
+        setShowGuestDetails(false);
+      } else {
+        setAvailability({ checked: true, available: true, message: "Suite is available for your dates!" });
+        setError(null);
+      }
+    } catch {
+      // fallback
+    } finally {
+      setIsCheckingDates(false);
+    }
+  };
+
+  const handleDateChange = (type: "in" | "out", value: string) => {
+    let newIn = checkIn;
+    let newOut = checkOut;
+
+    if (type === "in") {
+      newIn = value;
+      setCheckIn(value);
+      if (checkOut && new Date(value) >= new Date(checkOut)) {
+        newOut = "";
+        setCheckOut("");
+        setAvailability(null);
+      }
+    } else {
+      newOut = value;
+      setCheckOut(value);
+    }
+    setError(null);
+
+    if (newIn && newOut && new Date(newOut) > new Date(newIn)) {
+      verifyAvailability(newIn, newOut);
+    } else {
+      setAvailability(null);
+    }
+  };
+
+  const handleCheckAvailability = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (!checkIn || !checkOut) {
+      setError("Please select both check-in and check-out dates.");
+      checkInRef.current?.focus();
+      return;
+    }
+    if (nights <= 0) {
+      setError("Check-out date must be strictly after the check-in date.");
+      return;
+    }
+
+    setIsCheckingDates(true);
+    const res = await checkRoomAvailabilityAction(room.id, checkIn, checkOut);
+    setIsCheckingDates(false);
+
+    if (!res.available) {
+      setAvailability({ checked: true, available: false, message: res.error });
+      setError(res.error || "This room is not available for the selected dates.");
+      setShowGuestDetails(false);
+      return;
+    }
+
+    setAvailability({ checked: true, available: true, message: "Suite is available for your dates!" });
+    setError(null);
+    setShowGuestDetails(true);
+  };
+
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     
     if (!checkIn || !checkOut || nights <= 0) {
       setError("Please select both check-in and check-out dates.");
       checkInRef.current?.focus();
+      return;
+    }
+
+    // Final availability gate
+    setIsCheckingDates(true);
+    const checkRes = await checkRoomAvailabilityAction(room.id, checkIn, checkOut);
+    setIsCheckingDates(false);
+
+    if (!checkRes.available) {
+      setAvailability({ checked: true, available: false, message: checkRes.error });
+      setError(checkRes.error || "This room is not available for the selected dates. Please choose different dates.");
+      setShowGuestDetails(false);
+      return;
+    }
+
+    if (!showGuestDetails) {
+      setShowGuestDetails(true);
+      return;
+    }
+
+    if (!guestName.trim() || !guestEmail.trim() || !guestPhone.trim()) {
+      setError("Please fill in your name, email, and phone number to secure the reservation.");
       return;
     }
 
@@ -59,6 +187,7 @@ export default function BookingWidget({ room }: { room: any }) {
       guestPhone,
       checkIn,
       checkOut,
+      notes: `Adults: ${adults}, Children: ${childrenCount}`,
     };
 
     const result = await createBookingAction(payload);
@@ -70,27 +199,31 @@ export default function BookingWidget({ room }: { room: any }) {
       setGuestName("");
       setGuestEmail("");
       setGuestPhone("");
+      setShowGuestDetails(false);
+      setAvailability(null);
     } else {
       setError(result.error || "Failed to create booking.");
+      if (result.error?.toLowerCase().includes("booked") || result.error?.toLowerCase().includes("not available")) {
+        setAvailability({ checked: true, available: false, message: result.error });
+        setShowGuestDetails(false);
+      }
     }
     setLoading(false);
   }
 
   if (success) {
     return (
-      <div className="bg-white border-2 border-[#362618] p-8 text-center shadow-2xl relative overflow-hidden">
-        <div className="absolute top-0 left-0 right-0 h-1.5 bg-[#C97A4F]" />
-        
-        <div className="w-16 h-16 bg-[#F0FDF4] border-2 border-[#22C55E]/30 rounded-full flex items-center justify-center mx-auto mb-5 text-[#16A34A] shadow-inner">
-          <CheckCircle size={34} strokeWidth={2.5} />
+      <div className="bg-[#000000] border border-[#d7b56d]/30 rounded-[24px] p-8 text-center shadow-[0_20px_50px_rgba(25,16,10,0.35)] relative overflow-hidden text-[#FFFFFF]">
+        <div className="w-16 h-16 bg-[#FFFFFF]/10 border border-[#d7b56d]/40 rounded-full flex items-center justify-center mx-auto mb-5 text-[#d7b56d] shadow-inner">
+          <CheckCircle size={36} strokeWidth={2.2} />
         </div>
-        <h3 className="font-marcellus text-3xl text-[#362618] mb-2 font-medium">Reservation Secured</h3>
-        <p className="font-jost text-[#4A4036] text-[15px] mb-8 max-w-xs mx-auto leading-relaxed">
-          Your luxury suite has been reserved. A confirmation email and booking folio have been sent to your address.
+        <h3 className="font-marcellus text-3xl text-[#FFFFFF] mb-2 font-normal">Reservation Confirmed</h3>
+        <p className="font-jost text-[#FFFFFF]/80 text-[15px] mb-8 max-w-xs mx-auto leading-relaxed">
+          Your luxury suite has been reserved. A confirmation email and booking details have been sent to your email.
         </p>
         <button 
           onClick={() => setSuccess(false)}
-          className="w-full bg-[#362618] hover:bg-[#C97A4F] text-[#FAF8F5] font-jost uppercase tracking-[0.2em] text-[13px] font-semibold py-4 transition-all duration-300 shadow-md cursor-pointer"
+          className="w-full bg-[#d7b56d] hover:bg-[#000000] text-[#000000] hover:text-white font-jost text-[15px] font-semibold py-3.5 rounded-[20px] transition-all duration-300 shadow-md cursor-pointer"
         >
           Book Another Room
         </button>
@@ -98,199 +231,286 @@ export default function BookingWidget({ room }: { room: any }) {
     );
   }
 
+  const isUnavailable = availability?.checked && !availability?.available;
+
   return (
-    <div className="bg-white border-2 border-[#362618] shadow-[0_12px_40px_rgba(54,38,24,0.12)] relative overflow-hidden">
-      {/* Luxury Brand Top Accent */}
-      <div className="h-1.5 bg-gradient-to-r from-[#362618] via-[#C97A4F] to-[#362618]" />
-
-      <div className="p-6 md:p-8">
-        {/* Header with Pricing & Best Rate Guarantee */}
-        <div className="border-b-2 border-[#362618]/10 pb-6 mb-6">
-          <div className="flex items-center justify-between gap-2 mb-2">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#F4EBE1] text-[#A0522D] border border-[#C97A4F]/30 text-[11px] font-jost font-semibold uppercase tracking-widest rounded-none">
-              <Sparkles size={12} className="text-[#C97A4F]" /> Direct Booking Rate
-            </span>
-            <span className="text-[12px] font-jost font-semibold text-[#008060] flex items-center gap-1">
-              <ShieldCheck size={14} /> Best Price Guarantee
-            </span>
+    <div className="bg-[#000000] border border-[#d7b56d]/30 rounded-[24px] shadow-[0_20px_50px_rgba(25,16,10,0.35)] p-6 md:p-8 text-[#FFFFFF] relative">
+      {/* Form Header */}
+      <div className="flex items-baseline justify-between mb-6 pb-4 border-b border-[#FFFFFF]/10">
+        <div>
+          <h3 className="font-marcellus text-[24px] md:text-[26px] text-[#FFFFFF] font-normal leading-tight">
+            Reservation Form
+          </h3>
+          <p className="text-[12px] font-jost text-[#FFFFFF]/60 mt-1">
+            Best rate guaranteed • Free cancellation
+          </p>
+        </div>
+        <div className="text-right">
+          <div className="font-marcellus text-[26px] md:text-[28px] text-[#FFFFFF] leading-none">
+            ${room.price_per_night}
           </div>
+          <div className="text-[11px] font-jost uppercase tracking-wider text-[#FFFFFF]/60 mt-1">
+            / night
+          </div>
+        </div>
+      </div>
 
-          <div className="flex items-baseline gap-2 mt-1">
-            <span className="text-[40px] font-marcellus text-[#362618] font-medium leading-none">
-              ${room.price_per_night}
-            </span>
-            <span className="text-[14px] font-jost font-semibold text-[#66584B] uppercase tracking-wider">
-              / Night
-            </span>
+      {/* Error Message */}
+      {error && (
+        <div className="bg-[#5A231F] border border-[#EF4444]/60 text-[#FEE2E2] text-[13px] font-jost p-3.5 rounded-[12px] mb-5 flex items-start gap-2.5 shadow-sm">
+          <AlertTriangle size={18} className="text-[#F87171] shrink-0 mt-0.5" />
+          <span className="leading-snug">{error}</span>
+        </div>
+      )}
+
+      {/* Real-time Availability Feedback */}
+      {isCheckingDates && (
+        <div className="bg-[#000000] border border-[#d7b56d]/30 text-[#d7b56d] text-[12.5px] font-jost px-3.5 py-2.5 rounded-[12px] mb-4 flex items-center gap-2">
+          <Loader2 size={15} className="animate-spin text-[#d7b56d]" />
+          <span>Verifying room schedule availability...</span>
+        </div>
+      )}
+
+      {availability?.checked && availability.available && (
+        <div className="bg-[#14532D]/90 border border-[#4ADE80]/50 text-[#DCFCE7] text-[13px] font-jost px-3.5 py-2.5 rounded-[12px] mb-4 flex items-center gap-2 shadow-xs">
+          <CheckCircle size={16} className="text-[#4ADE80] shrink-0" />
+          <span className="font-medium">Room is available for {checkIn} to {checkOut}!</span>
+        </div>
+      )}
+
+      {isUnavailable && (
+        <div className="bg-[#78231C] border-2 border-[#EF4444] text-[#FEE2E2] text-[13px] font-jost p-4 rounded-[14px] mb-4 shadow-md">
+          <div className="flex items-center gap-2 font-semibold text-white text-[14px] mb-1">
+            <span className="w-2.5 h-2.5 rounded-full bg-red-400 animate-ping"></span>
+            Not Available on Selected Dates
+          </div>
+          <p className="text-[#FEE2E2]/90 leading-relaxed text-[12.5px]">
+            This suite is already reserved from <strong>{checkIn}</strong> to <strong>{checkOut}</strong>. Please select different dates or explore other suites.
+          </p>
+        </div>
+      )}
+
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        {/* Check-in Date */}
+        <div>
+          <label className="block text-[13.5px] font-jost font-medium text-[#FFFFFF] mb-1.5">
+            Check-in Date <span className="text-[#d7b56d] ml-0.5">*</span>
+          </label>
+          <div className="relative">
+            <input 
+              ref={checkInRef}
+              required 
+              type="date" 
+              min={today} 
+              value={checkIn} 
+              onChange={(e) => handleDateChange("in", e.target.value)} 
+              className={`w-full bg-white text-[#000000] font-jost text-[14.5px] px-4 py-3 rounded-[12px] border ${
+                isUnavailable ? "border-red-500 ring-2 ring-red-400" : "border-[#d7b56d]"
+              } focus:outline-none focus:ring-2 focus:ring-[#d7b56d] shadow-xs cursor-pointer font-medium`}
+              placeholder="Check-in Date"
+            />
           </div>
         </div>
 
-        {/* Error Alert Box */}
-        {error && (
-          <div className="bg-[#FEF2F2] border-2 border-[#EF4444] text-[#991B1B] text-[13.5px] font-jost p-3.5 mb-6 flex items-start gap-2 shadow-xs">
-            <span className="font-bold text-[#DC2626]">✕</span>
-            <span>{error}</span>
+        {/* Check-out Date */}
+        <div>
+          <label className="block text-[13.5px] font-jost font-medium text-[#FFFFFF] mb-1.5">
+            Check-out Date <span className="text-[#d7b56d] ml-0.5">*</span>
+          </label>
+          <div className="relative">
+            <input 
+              required 
+              type="date" 
+              min={checkIn || today} 
+              value={checkOut} 
+              onChange={(e) => handleDateChange("out", e.target.value)} 
+              className={`w-full bg-white text-[#000000] font-jost text-[14.5px] px-4 py-3 rounded-[12px] border ${
+                isUnavailable ? "border-red-500 ring-2 ring-red-400" : "border-[#d7b56d]"
+              } focus:outline-none focus:ring-2 focus:ring-[#d7b56d] shadow-xs cursor-pointer font-medium`}
+              placeholder="Check-out Date"
+            />
+          </div>
+        </div>
+
+        {/* Upcoming Booked Ranges (Convenience info for guest) */}
+        {upcomingBookings.length > 0 && (
+          <div className="bg-[#000000]/80 border border-[#FFFFFF]/10 rounded-[12px] p-3 text-[11.5px] font-jost text-[#FFFFFF]/70">
+            <span className="font-semibold text-[#d7b56d] block mb-1.5 uppercase tracking-wider text-[10.5px]">
+              Currently Reserved Dates:
+            </span>
+            <div className="flex flex-wrap gap-1.5">
+              {upcomingBookings.slice(0, 4).map((b, i) => (
+                <span key={i} className="bg-red-950/70 text-red-200 border border-red-800/40 px-2 py-0.5 rounded text-[11px]">
+                  {b.check_in} &rarr; {b.check_out}
+                </span>
+              ))}
+              {upcomingBookings.length > 4 && (
+                <span className="text-[10px] text-[#FFFFFF]/50 self-center">
+                  +{upcomingBookings.length - 4} more
+                </span>
+              )}
+            </div>
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-          {/* Guest Full Name Field */}
-          <div className="flex flex-col gap-1.5">
-            <label className="text-[12px] font-semibold font-jost uppercase tracking-wider text-[#2A1D13] flex items-center justify-between">
-              <span className="flex items-center gap-1.5">
-                <User size={13} className="text-[#C97A4F]" />
-                Guest Full Name <span className="text-[#C97A4F] text-[14px]">*</span>
-              </span>
-            </label>
-            <input 
-              required 
-              type="text" 
-              name="guestName"
-              value={guestName}
-              onChange={(e) => setGuestName(e.target.value)}
-              placeholder="e.g. Eleanor Vance"
-              className="w-full bg-[#FCFBF9] border-2 border-[#362618]/25 hover:border-[#362618]/60 focus:border-[#C97A4F] focus:bg-white px-4 py-3 text-[14.5px] font-jost text-[#1D1712] font-medium placeholder:text-[#8C827A] focus:outline-none focus:ring-1 focus:ring-[#C97A4F] transition-all rounded-none" 
-            />
+        {/* Adults Dropdown */}
+        <div>
+          <label className="block text-[13.5px] font-jost font-medium text-[#FFFFFF] mb-1.5">
+            Adults
+          </label>
+          <div className="relative">
+            <select
+              value={adults}
+              onChange={(e) => setAdults(e.target.value)}
+              className="w-full bg-white text-[#000000] font-jost text-[14.5px] px-4 py-3 pr-10 rounded-[12px] border border-[#d7b56d] focus:outline-none focus:ring-2 focus:ring-[#d7b56d] shadow-xs cursor-pointer appearance-none font-medium"
+            >
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5+</option>
+            </select>
+            <ChevronDown size={18} className="absolute right-4 top-1/2 -translate-y-1/2 text-[#d7b56d] pointer-events-none" />
           </div>
-          
-          {/* Email and Phone Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="flex flex-col gap-1.5">
-              <label className="text-[12px] font-semibold font-jost uppercase tracking-wider text-[#2A1D13] flex items-center justify-between">
-                <span className="flex items-center gap-1.5">
-                  <Mail size={13} className="text-[#C97A4F]" />
-                  Email Address <span className="text-[#C97A4F] text-[14px]">*</span>
-                </span>
-              </label>
-              <input 
-                required 
-                type="email" 
-                name="guestEmail"
-                value={guestEmail}
-                onChange={(e) => setGuestEmail(e.target.value)}
-                placeholder="eleanor@example.com"
-                className="w-full bg-[#FCFBF9] border-2 border-[#362618]/25 hover:border-[#362618]/60 focus:border-[#C97A4F] focus:bg-white px-4 py-3 text-[14.5px] font-jost text-[#1D1712] font-medium placeholder:text-[#8C827A] focus:outline-none focus:ring-1 focus:ring-[#C97A4F] transition-all rounded-none" 
-              />
-            </div>
+        </div>
 
-            <div className="flex flex-col gap-1.5">
-              <label className="text-[12px] font-semibold font-jost uppercase tracking-wider text-[#2A1D13] flex items-center justify-between">
-                <span className="flex items-center gap-1.5">
-                  <Phone size={13} className="text-[#C97A4F]" />
-                  Phone Number <span className="text-[#C97A4F] text-[14px]">*</span>
-                </span>
-              </label>
-              <input 
-                required 
-                type="tel" 
-                name="guestPhone"
-                value={guestPhone}
-                onChange={(e) => setGuestPhone(e.target.value)}
-                placeholder="+47 22 00 00 00"
-                className="w-full bg-[#FCFBF9] border-2 border-[#362618]/25 hover:border-[#362618]/60 focus:border-[#C97A4F] focus:bg-white px-4 py-3 text-[14.5px] font-jost text-[#1D1712] font-medium placeholder:text-[#8C827A] focus:outline-none focus:ring-1 focus:ring-[#C97A4F] transition-all rounded-none" 
-              />
-            </div>
+        {/* Children Dropdown */}
+        <div>
+          <label className="block text-[13.5px] font-jost font-medium text-[#FFFFFF] mb-1.5">
+            Children
+          </label>
+          <div className="relative">
+            <select
+              value={childrenCount}
+              onChange={(e) => setChildrenCount(e.target.value)}
+              className="w-full bg-white text-[#000000] font-jost text-[14.5px] px-4 py-3 pr-10 rounded-[12px] border border-[#d7b56d] focus:outline-none focus:ring-2 focus:ring-[#d7b56d] shadow-xs cursor-pointer appearance-none font-medium"
+            >
+              <option value="0">0</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3+</option>
+            </select>
+            <ChevronDown size={18} className="absolute right-4 top-1/2 -translate-y-1/2 text-[#d7b56d] pointer-events-none" />
           </div>
+        </div>
 
-          {/* Check-In / Check-Out Date Pickers */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-1">
-            <div className="flex flex-col gap-1.5">
-              <label className="text-[12px] font-semibold font-jost uppercase tracking-wider text-[#2A1D13] flex items-center justify-between">
-                <span className="flex items-center gap-1.5">
-                  <CalendarIcon size={13} className="text-[#C97A4F]" />
-                  Check-In <span className="text-[#C97A4F] text-[14px]">*</span>
-                </span>
-              </label>
-              <input 
-                ref={checkInRef}
-                required 
-                type="date" 
-                min={today} 
-                value={checkIn} 
-                onChange={(e) => setCheckIn(e.target.value)} 
-                className="w-full bg-[#FCFBF9] border-2 border-[#362618]/25 hover:border-[#362618]/60 focus:border-[#C97A4F] focus:bg-white px-4 py-3 text-[14.5px] font-jost text-[#1D1712] font-semibold focus:outline-none focus:ring-1 focus:ring-[#C97A4F] transition-all rounded-none cursor-pointer" 
-              />
+        {/* Nights & Price Calculation Summary */}
+        {nights > 0 && !isUnavailable && (
+          <div className="bg-[#000000] border border-[#d7b56d]/30 rounded-[14px] p-4 my-1">
+            <div className="flex justify-between items-center text-[13.5px] font-jost text-[#FFFFFF]/80 mb-1.5">
+              <span>${room.price_per_night} &times; {nights} {nights === 1 ? 'night' : 'nights'}</span>
+              <span className="font-semibold text-[#FFFFFF]">${totalAmount.toLocaleString()}</span>
             </div>
-
-            <div className="flex flex-col gap-1.5">
-              <label className="text-[12px] font-semibold font-jost uppercase tracking-wider text-[#2A1D13] flex items-center justify-between">
-                <span className="flex items-center gap-1.5">
-                  <CalendarIcon size={13} className="text-[#C97A4F]" />
-                  Check-Out <span className="text-[#C97A4F] text-[14px]">*</span>
-                </span>
-              </label>
-              <input 
-                required 
-                type="date" 
-                min={checkIn || today} 
-                value={checkOut} 
-                onChange={(e) => setCheckOut(e.target.value)} 
-                className="w-full bg-[#FCFBF9] border-2 border-[#362618]/25 hover:border-[#362618]/60 focus:border-[#C97A4F] focus:bg-white px-4 py-3 text-[14.5px] font-jost text-[#1D1712] font-semibold focus:outline-none focus:ring-1 focus:ring-[#C97A4F] transition-all rounded-none cursor-pointer" 
-              />
+            <div className="flex justify-between items-center text-[13px] font-jost text-[#FFFFFF]/70 mb-2 pb-2 border-b border-[#FFFFFF]/10">
+              <span>Taxes & Fees</span>
+              <span className="text-[#86EFAC] font-medium">Included</span>
+            </div>
+            <div className="flex justify-between items-baseline font-marcellus">
+              <span className="text-[17px] text-[#FFFFFF]">Total Cost:</span>
+              <span className="text-[22px] font-semibold text-[#d7b56d]">${totalAmount.toLocaleString()}</span>
             </div>
           </div>
+        )}
 
-          {/* Pricing Calculation Summary Box */}
-          {nights > 0 ? (
-            <div className="bg-[#FAF7F2] border-2 border-[#C97A4F]/30 p-4 mt-2 transition-all">
-              <div className="flex justify-between font-jost text-[14px] text-[#4A4036] font-medium mb-2">
-                <span>${room.price_per_night} &times; {nights} {nights === 1 ? 'night' : 'nights'}</span>
-                <span className="font-semibold text-[#2A1D13]">${totalAmount.toLocaleString()}</span>
+        {/* Guest Details Section (Expands smoothly when dates are selected and available) */}
+        <AnimatePresence>
+          {(showGuestDetails && !isUnavailable) && (
+            <motion.div 
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.3 }}
+              className="flex flex-col gap-3.5 pt-2 border-t border-[#FFFFFF]/10 overflow-hidden"
+            >
+              <div className="flex items-center justify-between text-[12px] font-jost uppercase tracking-wider text-[#d7b56d] font-medium">
+                <span>Guest Information</span>
+                <span>Pay Upon Arrival</span>
               </div>
-              <div className="flex justify-between font-jost text-[14px] text-[#4A4036] font-medium mb-3 pb-3 border-b border-[#362618]/15">
-                <span>Taxes & Service Fees</span>
-                <span className="text-[#008060] font-semibold">Included</span>
+
+              <div>
+                <label className="block text-[13px] font-jost font-medium text-[#FFFFFF] mb-1">
+                  Guest Full Name <span className="text-[#d7b56d] ml-0.5">*</span>
+                </label>
+                <input 
+                  required 
+                  type="text" 
+                  value={guestName}
+                  onChange={(e) => setGuestName(e.target.value)}
+                  placeholder="e.g. Eleanor Vance"
+                  className="w-full bg-white text-[#000000] font-jost text-[14px] px-4 py-3 rounded-[12px] border border-[#d7b56d] focus:outline-none focus:ring-2 focus:ring-[#d7b56d] shadow-xs placeholder:text-stone-400 font-medium"
+                />
               </div>
-              <div className="flex justify-between items-baseline font-marcellus text-[22px] text-[#362618]">
-                <span>Total Stay Cost</span>
-                <span className="text-[24px] font-bold text-[#C97A4F]">${totalAmount.toLocaleString()}</span>
+
+              <div>
+                <label className="block text-[13px] font-jost font-medium text-[#FFFFFF] mb-1">
+                  Email Address <span className="text-[#d7b56d] ml-0.5">*</span>
+                </label>
+                <input 
+                  required 
+                  type="email" 
+                  value={guestEmail}
+                  onChange={(e) => setGuestEmail(e.target.value)}
+                  placeholder="eleanor@example.com"
+                  className="w-full bg-white text-[#000000] font-jost text-[14px] px-4 py-3 rounded-[12px] border border-[#d7b56d] focus:outline-none focus:ring-2 focus:ring-[#d7b56d] shadow-xs placeholder:text-stone-400 font-medium"
+                />
               </div>
-            </div>
-          ) : (
-            <div className="bg-[#FAF7F2] border border-dashed border-[#362618]/25 p-3.5 text-center text-[12.5px] font-jost text-[#66584B]">
-              Select check-in & check-out dates to calculate total reservation cost
-            </div>
+
+              <div>
+                <label className="block text-[13px] font-jost font-medium text-[#FFFFFF] mb-1">
+                  Phone Number <span className="text-[#d7b56d] ml-0.5">*</span>
+                </label>
+                <input 
+                  required 
+                  type="tel" 
+                  value={guestPhone}
+                  onChange={(e) => setGuestPhone(e.target.value)}
+                  placeholder="+47 22 00 00 00"
+                  className="w-full bg-white text-[#000000] font-jost text-[14px] px-4 py-3 rounded-[12px] border border-[#d7b56d] focus:outline-none focus:ring-2 focus:ring-[#d7b56d] shadow-xs placeholder:text-stone-400 font-medium"
+                />
+              </div>
+            </motion.div>
           )}
+        </AnimatePresence>
 
-          {/* Primary Action Button */}
-          <button 
-            type="submit"
-            disabled={loading}
-            className={`w-full py-4.5 px-6 font-jost uppercase tracking-[0.18em] text-[14px] font-bold transition-all duration-300 shadow-md flex items-center justify-center gap-2 rounded-none mt-2 cursor-pointer ${
-              nights > 0
-                ? "bg-[#C97A4F] hover:bg-[#362618] text-white hover:shadow-lg active:scale-[0.99]"
-                : "bg-[#362618] hover:bg-[#C97A4F] text-white"
-            }`}
-          >
-            {loading ? (
-              <>
-                <Loader2 size={18} className="animate-spin text-white" />
-                <span>Securing Your Suite...</span>
-              </>
-            ) : nights > 0 ? (
-              <>
-                <span>Confirm & Reserve Suite</span>
-                <ArrowRight size={17} />
-              </>
-            ) : (
-              <>
-                <span>Select Dates & Reserve</span>
-                <ArrowRight size={17} />
-              </>
-            )}
-          </button>
+        {/* Action Button */}
+        <button 
+          type="submit"
+          onClick={!showGuestDetails ? handleCheckAvailability : undefined}
+          disabled={loading || isCheckingDates || isUnavailable}
+          className={`w-full mt-2 py-3.5 px-6 rounded-[22px] font-jost font-medium text-[16px] tracking-wide shadow-md transition-all duration-300 flex items-center justify-center gap-2 ${
+            isUnavailable
+              ? "bg-[#5A231F] text-[#FEE2E2]/70 cursor-not-allowed opacity-80 border border-red-700/50"
+              : "bg-[#d7b56d] hover:bg-[#000000] active:scale-[0.99] text-[#000000] hover:text-white cursor-pointer"
+          }`}
+        >
+          {loading ? (
+            <>
+              <Loader2 size={18} className="animate-spin text-white" />
+              <span>Securing Reservation...</span>
+            </>
+          ) : isCheckingDates ? (
+            <>
+              <Loader2 size={18} className="animate-spin text-white" />
+              <span>Checking Availability...</span>
+            </>
+          ) : isUnavailable ? (
+            <span>Not Available on Selected Dates</span>
+          ) : showGuestDetails ? (
+            <>
+              <span>Reserve Suite</span>
+              <ArrowRight size={17} />
+            </>
+          ) : (
+            <span>Check Availability</span>
+          )}
+        </button>
 
-          {/* Trust Badges & Highlights */}
-          <div className="pt-2 border-t border-[#362618]/10 flex flex-col gap-1.5 text-center text-[11px] font-jost font-medium text-[#66584B] tracking-wide">
-            <div className="flex items-center justify-center gap-4 text-[#362618]">
-              <span className="flex items-center gap-1"><Lock size={12} className="text-[#C97A4F]" /> 256-Bit SSL Secure</span>
-              <span>•</span>
-              <span className="flex items-center gap-1"><Sparkles size={12} className="text-[#C97A4F]" /> Free Valet Included</span>
-            </div>
-            <span className="text-[#8C827A] text-[10.5px]">No credit card pre-charge required • Pay upon arrival</span>
-          </div>
-        </form>
-      </div>
+        {/* Security & Guarantees Footer */}
+        <div className="pt-2 text-center text-[11px] font-jost text-[#FFFFFF]/60 flex items-center justify-center gap-2">
+          <Lock size={12} className="text-[#d7b56d]" />
+          <span>256-Bit SSL Secure • No advance payment required</span>
+        </div>
+      </form>
     </div>
   );
 }

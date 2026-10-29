@@ -140,8 +140,8 @@ export default function RecentBookingsTable({ initialBookings }: { initialBookin
                         {booking.check_in} <br/> 
                         <span className="text-[#50575e]">{nights} nights</span>
                       </td>
-                      <td className="px-3 py-3 align-top">
-                        ${booking.total_amount?.toLocaleString() || 0}
+                      <td className="px-3 py-3 align-top font-medium">
+                        PKR {booking.total_amount?.toLocaleString() || 0}
                       </td>
                       <td className="px-3 py-3 align-top">
                         <span className={`inline-block px-2 py-0.5 text-[12px] rounded-[3px] font-medium border ${

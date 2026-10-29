@@ -189,6 +189,7 @@ export default function AdminSettingsClient({ initialSettings }: { initialSettin
                     onChange={(e) => handleChange("currency", e.target.value)}
                     className="w-full bg-white border border-[#8c8f94] rounded-[3px] px-3 py-2 text-[13.5px] text-[#3c434a] focus:outline-none focus:border-[#2271b1]"
                   >
+                    <option value="PKR (₨)">PKR (₨)</option>
                     <option value="USD ($)">USD ($)</option>
                     <option value="NOK (kr)">NOK (kr)</option>
                     <option value="EUR (€)">EUR (€)</option>
