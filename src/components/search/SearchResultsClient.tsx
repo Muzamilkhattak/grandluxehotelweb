@@ -171,15 +171,13 @@ export default function SearchResultsClient({
 
               {/* Price block */}
               <div className="text-right">
-                <span className="text-xs font-jost text-gray-500 uppercase tracking-wider block">Rate per night</span>
+                <span className="text-xs font-jost text-gray-500 uppercase tracking-wider block">Daily Rate</span>
                 <div className="font-marcellus text-2xl sm:text-3xl text-gray-900 font-bold">
                   PKR {room.price_per_night?.toLocaleString()}
                 </div>
-                {nights > 1 && (
-                  <span className="text-[12px] font-jost text-gray-600 font-medium block mt-0.5">
-                    Total for {nights} nights: PKR {totalStayPrice.toLocaleString()}
-                  </span>
-                )}
+                <span className="text-[12.5px] font-jost text-[#8f6618] font-semibold block mt-0.5">
+                  Total for {nights} {nights === 1 ? 'day' : 'days'}: PKR {totalStayPrice.toLocaleString()}
+                </span>
               </div>
             </div>
 

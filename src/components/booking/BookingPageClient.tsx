@@ -27,6 +27,7 @@ import {
   Sparkles, 
   FileText,
   ShieldCheck,
+  Clock,
   User,
   Mail,
   Phone,
@@ -285,7 +286,10 @@ export default function BookingPageClient({
             </div>
             <div className="flex justify-between items-center pt-3 border-t border-gray-200">
               <span className="text-gray-700 font-medium">Total Amount:</span>
-              <span className="font-marcellus text-xl font-bold text-gray-900">PKR {totalAmount.toLocaleString()}</span>
+              <div className="text-right">
+                <span className="font-marcellus text-xl font-bold text-gray-900 block">PKR {totalAmount.toLocaleString()}</span>
+                <span className="text-xs text-gray-500 font-normal">PKR {room.price_per_night?.toLocaleString()} × {nights} {nights === 1 ? 'day' : 'days'}</span>
+              </div>
             </div>
             <div className="flex justify-between items-center pt-2">
               <span className="text-gray-600 text-sm">Payment Status:</span>
@@ -425,6 +429,25 @@ export default function BookingPageClient({
                   />
                 </div>
               </div>
+
+              {/* Dynamic Live Stay & Price Breakdown */}
+              <div className="mt-4 bg-amber-50/70 border border-amber-200/80 rounded-lg p-3 sm:p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs sm:text-[13.5px]">
+                <div className="flex items-center gap-2 text-amber-950 font-medium">
+                  <Clock size={15} className="text-[#8f6618] shrink-0" />
+                  <span>
+                    Duration: <strong className="font-semibold text-gray-950">{nights} {nights === 1 ? 'Day / Night' : 'Days / Nights'}</strong>
+                  </span>
+                </div>
+                <div className="text-gray-800 text-left sm:text-right">
+                  <span className="text-gray-600">Rate: </span>
+                  <span className="font-semibold text-gray-900">PKR {room.price_per_night?.toLocaleString()}</span>
+                  <span className="text-gray-500 text-xs"> / day</span>
+                  <span className="mx-1.5 text-gray-400">•</span>
+                  <span className="text-gray-600">Calculated: </span>
+                  <span className="font-bold text-[#8f6618]">PKR {totalAmount.toLocaleString()}</span>
+                  <span className="text-xs text-gray-500 font-normal ml-1">({nights} {nights === 1 ? 'day' : 'days'})</span>
+                </div>
+              </div>
             </div>
 
             {/* STEP 2: GUEST INFORMATION */}
@@ -522,6 +545,19 @@ export default function BookingPageClient({
                   <span>{settings.paymentInstructions}</span>
                 </div>
               )}
+
+              {/* Dynamic Amount to Transfer Breakdown Banner */}
+              <div className="mb-4 bg-[#12161F] text-white p-3.5 sm:p-4 rounded-lg flex flex-col sm:flex-row sm:items-center justify-between gap-2 border border-white/10 shadow-xs">
+                <div>
+                  <span className="text-[11px] sm:text-xs text-gray-400 uppercase tracking-wider block font-semibold">Total Amount to Transfer</span>
+                  <span className="text-xs text-[#d7b56d]">
+                    For {nights} {nights === 1 ? 'Day' : 'Days'} Stay (PKR {room.price_per_night?.toLocaleString()} × {nights} {nights === 1 ? 'day' : 'days'})
+                  </span>
+                </div>
+                <div className="font-marcellus text-2xl font-bold text-white">
+                  PKR {totalAmount.toLocaleString()}
+                </div>
+              </div>
 
               {/* Dynamic Payment Accounts List */}
               <div className="space-y-3.5 mb-6">
@@ -702,6 +738,9 @@ export default function BookingPageClient({
                   <div className="font-marcellus text-2xl sm:text-3xl font-bold text-gray-900">
                     PKR {totalAmount.toLocaleString()}
                   </div>
+                  <span className="text-xs text-gray-500 block font-normal mt-0.5">
+                    PKR {room.price_per_night?.toLocaleString()} × {nights} {nights === 1 ? 'day' : 'days'}
+                  </span>
                 </div>
 
                 <button
@@ -778,17 +817,28 @@ export default function BookingPageClient({
               </div>
 
               <div className="flex items-center justify-between text-sm py-2 border-b border-gray-100">
-                <span className="text-gray-600">Total Nights</span>
-                <span className="font-semibold text-gray-900">{nights} {nights === 1 ? 'Night' : 'Nights'}</span>
+                <span className="text-gray-600">Total Stay</span>
+                <span className="font-semibold text-gray-900">{nights} {nights === 1 ? 'Day / Night' : 'Days / Nights'}</span>
               </div>
 
               <div className="flex items-center justify-between text-sm py-2 border-b border-gray-100">
-                <span className="text-gray-600">Rate Per Night</span>
-                <span className="font-semibold text-gray-900">PKR {room.price_per_night?.toLocaleString()}</span>
+                <span className="text-gray-600">Daily Rate</span>
+                <span className="font-semibold text-gray-900">PKR {room.price_per_night?.toLocaleString()} <span className="text-xs text-gray-500 font-normal">/ day</span></span>
+              </div>
+
+              {/* Explicit calculation breakdown */}
+              <div className="flex items-center justify-between text-xs py-2 bg-gray-50 px-2.5 rounded border border-gray-150">
+                <span className="text-gray-600 font-medium">Pricing Calculation:</span>
+                <span className="font-semibold text-gray-900">
+                  PKR {room.price_per_night?.toLocaleString()} × {nights} {nights === 1 ? 'day' : 'days'}
+                </span>
               </div>
 
               <div className="pt-2 flex items-center justify-between text-base">
-                <span className="font-bold text-gray-900">Total Payable:</span>
+                <div>
+                  <span className="font-bold text-gray-900 block leading-tight">Total Payable:</span>
+                  <span className="text-[11px] text-gray-500 font-normal">Based on {nights} {nights === 1 ? 'day stay' : 'days stay'}</span>
+                </div>
                 <span className="font-marcellus text-2xl font-bold text-gray-900">
                   PKR {totalAmount.toLocaleString()}
                 </span>
