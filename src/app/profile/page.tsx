@@ -30,11 +30,11 @@ export default async function ProfilePage() {
     );
   }
 
-  // Fetch bookings for this user using their email
-  const { data: bookings, error } = await supabase
+  // Fetch bookings for this user using either their account ID or their email address
+  const { data: bookings } = await supabase
     .from("bookings")
-    .select("*, rooms(title, price_per_night)")
-    .eq("user_id", user.id)
+    .select("*, rooms(title, price_per_night, image_url)")
+    .or(`user_id.eq.${user.id},guest_email.eq.${user.email || ""}`)
     .order("created_at", { ascending: false });
 
   return (

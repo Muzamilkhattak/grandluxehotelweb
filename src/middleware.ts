@@ -5,15 +5,15 @@ import { createClient } from "@/utils/supabase/middleware";
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Protect Admin Routes
+  // 1. Protect Admin Routes
   if (pathname.startsWith("/admin")) {
     const adminCookie = request.cookies.get(ADMIN_COOKIE_NAME)?.value;
     const session = await verifyAdminToken(adminCookie);
 
-    // If accessing the login page
+    // If accessing the admin login page
     if (pathname === "/admin/login") {
       if (session) {
-        // Already logged in, redirect to admin dashboard
+        // Already logged in as admin, redirect to admin dashboard
         return NextResponse.redirect(new URL("/admin", request.url));
       }
       return NextResponse.next();
@@ -29,15 +29,34 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Refresh Supabase auth session for public routes if needed
+  // 2. Handle Supabase User Session & Protection
   const { supabase, supabaseResponse } = createClient(request);
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  // Protect /profile route
+  // If user visits /login while already logged in, redirect them to /profile or intended destination
+  if (pathname === "/login") {
+    if (user) {
+      const redirectParam = request.nextUrl.searchParams.get("redirect") || "/profile";
+      const redirectResponse = NextResponse.redirect(new URL(redirectParam, request.url));
+      supabaseResponse.cookies.getAll().forEach((cookie) => {
+        redirectResponse.cookies.set(cookie);
+      });
+      return redirectResponse;
+    }
+  }
+
+  // Protect /profile route: requires logged in user
   if (pathname.startsWith("/profile")) {
-    const { data: { user } } = await supabase.auth.getUser();
-
     if (!user) {
-      return NextResponse.redirect(new URL("/login", request.url));
+      const loginUrl = new URL("/login", request.url);
+      loginUrl.searchParams.set("redirect", pathname);
+      const redirectResponse = NextResponse.redirect(loginUrl);
+      supabaseResponse.cookies.getAll().forEach((cookie) => {
+        redirectResponse.cookies.set(cookie);
+      });
+      return redirectResponse;
     }
   }
 

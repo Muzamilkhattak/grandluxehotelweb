@@ -132,6 +132,17 @@ export default function Header() {
             </Link>
 
             <Link 
+              href={user ? "/profile" : "/login"} 
+              className="hidden lg:flex items-center gap-1.5 font-jost text-[12.5px] uppercase tracking-[0.16em] text-[#FFFFFF]/90 hover:text-[#d7b56d] font-medium py-1.5 transition-colors whitespace-nowrap"
+              title={user ? "My Profile" : "Sign In"}
+            >
+              <div className="w-6 h-6 rounded-full border border-[#d7b56d]/60 flex items-center justify-center">
+                <User size={12} className="text-[#d7b56d]" />
+              </div>
+              <span>{user ? "Profile" : "Sign In"}</span>
+            </Link>
+
+            <Link 
               href="/rooms"
               className="bg-[#d7b56d] hover:bg-[#000000] text-[#000000] hover:text-white font-jost uppercase tracking-[0.14em] sm:tracking-[0.16em] text-[11px] sm:text-[12.5px] font-semibold px-3.5 sm:px-5 md:px-6 py-2 sm:py-2.5 rounded-full shadow-md transition-all duration-300 active:scale-95 whitespace-nowrap"
             >
