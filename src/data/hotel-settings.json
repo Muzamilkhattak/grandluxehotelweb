@@ -26,7 +26,7 @@
       "accountTitle": "Signature Art Hotel",
       "accountNumber": "03001234567",
       "notes": "Instant mobile account transfer",
-      "isActive": true
+      "isActive": false
     },
     {
       "id": "acc-jazzcash",
@@ -35,7 +35,7 @@
       "accountTitle": "Signature Art Hotel",
       "accountNumber": "03007654321",
       "notes": "Instant mobile account transfer",
-      "isActive": true
+      "isActive": false
     },
     {
       "id": "acc-meezan",
@@ -46,7 +46,7 @@
       "iban": "PK36MEZN0001020304050607",
       "branchName": "F-8 Markaz Branch, Islamabad",
       "notes": "Direct online bank transfer / IBFT / Raast",
-      "isActive": true
+      "isActive": false
     }
   ],
   "bankName": "Meezan Bank",
