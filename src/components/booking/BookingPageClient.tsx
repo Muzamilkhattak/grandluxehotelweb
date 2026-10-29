@@ -327,23 +327,22 @@ export default function BookingPageClient({
         </button>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
-        {/* LEFT COLUMN: Booking & Payment Form (8 cols) */}
-        <div className="lg:col-span-7 xl:col-span-8 space-y-7">
-          
-          {/* Header */}
-          <div>
-            <span className="text-[12px] uppercase tracking-[0.2em] text-[#d7b56d] font-semibold block mb-1">
-              Finalize Your Reservation
-            </span>
-            <h1 className="font-marcellus text-3xl sm:text-4xl text-gray-900 font-normal leading-tight">
-              Book {room.title}
-            </h1>
-            <p className="text-gray-600 text-sm mt-1">
-              Complete your guest details and transfer payment to confirm your luxury stay.
-            </p>
-          </div>
+      {/* Header */}
+      <div className="mb-6 sm:mb-8">
+        <span className="text-[12px] uppercase tracking-[0.2em] text-[#d7b56d] font-semibold block mb-1">
+          Finalize Your Reservation
+        </span>
+        <h1 className="font-marcellus text-3xl sm:text-4xl text-gray-900 font-normal leading-tight">
+          Book {room.title}
+        </h1>
+        <p className="text-gray-600 text-sm mt-1">
+          Complete your guest details and transfer payment to confirm your luxury stay.
+        </p>
+      </div>
 
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
+        {/* LEFT COLUMN: Booking & Payment Form (8 cols) - on mobile order-2 so summary card shows first */}
+        <div className="order-2 lg:order-1 lg:col-span-7 xl:col-span-8 space-y-7">
           {errorMsg && (
             <div className="bg-red-50 border border-red-300 rounded-md p-4 flex items-start gap-3 text-red-800 text-sm">
               <AlertTriangle size={18} className="text-red-600 shrink-0 mt-0.5" />
@@ -728,8 +727,8 @@ export default function BookingPageClient({
           </form>
         </div>
 
-        {/* RIGHT COLUMN: Order Summary & Room Preview Sticky Card (4 cols) */}
-        <div className="lg:col-span-5 xl:col-span-4 lg:sticky lg:top-28">
+        {/* RIGHT COLUMN: Order Summary & Room Preview Sticky Card (4 cols) - on mobile order-1 so it displays first */}
+        <div className="order-1 lg:order-2 lg:col-span-5 xl:col-span-4 lg:sticky lg:top-28">
           <div className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
             
             {/* Room Image */}
