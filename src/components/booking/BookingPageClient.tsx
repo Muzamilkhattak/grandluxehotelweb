@@ -29,7 +29,10 @@ import {
   ShieldCheck,
   User,
   Mail,
-  Phone
+  Phone,
+  Smartphone,
+  Landmark,
+  Wallet
 } from "lucide-react";
 
 interface BookingPageClientProps {
@@ -92,9 +95,31 @@ export default function BookingPageClient({
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [confirmedBooking, setConfirmedBooking] = useState<any | null>(null);
 
-  // Copy helpers
-  const [copiedAccount, setCopiedAccount] = useState(false);
-  const [copiedIban, setCopiedIban] = useState(false);
+  // Multi-Account Copy Helpers
+  const [copiedKey, setCopiedKey] = useState<string | null>(null);
+
+  const copyToClipboard = (text: string, key: string) => {
+    if (!navigator.clipboard) return;
+    navigator.clipboard.writeText(text);
+    setCopiedKey(key);
+    setTimeout(() => setCopiedKey(null), 2000);
+  };
+
+  // Active Payment Accounts (EasyPaisa, JazzCash, Bank Accounts)
+  const activeAccounts = (settings.paymentAccounts && settings.paymentAccounts.length > 0)
+    ? settings.paymentAccounts.filter((a) => a.isActive)
+    : [
+        {
+          id: "default-bank",
+          type: "bank" as const,
+          providerName: settings.bankName || "Meezan Bank",
+          accountTitle: settings.accountTitle || "Signature Art Hotel",
+          accountNumber: settings.accountNumber || "01020304050607",
+          iban: settings.iban || "PK36MEZN0001020304050607",
+          notes: "Direct bank transfer / Raast",
+          isActive: true,
+        },
+      ];
 
   // Calculate Nights & Total
   const calculateNights = (inDate: string, outDate: string) => {
@@ -110,18 +135,6 @@ export default function BookingPageClient({
   const subtotal = room.price_per_night * nights;
   const totalAmount = subtotal;
   const totalGuests = adults + children;
-
-  const copyToClipboard = (text: string, type: "account" | "iban") => {
-    if (!navigator.clipboard) return;
-    navigator.clipboard.writeText(text);
-    if (type === "account") {
-      setCopiedAccount(true);
-      setTimeout(() => setCopiedAccount(false), 2000);
-    } else {
-      setCopiedIban(true);
-      setTimeout(() => setCopiedIban(false), 2000);
-    }
-  };
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -479,84 +492,123 @@ export default function BookingPageClient({
               </div>
             </div>
 
-            {/* STEP 3: PAYMENT DETAILS & BANK TRANSFER */}
+            {/* STEP 3: PAYMENT DETAILS & ACCOUNTS (EasyPaisa, JazzCash, Bank Accounts) */}
             <div className="bg-white border-2 border-[#d7b56d] rounded-lg p-5 sm:p-7 shadow-sm">
               <div className="flex items-center gap-2.5 pb-4 mb-5 border-b border-gray-100">
                 <span className="w-6 h-6 rounded-full bg-[#d7b56d] text-black text-xs flex items-center justify-center font-bold">3</span>
                 <div>
                   <h2 className="font-marcellus text-xl text-gray-900 font-medium">
-                    Payment & Bank Transfer Details
+                    Payment & Transfer Details
                   </h2>
                   <p className="text-xs text-gray-500">
-                    Direct bank transfer to hotel official account. Zero booking fees.
+                    Pay via EasyPaisa, JazzCash, or online Bank Transfer to any official account below. Zero booking fees.
                   </p>
                 </div>
               </div>
 
-              {/* Bank Details Display Card */}
-              <div className="bg-[#0F141C] text-white rounded-lg p-5 sm:p-6 mb-6 shadow-md border border-[#d7b56d]/30 relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-[#d7b56d]/10 rounded-full blur-2xl pointer-events-none" />
-                
-                <div className="flex items-center justify-between mb-4 pb-3 border-b border-white/10">
-                  <div className="flex items-center gap-2">
-                    <Building2 size={18} className="text-[#d7b56d]" />
-                    <span className="font-marcellus text-lg text-white font-medium">
-                      {settings.bankName || "Meezan Bank"}
-                    </span>
-                  </div>
-                  <span className="text-[11px] font-semibold text-[#d7b56d] uppercase tracking-wider bg-white/10 px-2.5 py-1 rounded">
-                    Official Account
-                  </span>
+              {/* Payment Instructions banner */}
+              {settings.paymentInstructions && (
+                <div className="mb-5 bg-amber-50/80 border border-amber-200 rounded-md p-3.5 text-xs sm:text-[13px] text-amber-950 leading-relaxed flex items-start gap-2.5">
+                  <Sparkles size={16} className="text-[#d7b56d] shrink-0 mt-0.5" />
+                  <span>{settings.paymentInstructions}</span>
                 </div>
+              )}
 
-                <div className="space-y-3.5 text-sm">
-                  <div>
-                    <span className="text-gray-400 text-xs block uppercase tracking-wider">Account Title</span>
-                    <span className="font-semibold text-white text-base">
-                      {settings.accountTitle || "Signature Art Hotel"}
-                    </span>
-                  </div>
+              {/* Dynamic Payment Accounts List */}
+              <div className="space-y-4 mb-6">
+                {activeAccounts.map((account) => {
+                  const isEasyPaisa = account.type === "easypaisa";
+                  const isJazzCash = account.type === "jazzcash";
+                  const isBank = account.type === "bank";
 
-                  <div className="flex items-center justify-between bg-white/5 p-3 rounded border border-white/10">
-                    <div>
-                      <span className="text-gray-400 text-xs block uppercase tracking-wider">Account Number</span>
-                      <span className="font-mono font-bold text-white text-sm sm:text-base tracking-wider">
-                        {settings.accountNumber || "01020304050607"}
-                      </span>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => copyToClipboard(settings.accountNumber || "01020304050607", "account")}
-                      className="flex items-center gap-1.5 text-xs bg-[#d7b56d] hover:bg-white text-black font-semibold px-3 py-1.5 rounded transition-colors cursor-pointer"
+                  return (
+                    <div
+                      key={account.id}
+                      className="bg-[#0F141C] text-white rounded-lg p-4 sm:p-5 shadow-md border border-[#d7b56d]/30 relative overflow-hidden"
                     >
-                      {copiedAccount ? <Check size={13} /> : <Copy size={13} />}
-                      {copiedAccount ? "Copied" : "Copy"}
-                    </button>
-                  </div>
+                      <div className="absolute top-0 right-0 w-32 h-32 bg-[#d7b56d]/10 rounded-full blur-2xl pointer-events-none" />
 
-                  {settings.iban && (
-                    <div className="flex items-center justify-between bg-white/5 p-3 rounded border border-white/10">
-                      <div>
-                        <span className="text-gray-400 text-xs block uppercase tracking-wider">IBAN</span>
-                        <span className="font-mono font-bold text-white text-xs sm:text-sm tracking-wider">
-                          {settings.iban}
+                      <div className="flex items-center justify-between mb-3 pb-2.5 border-b border-white/10">
+                        <div className="flex items-center gap-2">
+                          <div
+                            className={`w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-bold ${
+                              isEasyPaisa
+                                ? "bg-[#00A859]"
+                                : isJazzCash
+                                ? "bg-[#ED1C24]"
+                                : isBank
+                                ? "bg-[#d7b56d] text-black"
+                                : "bg-blue-600"
+                            }`}
+                          >
+                            {isBank ? <Landmark size={14} /> : <Smartphone size={14} />}
+                          </div>
+                          <span className="font-marcellus text-base sm:text-lg text-white font-medium">
+                            {account.providerName}
+                          </span>
+                        </div>
+                        <span className="text-[10.5px] font-semibold text-[#d7b56d] uppercase tracking-wider bg-white/10 px-2.5 py-0.5 rounded">
+                          {account.type === "bank" ? "Bank Account" : account.providerName}
                         </span>
                       </div>
-                      <button
-                        type="button"
-                        onClick={() => copyToClipboard(settings.iban || "", "iban")}
-                        className="flex items-center gap-1.5 text-xs bg-[#d7b56d] hover:bg-white text-black font-semibold px-3 py-1.5 rounded transition-colors cursor-pointer"
-                      >
-                        {copiedIban ? <Check size={13} /> : <Copy size={13} />}
-                        {copiedIban ? "Copied" : "Copy"}
-                      </button>
-                    </div>
-                  )}
 
-                  <div className="pt-2 text-xs text-gray-300 leading-relaxed italic border-t border-white/10">
-                    {settings.paymentInstructions || "Please transfer the reservation total amount to the account above and upload the screenshot below."}
-                  </div>
-                </div>
+                      <div className="space-y-2.5 text-sm">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-xs sm:text-sm">
+                          <span className="text-gray-400">Account Title:</span>
+                          <span className="font-semibold text-white">{account.accountTitle}</span>
+                        </div>
+
+                        {/* Account Number Box with 1-click Copy */}
+                        <div className="flex items-center justify-between bg-white/5 p-2.5 sm:p-3 rounded border border-white/10">
+                          <div>
+                            <span className="text-gray-400 text-[11px] block uppercase tracking-wider">
+                              {isBank ? "Account Number" : "Mobile Account Number"}
+                            </span>
+                            <span className="font-mono font-bold text-white text-sm sm:text-base tracking-wider">
+                              {account.accountNumber}
+                            </span>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => copyToClipboard(account.accountNumber, `num-${account.id}`)}
+                            className="flex items-center gap-1.5 text-xs bg-[#d7b56d] hover:bg-white text-black font-semibold px-3 py-1.5 rounded transition-colors cursor-pointer shrink-0"
+                          >
+                            {copiedKey === `num-${account.id}` ? <Check size={13} /> : <Copy size={13} />}
+                            {copiedKey === `num-${account.id}` ? "Copied" : "Copy"}
+                          </button>
+                        </div>
+
+                        {/* IBAN Box if available */}
+                        {account.iban && (
+                          <div className="flex items-center justify-between bg-white/5 p-2.5 sm:p-3 rounded border border-white/10">
+                            <div>
+                              <span className="text-gray-400 text-[11px] block uppercase tracking-wider">
+                                IBAN
+                              </span>
+                              <span className="font-mono font-bold text-white text-xs sm:text-sm tracking-wider">
+                                {account.iban}
+                              </span>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => copyToClipboard(account.iban || "", `iban-${account.id}`)}
+                              className="flex items-center gap-1.5 text-xs bg-[#d7b56d] hover:bg-white text-black font-semibold px-3 py-1.5 rounded transition-colors cursor-pointer shrink-0"
+                            >
+                              {copiedKey === `iban-${account.id}` ? <Check size={13} /> : <Copy size={13} />}
+                              {copiedKey === `iban-${account.id}` ? "Copied" : "Copy"}
+                            </button>
+                          </div>
+                        )}
+
+                        {account.notes && (
+                          <div className="pt-1 text-[11.5px] text-gray-300 italic">
+                            {account.notes}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
 
               {/* File Upload Box */}
