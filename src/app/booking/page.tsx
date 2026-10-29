@@ -95,11 +95,11 @@ export default async function BookingPage({
             <Sparkles size={14} className="text-[#d7b56d]" />
           </div>
 
-          <h1 className="font-marcellus text-3xl sm:text-5xl text-white font-normal mb-2">
+          <h1 className="font-marcellus text-3xl sm:text-5xl text-white font-bold mb-2 tracking-wide drop-shadow-md">
             Reservation & Payment
           </h1>
-          <p className="font-jost text-gray-300 text-sm sm:text-base max-w-xl mx-auto">
-            Review your stay details, transfer to the official hotel account, and confirm your booking.
+          <p className="font-jost text-white font-medium text-base sm:text-lg max-w-xl mx-auto">
+            Review your stay details, transfer to any official hotel account, and confirm your booking.
           </p>
         </div>
       </section>
