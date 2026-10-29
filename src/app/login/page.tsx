@@ -28,7 +28,7 @@ function LoginFormContent() {
 
   const router = useRouter();
   const searchParams = useSearchParams();
-  const redirectUrl = searchParams.get("redirect") || "/profile";
+  const redirectUrl = searchParams.get("redirect") || "/";
 
   // Active lockout countdown
   useEffect(() => {

@@ -36,6 +36,13 @@ export default function Header() {
     return () => subscription.unsubscribe();
   }, []);
 
+  // Compute display name for authenticated user
+  const displayName = user
+    ? user.user_metadata?.full_name ||
+      user.user_metadata?.name ||
+      (user.email ? user.email.split("@")[0] : "Profile")
+    : null;
+
   // Lock body scroll when drawer menu is open
   useEffect(() => {
     if (menuOpen) {
@@ -121,8 +128,8 @@ export default function Header() {
             </Link>
           </div>
 
-          {/* Right Side: Contact Us (md+) & Check Availability / Book Now (responsive) */}
-          <div className="flex items-center justify-end gap-2 sm:gap-4 md:gap-6 pointer-events-auto flex-1">
+          {/* Right Side: Contact Us (md+) & User Profile / Login & Book Now */}
+          <div className="flex items-center justify-end gap-2 sm:gap-3.5 md:gap-5 pointer-events-auto flex-1">
             <Link 
               href="/contact" 
               className="hidden md:inline-block font-jost text-[12.5px] sm:text-[13.5px] uppercase tracking-[0.18em] text-[#FFFFFF]/90 hover:text-white font-medium py-1.5 transition-colors relative group whitespace-nowrap"
@@ -131,23 +138,30 @@ export default function Header() {
               <span className="absolute -bottom-0.5 left-0 w-full h-[1.5px] bg-[#d7b56d] origin-center transition-transform duration-300 scale-x-0 group-hover:scale-x-100" />
             </Link>
 
+            {/* User Account / Profile Button with Name */}
             <Link 
               href={user ? "/profile" : "/login"} 
-              className="hidden lg:flex items-center gap-1.5 font-jost text-[12.5px] uppercase tracking-[0.16em] text-[#FFFFFF]/90 hover:text-[#d7b56d] font-medium py-1.5 transition-colors whitespace-nowrap"
-              title={user ? "My Profile" : "Sign In"}
+              className={`flex items-center gap-1.5 font-jost text-[12px] sm:text-[13px] uppercase tracking-[0.12em] py-1 sm:py-1.5 px-2 rounded-full transition-all group whitespace-nowrap cursor-pointer ${
+                (pathname === "/profile" || pathname === "/login")
+                  ? "text-[#d7b56d] bg-white/10"
+                  : "text-[#FFFFFF]/90 hover:text-[#d7b56d] hover:bg-white/5"
+              }`}
+              title={user ? `Signed in as ${displayName}` : "Sign In"}
             >
-              <div className="w-6 h-6 rounded-full border border-[#d7b56d]/60 flex items-center justify-center">
-                <User size={12} className="text-[#d7b56d]" />
+              <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-full border border-[#d7b56d]/70 flex items-center justify-center bg-[#2C1D12]/60 group-hover:border-[#d7b56d] group-hover:bg-[#d7b56d]/20 transition-colors shrink-0">
+                <User size={13} className="text-[#d7b56d]" />
               </div>
-              <span>{user ? "Profile" : "Sign In"}</span>
+              <span className="max-w-[85px] sm:max-w-[130px] md:max-w-[160px] truncate capitalize font-medium text-[11.5px] sm:text-[12.5px]">
+                {user ? displayName : "Sign In"}
+              </span>
             </Link>
 
             <Link 
               href="/rooms"
-              className="bg-[#d7b56d] hover:bg-[#000000] text-[#000000] hover:text-white font-jost uppercase tracking-[0.14em] sm:tracking-[0.16em] text-[11px] sm:text-[12.5px] font-semibold px-3.5 sm:px-5 md:px-6 py-2 sm:py-2.5 rounded-full shadow-md transition-all duration-300 active:scale-95 whitespace-nowrap"
+              className="bg-[#d7b56d] hover:bg-[#000000] text-[#000000] hover:text-white font-jost uppercase tracking-[0.14em] sm:tracking-[0.16em] text-[11px] sm:text-[12.5px] font-semibold px-3 sm:px-4 md:px-6 py-2 sm:py-2.5 rounded-full shadow-md transition-all duration-300 active:scale-95 whitespace-nowrap"
             >
               <span className="hidden sm:inline">Check Availability</span>
-              <span className="sm:hidden">Book Now</span>
+              <span className="sm:hidden">Book</span>
             </Link>
           </div>
         </div>
@@ -266,7 +280,7 @@ export default function Header() {
                 <div className="w-5 h-5 rounded-full border border-[#d7b56d]/60 flex items-center justify-center">
                   <User size={12} strokeWidth={2} className="text-[#d7b56d]" />
                 </div>
-                <span className="font-light tracking-[0.04em]">{user ? "My Profile" : "Sign In"}</span>
+                <span className="font-light tracking-[0.04em] capitalize">{user ? displayName : "Sign In"}</span>
               </Link>
             </div>
           </div>

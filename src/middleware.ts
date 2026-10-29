@@ -35,10 +35,10 @@ export async function middleware(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // If user visits /login while already logged in, redirect them to /profile or intended destination
+  // If user visits /login while already logged in, redirect them to / or intended destination
   if (pathname === "/login") {
     if (user) {
-      const redirectParam = request.nextUrl.searchParams.get("redirect") || "/profile";
+      const redirectParam = request.nextUrl.searchParams.get("redirect") || "/";
       const redirectResponse = NextResponse.redirect(new URL(redirectParam, request.url));
       supabaseResponse.cookies.getAll().forEach((cookie) => {
         redirectResponse.cookies.set(cookie);

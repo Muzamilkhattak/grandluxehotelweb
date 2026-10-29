@@ -137,8 +137,12 @@ export default function ProfileClient({ initialUser }: { initialUser: any }) {
       )}
 
       <div className="space-y-3 pt-6 border-t border-[#d7b56d]">
-        <form action={async () => { await logoutAction(); }}>
-          <button className="w-full flex items-center justify-center gap-2 py-2.5 border border-[#000000] text-[#000000] hover:bg-[#000000] hover:text-white transition-colors font-jost uppercase tracking-wider text-[12px] font-semibold">
+        <form action={async () => { 
+          await logoutAction(); 
+          router.push("/");
+          router.refresh();
+        }}>
+          <button type="submit" className="w-full flex items-center justify-center gap-2 py-2.5 border border-[#000000] text-[#000000] hover:bg-[#000000] hover:text-white transition-colors font-jost uppercase tracking-wider text-[12px] font-semibold cursor-pointer">
             <LogOut size={14} />
             Sign Out
           </button>
