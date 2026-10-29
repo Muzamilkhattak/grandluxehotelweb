@@ -63,16 +63,17 @@ export default function AboutSection() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.8, ease: "easeOut" }}
+            className="flex flex-col items-start"
           >
-            <div className="inline-flex items-center gap-3 mb-4 sm:mb-6">
-              <span className="w-8 sm:w-10 h-[2px] bg-[#9e7422]" />
+            <div className="w-full flex items-center gap-3 mb-3 sm:mb-4">
+              <span className="w-8 sm:w-10 h-[2px] bg-[#9e7422] shrink-0" />
               <h4 className="font-marcellus text-[#8f6618] tracking-[0.22em] uppercase text-[15px] sm:text-[17px] md:text-[18px] font-bold">
                 Our Legacy
               </h4>
             </div>
             <h2 
               ref={textRef}
-              className="reveal-text font-marcellus text-3xl sm:text-4xl md:text-[50px] lg:text-[56px] leading-[1.12]"
+              className="reveal-text font-marcellus text-3xl sm:text-4xl md:text-[50px] lg:text-[56px] leading-[1.12] w-full block"
             >
               Your perfect stay <br className="hidden md:block"/> experience starts here
             </h2>
