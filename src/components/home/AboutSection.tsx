@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { ArrowRight } from "lucide-react";
 
 function AnimatedCounter({ from, to, duration = 2 }: { from: number, to: number, duration?: number }) {
   const nodeRef = useRef<HTMLSpanElement>(null);
@@ -56,24 +57,24 @@ export default function AboutSection() {
     <section id="about" className="py-16 sm:py-24 md:py-32 bg-[#FFFFFF] relative overflow-hidden scroll-mt-20">
       <div className="max-w-7xl mx-auto px-4 flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
         
-        {/* Text Content */}
-        <div className="w-full lg:w-1/2 space-y-6 sm:space-y-8 md:space-y-10 z-10">
+        {/* Text Content: On mobile order-2 (appears below images), on desktop lg:order-1 (left column) */}
+        <div className="w-full lg:w-1/2 space-y-6 sm:space-y-8 md:space-y-10 z-10 order-2 lg:order-1">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.8, ease: "easeOut" }}
-            className="flex flex-col items-start"
+            className="flex flex-col items-start w-full"
           >
-            <div className="w-full flex items-center gap-3 mb-3 sm:mb-4">
-              <span className="w-8 sm:w-10 h-[2px] bg-[#9e7422] shrink-0" />
-              <h4 className="font-marcellus text-[#8f6618] tracking-[0.22em] uppercase text-[15px] sm:text-[17px] md:text-[18px] font-bold">
+            <div className="w-full flex items-center gap-2.5 sm:gap-3 mb-2 sm:mb-4">
+              <span className="w-7 sm:w-10 h-[2px] bg-[#9e7422] shrink-0" />
+              <h4 className="font-marcellus text-[#8f6618] tracking-[0.2em] sm:tracking-[0.22em] uppercase text-[14px] sm:text-[17px] md:text-[18px] font-bold">
                 Our Legacy
               </h4>
             </div>
             <h2 
               ref={textRef}
-              className="reveal-text font-marcellus text-3xl sm:text-4xl md:text-[50px] lg:text-[56px] leading-[1.12] w-full block"
+              className="reveal-text font-marcellus text-[28px] sm:text-4xl md:text-[50px] lg:text-[56px] leading-[1.15] w-full block mt-1"
             >
               Your perfect stay <br className="hidden md:block"/> experience starts here
             </h2>
@@ -91,11 +92,11 @@ export default function AboutSection() {
             </p>
             <ul className="list-none space-y-2.5 sm:space-y-3 font-medium text-[#000000]/80 text-[14px] sm:text-[16px]">
               <li className="flex items-start gap-2.5 sm:gap-3">
-                <span className="text-[#d7b56d] mt-1 text-[11px] sm:text-[12px]">◆</span> 
+                <span className="text-[#8f6618] mt-1 text-[11px] sm:text-[12px]">◆</span> 
                 Discover exceptional hospitality in the heart of Islamabad
               </li>
               <li className="flex items-start gap-2.5 sm:gap-3">
-                <span className="text-[#d7b56d] mt-1 text-[11px] sm:text-[12px]">◆</span> 
+                <span className="text-[#8f6618] mt-1 text-[11px] sm:text-[12px]">◆</span> 
                 Luxury accommodations for unforgettable travel moments
               </li>
             </ul>
@@ -107,7 +108,7 @@ export default function AboutSection() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.8, delay: 0.4, ease: "easeOut" }}
-            className="flex items-center gap-8 sm:gap-14 md:gap-16 pt-6 sm:pt-8 border-t border-[#d7b56d]/15"
+            className="flex items-center gap-8 sm:gap-14 md:gap-16 pt-6 sm:pt-8 border-t border-[#d7b56d]/20"
           >
             <div className="flex flex-col">
               <div className="font-marcellus text-4xl sm:text-[50px] md:text-[54px] font-normal text-[#000000] flex items-center leading-none mb-2">
@@ -128,21 +129,26 @@ export default function AboutSection() {
             </div>
           </motion.div>
 
+          {/* Luxury CTA Button */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.8, delay: 0.6, ease: "easeOut" }}
-            className="pt-4"
+            className="pt-2 sm:pt-4"
           >
-            <Link href="/about" className="inline-block border-b border-[#d7b56d] text-[#000000] font-vogue uppercase tracking-[0.15em] text-[12px] pb-2 hover:text-[#d7b56d] hover:border-[#000000] transition-all">
-              Discover Our History
+            <Link 
+              href="/about" 
+              className="inline-flex items-center gap-3 bg-[#d7b56d] hover:bg-[#000000] text-[#000000] hover:text-white font-jost uppercase tracking-[0.18em] text-[12.5px] sm:text-[13.5px] font-semibold px-8 sm:px-10 py-3.5 sm:py-4 rounded-full shadow-lg hover:shadow-2xl transition-all duration-300 group active:scale-95 border border-[#d7b56d] hover:border-[#000000]"
+            >
+              <span>Discover Our History</span>
+              <ArrowRight size={15} className="group-hover:translate-x-1.5 transition-transform duration-300" />
             </Link>
           </motion.div>
         </div>
 
-        {/* Animated Image Composition */}
-        <div className="w-full lg:w-1/2 relative min-h-[420px] sm:min-h-[520px] lg:min-h-[650px] flex items-center justify-center mt-6 lg:mt-0">
+        {/* Animated Image Composition: On mobile order-1 (appears before content), on desktop lg:order-2 */}
+        <div className="w-full lg:w-1/2 relative min-h-[380px] sm:min-h-[500px] lg:min-h-[650px] flex items-center justify-center mt-2 lg:mt-0 mb-8 sm:mb-12 lg:mb-0 order-1 lg:order-2">
           
           {/* Main Large Image */}
           <motion.div
