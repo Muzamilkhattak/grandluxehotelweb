@@ -10,6 +10,16 @@ import {
   recordFailedAttempt,
   resetRateLimit,
 } from "@/lib/rate-limit";
+import {
+  isSuspiciousBotRequest,
+  verifyHoneypot,
+  verifySubmissionTiming,
+  sanitizeAndValidateEmail,
+  sanitizeFullName,
+  sanitizePhone,
+  validatePasswordStrength,
+  equalizeTiming,
+} from "@/lib/security";
 
 export interface AuthActionResult {
   success: boolean;
@@ -21,24 +31,71 @@ export interface AuthActionResult {
 }
 
 export async function loginAction(formData: FormData): Promise<AuthActionResult> {
-  const email = (formData.get("email") as string || "").trim().toLowerCase();
+  const startTime = Date.now();
+
+  // 1. Anti-Bot Defense Layer
+  if (await isSuspiciousBotRequest()) {
+    await equalizeTiming(startTime, 500);
+    return { success: false, error: "Automated activity detected. Access restricted." };
+  }
+
+  // Honeypot trap check
+  const honeypot = formData.get("hotel_hp_field") as string;
+  if (!verifyHoneypot(honeypot)) {
+    await equalizeTiming(startTime, 600);
+    return { success: false, error: "Security check failed. Please refresh and try again." };
+  }
+
+  // Time-to-submit verification (blocks automated submission scripts)
+  const formTs = formData.get("_form_ts") as string;
+  if (!verifySubmissionTiming(formTs, 600)) {
+    await equalizeTiming(startTime, 500);
+    return { success: false, error: "Form submitted unusually fast. Please try again." };
+  }
+
+  // 2. Input Sanitization & Validation
+  const rawEmail = (formData.get("email") as string || "");
   const password = formData.get("password") as string || "";
 
-  if (!email || !password) {
-    return { success: false, error: "Email and password are required" };
+  const emailCheck = sanitizeAndValidateEmail(rawEmail);
+  if (!emailCheck.isValid) {
+    await equalizeTiming(startTime, 250);
+    return { success: false, error: emailCheck.error || "Valid email is required." };
+  }
+  const email = emailCheck.email;
+
+  if (!password) {
+    await equalizeTiming(startTime, 250);
+    return { success: false, error: "Password is required." };
   }
 
   const clientIp = await getClientIp();
-  const rateLimitKey = `user_login:${clientIp}:${email}`;
+  const ipRateLimitKey = `user_login_ip:${clientIp}`;
+  const targetRateLimitKey = `user_login_target:${email}`;
 
-  // 1. Enforce rate limit check before hitting Supabase
-  const limitStatus = await checkRateLimit(rateLimitKey, 5, 15 * 60 * 1000);
-  if (limitStatus.isLimited) {
+  // 3. Dual-Layer Rate Limiting (Prevents IP brute force & Distributed Credential Stuffing)
+  const [ipLimit, targetLimit] = await Promise.all([
+    checkRateLimit(ipRateLimitKey, 5, 15 * 60 * 1000),
+    checkRateLimit(targetRateLimitKey, 5, 15 * 60 * 1000),
+  ]);
+
+  if (ipLimit.isLimited) {
+    await equalizeTiming(startTime, 300);
     return {
       success: false,
-      error: limitStatus.errorMessage,
+      error: ipLimit.errorMessage,
       isLocked: true,
-      retryAfterSeconds: limitStatus.retryAfterSeconds,
+      retryAfterSeconds: ipLimit.retryAfterSeconds,
+    };
+  }
+
+  if (targetLimit.isLimited) {
+    await equalizeTiming(startTime, 300);
+    return {
+      success: false,
+      error: `Too many login attempts on this account. Locked for security. Try again in ${targetLimit.retryAfterSeconds}s.`,
+      isLocked: true,
+      retryAfterSeconds: targetLimit.retryAfterSeconds,
     };
   }
 
@@ -80,8 +137,13 @@ export async function loginAction(formData: FormData): Promise<AuthActionResult>
   }
 
   if (error) {
-    // Record failed attempt
-    const failRecord = await recordFailedAttempt(rateLimitKey, 5, 15 * 60 * 1000, 15 * 60 * 1000);
+    // Record failed attempt in both IP and Target Account stores
+    const [ipFailRecord] = await Promise.all([
+      recordFailedAttempt(ipRateLimitKey, 5, 15 * 60 * 1000, 15 * 60 * 1000),
+      recordFailedAttempt(targetRateLimitKey, 5, 15 * 60 * 1000, 15 * 60 * 1000),
+    ]);
+
+    await equalizeTiming(startTime, 350);
 
     const friendlyError = error.message.toLowerCase().includes("invalid login credentials")
       ? "Invalid email or password. Please verify your credentials."
@@ -89,46 +151,84 @@ export async function loginAction(formData: FormData): Promise<AuthActionResult>
 
     return {
       success: false,
-      error: failRecord.isLimited
-        ? failRecord.errorMessage
-        : `${friendlyError} (${failRecord.remainingAttempts} attempt${failRecord.remainingAttempts === 1 ? "" : "s"} remaining before lockout).`,
-      isLocked: failRecord.isLimited,
-      retryAfterSeconds: failRecord.retryAfterSeconds,
+      error: ipFailRecord.isLimited
+        ? ipFailRecord.errorMessage
+        : `${friendlyError} (${ipFailRecord.remainingAttempts} attempt${ipFailRecord.remainingAttempts === 1 ? "" : "s"} remaining before lockout).`,
+      isLocked: ipFailRecord.isLimited,
+      retryAfterSeconds: ipFailRecord.retryAfterSeconds,
     };
   }
 
-  // Clear rate limit record upon successful sign-in
-  await resetRateLimit(rateLimitKey);
+  // Clear rate limits upon successful sign-in
+  await Promise.all([
+    resetRateLimit(ipRateLimitKey),
+    resetRateLimit(targetRateLimitKey),
+  ]);
+
+  await equalizeTiming(startTime, 300);
 
   revalidatePath("/", "layout");
   return { success: true };
 }
 
 export async function signupAction(formData: FormData): Promise<AuthActionResult> {
-  const email = (formData.get("email") as string || "").trim().toLowerCase();
+  const startTime = Date.now();
+
+  // 1. Anti-Bot Defense Layer
+  if (await isSuspiciousBotRequest()) {
+    await equalizeTiming(startTime, 500);
+    return { success: false, error: "Automated activity detected. Access restricted." };
+  }
+
+  // Honeypot trap check
+  const honeypot = formData.get("hotel_hp_field") as string;
+  if (!verifyHoneypot(honeypot)) {
+    await equalizeTiming(startTime, 600);
+    return { success: false, error: "Security validation failed. Please try again." };
+  }
+
+  // Time-to-submit verification
+  const formTs = formData.get("_form_ts") as string;
+  if (!verifySubmissionTiming(formTs, 800)) {
+    await equalizeTiming(startTime, 500);
+    return { success: false, error: "Form submitted unusually fast. Please try again." };
+  }
+
+  // 2. Strict Input Sanitization & Validation
+  const rawEmail = formData.get("email") as string || "";
   const password = formData.get("password") as string || "";
-  const fullName = (formData.get("fullName") as string || "").trim();
-  const phone = (formData.get("phone") as string || "").trim();
+  const rawFullName = formData.get("fullName") as string || "";
+  const rawPhone = formData.get("phone") as string || "";
 
-  if (!email || !password || !fullName) {
-    return { success: false, error: "Full name, email address, and password are required" };
+  const nameCheck = sanitizeFullName(rawFullName);
+  if (!nameCheck.isValid) {
+    await equalizeTiming(startTime, 250);
+    return { success: false, error: nameCheck.error };
+  }
+  const fullName = nameCheck.name;
+
+  const emailCheck = sanitizeAndValidateEmail(rawEmail);
+  if (!emailCheck.isValid) {
+    await equalizeTiming(startTime, 250);
+    return { success: false, error: emailCheck.error };
+  }
+  const email = emailCheck.email;
+
+  const passwordCheck = validatePasswordStrength(password);
+  if (!passwordCheck.isValid) {
+    await equalizeTiming(startTime, 250);
+    return { success: false, error: passwordCheck.error };
   }
 
-  if (password.length < 6) {
-    return { success: false, error: "Password must be at least 6 characters long" };
-  }
+  const phone = sanitizePhone(rawPhone);
 
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(email)) {
-    return { success: false, error: "Please enter a valid email address" };
-  }
-
+  // 3. Signup Rate Limiting (Prevents account creation spam & DB exhaustion)
   const clientIp = await getClientIp();
   const signupLimitKey = `user_signup:${clientIp}`;
 
-  // Rate limit: max 10 account signups per 30 minutes per IP
-  const limitStatus = await checkRateLimit(signupLimitKey, 10, 30 * 60 * 1000);
+  const limitStatus = await checkRateLimit(signupLimitKey, 5, 30 * 60 * 1000);
   if (limitStatus.isLimited) {
+    await equalizeTiming(startTime, 300);
     return {
       success: false,
       error: "Too many accounts created from this network. Please try again later.",
@@ -142,7 +242,7 @@ export async function signupAction(formData: FormData): Promise<AuthActionResult
   const adminClient = createAdminClient();
 
   if (adminClient) {
-    // Create user with verified email via Admin client for instant access
+    // Create user with verified email via Admin client for instant, secure access
     const { data: adminData, error: adminError } = await adminClient.auth.admin.createUser({
       email,
       password,
@@ -154,6 +254,7 @@ export async function signupAction(formData: FormData): Promise<AuthActionResult
     });
 
     if (adminError) {
+      await equalizeTiming(startTime, 350);
       if (
         adminError.message.toLowerCase().includes("already registered") ||
         adminError.message.toLowerCase().includes("already exists")
@@ -173,13 +274,14 @@ export async function signupAction(formData: FormData): Promise<AuthActionResult
     });
 
     if (signInError) {
+      await equalizeTiming(startTime, 300);
       return {
         success: false,
-        error: `Account created successfully, but automatic sign in failed: ${signInError.message}. Please sign in manually.`,
+        error: `Account created, but sign in failed: ${signInError.message}. Please sign in with your credentials.`,
       };
     }
   } else {
-    // Fallback to standard Supabase signUp if admin client is not available
+    // Fallback if admin client not available
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
@@ -192,23 +294,25 @@ export async function signupAction(formData: FormData): Promise<AuthActionResult
     });
 
     if (error) {
+      await equalizeTiming(startTime, 300);
       return { success: false, error: error.message };
     }
 
     if (data.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
+      await equalizeTiming(startTime, 300);
       return {
         success: false,
         error: "An account with this email address already exists. Please sign in instead.",
       };
     }
 
-    // If session wasn't automatically established, try signing in
     if (!data.session) {
       const { error: signInError } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
       if (signInError) {
+        await equalizeTiming(startTime, 300);
         return {
           success: true,
           requiresConfirmation: true,
@@ -218,9 +322,11 @@ export async function signupAction(formData: FormData): Promise<AuthActionResult
     }
   }
 
-  // Clear rate limits
-  const rateLimitKey = `user_login:${clientIp}:${email}`;
-  await resetRateLimit(rateLimitKey);
+  // Clear IP rate limit upon successful legitimate account creation
+  await resetRateLimit(`user_login_ip:${clientIp}`);
+  await resetRateLimit(`user_login_target:${email}`);
+
+  await equalizeTiming(startTime, 350);
 
   revalidatePath("/", "layout");
   return { success: true };

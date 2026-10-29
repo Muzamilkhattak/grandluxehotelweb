@@ -15,6 +15,7 @@ import {
   EyeOff,
   CheckCircle2,
   ChevronLeft,
+  ShieldCheck,
 } from "lucide-react";
 
 function LoginFormContent() {
@@ -25,10 +26,16 @@ function LoginFormContent() {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [isLocked, setIsLocked] = useState(false);
   const [lockoutSeconds, setLockoutSeconds] = useState(0);
+  const [formTs, setFormTs] = useState<number>(0);
 
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirectUrl = searchParams.get("redirect") || "/";
+
+  // Initialize anti-bot timestamp upon mount
+  useEffect(() => {
+    setFormTs(Date.now());
+  }, []);
 
   // Active lockout countdown
   useEffect(() => {
@@ -70,11 +77,15 @@ function LoginFormContent() {
         setSuccessMessage(res.message);
         setLoading(false);
       } else {
-        setSuccessMessage(isLogin ? "Signed in successfully! Redirecting..." : "Account created successfully! Redirecting...");
+        setSuccessMessage(
+          isLogin
+            ? "Signed in successfully! Redirecting..."
+            : "Account created successfully! Redirecting..."
+        );
         setTimeout(() => {
           router.push(redirectUrl);
           router.refresh();
-        }, 600);
+        }, 500);
       }
     } else {
       setError(res.error || "An unexpected error occurred. Please try again.");
@@ -94,13 +105,16 @@ function LoginFormContent() {
       <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" />
 
       <div className="relative z-10 w-full max-w-md bg-white p-6 sm:p-10 shadow-2xl border-t-4 border-[#d7b56d]">
-        <div className="mb-4">
+        <div className="mb-4 flex items-center justify-between">
           <Link
             href="/"
             className="inline-flex items-center gap-1 text-[12px] font-jost uppercase tracking-wider text-[#000000]/70 hover:text-[#d7b56d] transition-colors"
           >
             <ChevronLeft size={14} /> Back to Home
           </Link>
+          <span className="flex items-center gap-1 text-[10.5px] uppercase tracking-wider text-emerald-800 font-jost font-semibold">
+            <ShieldCheck size={13} className="text-emerald-700" /> 256-Bit SSL
+          </span>
         </div>
 
         <div className="text-center mb-6">
@@ -129,6 +143,30 @@ function LoginFormContent() {
         )}
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          {/* Anti-Bot Invisible Honeypot Trap (Bots fill this, humans don't) */}
+          <div
+            style={{
+              position: "absolute",
+              left: "-9999px",
+              top: "-9999px",
+              opacity: 0,
+              pointerEvents: "none",
+            }}
+            aria-hidden="true"
+          >
+            <label htmlFor="hotel_hp_field">Security Verification</label>
+            <input
+              id="hotel_hp_field"
+              name="hotel_hp_field"
+              type="text"
+              tabIndex={-1}
+              autoComplete="off"
+            />
+          </div>
+
+          {/* Time-To-Submit Verification Token */}
+          <input type="hidden" name="_form_ts" value={formTs} />
+
           {!isLogin && (
             <>
               <div className="flex flex-col gap-1">
@@ -139,6 +177,7 @@ function LoginFormContent() {
                   name="fullName"
                   type="text"
                   required
+                  maxLength={70}
                   placeholder="Eleanor Vance"
                   className="w-full bg-[#FFFFFF] border border-[#d7b56d] focus:border-[#000000] px-3.5 py-2.5 text-[14px] font-jost text-[#000000] outline-none transition-colors"
                 />
@@ -151,6 +190,7 @@ function LoginFormContent() {
                 <input
                   name="phone"
                   type="tel"
+                  maxLength={25}
                   placeholder="+47 22 00 00 00"
                   className="w-full bg-[#FFFFFF] border border-[#d7b56d] focus:border-[#000000] px-3.5 py-2.5 text-[14px] font-jost text-[#000000] outline-none transition-colors"
                 />
@@ -166,6 +206,7 @@ function LoginFormContent() {
               name="email"
               type="email"
               required
+              maxLength={128}
               placeholder="name@example.com"
               className="w-full bg-[#FFFFFF] border border-[#d7b56d] focus:border-[#000000] px-3.5 py-2.5 text-[14px] font-jost text-[#000000] outline-none transition-colors"
             />
@@ -180,8 +221,9 @@ function LoginFormContent() {
                 name="password"
                 type={showPassword ? "text" : "password"}
                 required
-                minLength={6}
-                placeholder={isLogin ? "••••••••" : "Minimum 6 characters"}
+                minLength={8}
+                maxLength={72}
+                placeholder={isLogin ? "••••••••" : "Minimum 8 characters"}
                 className="w-full bg-[#FFFFFF] border border-[#d7b56d] focus:border-[#000000] px-3.5 py-2.5 pr-10 text-[14px] font-jost text-[#000000] outline-none transition-colors"
               />
               <button
@@ -195,7 +237,7 @@ function LoginFormContent() {
             </div>
             {!isLogin && (
               <span className="text-[11px] font-jost text-gray-500">
-                Must be at least 6 characters
+                Minimum 8 characters
               </span>
             )}
           </div>
@@ -230,6 +272,7 @@ function LoginFormContent() {
                 setIsLogin(!isLogin);
                 setError(null);
                 setSuccessMessage(null);
+                setFormTs(Date.now());
               }}
               className="ml-2 text-[#d7b56d] font-semibold hover:underline cursor-pointer"
             >
