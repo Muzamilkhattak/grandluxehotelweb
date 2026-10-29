@@ -94,7 +94,7 @@ export default function Header() {
         <div className="relative w-full h-[82px] sm:h-[90px] md:h-[96px] max-w-7xl mx-auto px-4 sm:px-6 md:px-8 flex items-center justify-between pointer-events-none">
           
           {/* Left Side: Hamburger Toggle Icon & Menu Label */}
-          <div className="flex items-center gap-1.5 sm:gap-2 pointer-events-auto flex-1">
+          <div className="relative z-30 flex items-center gap-1.5 sm:gap-2 pointer-events-auto shrink-0">
             <button 
               onClick={() => setMenuOpen(!menuOpen)}
               className="flex items-center gap-2 text-[#FFFFFF] hover:text-[#d7b56d] transition-all duration-300 group py-1.5 px-2 rounded-full hover:bg-white/5 active:scale-95 cursor-pointer"
@@ -111,7 +111,7 @@ export default function Header() {
           </div>
 
           {/* Center Logo - Clean, Vertically & Horizontally Centered */}
-          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-auto z-10 flex flex-col items-center">
+          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-auto z-10 flex flex-col items-center max-w-[40%] sm:max-w-none">
             <Link 
               href="/" 
               className="group flex items-center transition-all duration-300 hover:scale-105 active:scale-95 py-1"
@@ -123,13 +123,13 @@ export default function Header() {
                 width={260}
                 height={150}
                 priority
-                className="h-[64px] sm:h-[76px] md:h-[84px] w-auto object-contain drop-shadow-[0_2px_12px_rgba(0,0,0,0.55)] group-hover:brightness-110 transition-all duration-300"
+                className="h-[48px] sm:h-[68px] md:h-[84px] w-auto object-contain drop-shadow-[0_2px_12px_rgba(0,0,0,0.55)] group-hover:brightness-110 transition-all duration-300"
               />
             </Link>
           </div>
 
           {/* Right Side: Contact Us (md+) & User Profile / Login & Book Now */}
-          <div className="flex items-center justify-end gap-2 sm:gap-3.5 md:gap-5 pointer-events-auto flex-1">
+          <div className="relative z-30 flex items-center justify-end gap-2 sm:gap-3.5 md:gap-5 pointer-events-auto shrink-0">
             <Link 
               href="/contact" 
               className="hidden md:inline-block font-jost text-[12.5px] sm:text-[13.5px] uppercase tracking-[0.18em] text-[#FFFFFF]/90 hover:text-white font-medium py-1.5 transition-colors relative group whitespace-nowrap"
@@ -138,30 +138,31 @@ export default function Header() {
               <span className="absolute -bottom-0.5 left-0 w-full h-[1.5px] bg-[#d7b56d] origin-center transition-transform duration-300 scale-x-0 group-hover:scale-x-100" />
             </Link>
 
-            {/* User Account / Profile Button with Name */}
+            {/* User Account / Profile Button */}
             <Link 
               href={user ? "/profile" : "/login"} 
-              className={`flex items-center gap-1.5 font-jost text-[12px] sm:text-[13px] uppercase tracking-[0.12em] py-1 sm:py-1.5 px-2 rounded-full transition-all group whitespace-nowrap cursor-pointer ${
+              className={`relative z-30 flex items-center gap-1.5 font-jost text-[12px] sm:text-[13px] uppercase tracking-[0.12em] py-1 sm:py-1.5 px-1.5 sm:px-2 rounded-full transition-all group whitespace-nowrap cursor-pointer touch-manipulation ${
                 (pathname === "/profile" || pathname === "/login")
                   ? "text-[#d7b56d] bg-white/10"
                   : "text-[#FFFFFF]/90 hover:text-[#d7b56d] hover:bg-white/5"
               }`}
               title={user ? `Signed in as ${displayName}` : "Sign In"}
             >
-              <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-full border border-[#d7b56d]/70 flex items-center justify-center bg-[#2C1D12]/60 group-hover:border-[#d7b56d] group-hover:bg-[#d7b56d]/20 transition-colors shrink-0">
+              <div className="w-7 h-7 sm:w-7 sm:h-7 rounded-full border border-[#d7b56d]/70 flex items-center justify-center bg-[#2C1D12]/60 group-hover:border-[#d7b56d] group-hover:bg-[#d7b56d]/20 transition-colors shrink-0">
                 <User size={13} className="text-[#d7b56d]" />
               </div>
-              <span className="max-w-[85px] sm:max-w-[130px] md:max-w-[160px] truncate capitalize font-medium text-[11.5px] sm:text-[12.5px]">
+              <span className="hidden sm:inline max-w-[120px] md:max-w-[160px] truncate capitalize font-medium text-[11.5px] sm:text-[12.5px]">
                 {user ? displayName : "Sign In"}
               </span>
             </Link>
 
+            {/* Book Now Button: guaranteed clickable and touch-responsive */}
             <Link 
               href="/rooms"
-              className="bg-[#d7b56d] hover:bg-[#000000] text-[#000000] hover:text-white font-jost uppercase tracking-[0.14em] sm:tracking-[0.16em] text-[11px] sm:text-[12.5px] font-semibold px-3 sm:px-4 md:px-6 py-2 sm:py-2.5 rounded-full shadow-md transition-all duration-300 active:scale-95 whitespace-nowrap"
+              className="relative z-30 pointer-events-auto cursor-pointer touch-manipulation bg-[#d7b56d] hover:bg-[#000000] text-[#000000] hover:text-white font-jost uppercase tracking-[0.12em] sm:tracking-[0.16em] text-[11px] sm:text-[12.5px] font-semibold px-3 sm:px-4 md:px-6 py-2 sm:py-2.5 rounded-full shadow-md transition-all duration-300 active:scale-95 whitespace-nowrap flex items-center justify-center shrink-0 min-h-[34px]"
             >
               <span className="hidden sm:inline">Check Availability</span>
-              <span className="sm:hidden">Book</span>
+              <span className="sm:hidden">Book Now</span>
             </Link>
           </div>
         </div>
