@@ -46,7 +46,7 @@ export default function ContactClient() {
                 </div>
                 <div>
                   <h3 className="font-jost font-semibold text-[#000000] uppercase tracking-widest text-[13px] mb-1">Our Location</h3>
-                  <p className="font-jost text-[#000000] text-[16px]">Karl Johans gate 37<br/>0162 Oslo, Norway</p>
+                  <p className="font-jost text-[#000000] text-[16px]">F-8, Islamabad<br/>Pakistan</p>
                 </div>
               </div>
 
@@ -67,7 +67,9 @@ export default function ContactClient() {
                 </div>
                 <div>
                   <h3 className="font-jost font-semibold text-[#000000] uppercase tracking-widest text-[13px] mb-1">Email Address</h3>
-                  <p className="font-jost text-[#000000] text-[16px]">concierge@osloelitehotel.com</p>
+                  <a href="mailto:signaturearthotel@gmail.com" className="font-jost text-[#000000] hover:text-[#d7b56d] transition-colors text-[16px] block">
+                    signaturearthotel@gmail.com
+                  </a>
                   <p className="font-jost text-[#000000] text-[13px] mt-0.5">We reply within 24 hours</p>
                 </div>
               </div>

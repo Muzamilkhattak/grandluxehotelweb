@@ -102,7 +102,7 @@ const jsonLd = {
       logo: `${siteUrl}/signaturearthotellogo.webp`,
       image: `${siteUrl}/signaturearthotellogo.webp`,
       telephone: "+47 22 00 55 00",
-      email: "concierge@osloelitehotel.com",
+      email: "signaturearthotel@gmail.com",
       priceRange: "$$$$",
       currenciesAccepted: "PKR, NOK, EUR, USD, GBP",
       paymentAccepted: "Credit Card, Debit Card",
