@@ -64,7 +64,12 @@ export default function AboutSection() {
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.8, ease: "easeOut" }}
           >
-            <h4 className="font-vogue text-[#d7b56d] tracking-[0.2em] uppercase text-[11px] sm:text-[12px] mb-4 sm:mb-6">Our Legacy</h4>
+            <div className="inline-flex items-center gap-3 mb-4 sm:mb-6">
+              <span className="w-8 sm:w-10 h-[2px] bg-[#9e7422]" />
+              <h4 className="font-marcellus text-[#8f6618] tracking-[0.22em] uppercase text-[15px] sm:text-[17px] md:text-[18px] font-bold">
+                Our Legacy
+              </h4>
+            </div>
             <h2 
               ref={textRef}
               className="reveal-text font-marcellus text-3xl sm:text-4xl md:text-[50px] lg:text-[56px] leading-[1.12]"
@@ -107,16 +112,16 @@ export default function AboutSection() {
               <div className="font-marcellus text-4xl sm:text-[50px] md:text-[54px] font-normal text-[#000000] flex items-center leading-none mb-2">
                 <AnimatedCounter from={0} to={24} duration={1.5} />
               </div>
-              <span className="font-jost uppercase tracking-[0.16em] text-[11px] sm:text-[12px] md:text-[13px] font-medium text-[#d7b56d]">
+              <span className="font-jost uppercase tracking-[0.16em] text-[11px] sm:text-[12px] md:text-[13px] font-semibold text-[#8f6618]">
                 Hours Guest Support
               </span>
             </div>
             <div className="flex flex-col">
               <div className="font-marcellus text-4xl sm:text-[50px] md:text-[54px] font-normal text-[#000000] flex items-center leading-none mb-2">
                 <AnimatedCounter from={0} to={855} duration={2} />
-                <span className="text-[#d7b56d] ml-1 font-light">+</span>
+                <span className="text-[#8f6618] ml-1 font-normal">+</span>
               </div>
-              <span className="font-jost uppercase tracking-[0.16em] text-[11px] sm:text-[12px] md:text-[13px] font-medium text-[#d7b56d]">
+              <span className="font-jost uppercase tracking-[0.16em] text-[11px] sm:text-[12px] md:text-[13px] font-semibold text-[#8f6618]">
                 Satisfied Customers
               </span>
             </div>
