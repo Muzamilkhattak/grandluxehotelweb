@@ -250,17 +250,26 @@ export default function BookingModal({
               <Loader2 size={24} className="animate-spin text-[#d7b56d]" />
             </div>
           ) : !user ? (
-            <div className="py-10 text-center border-t border-[#d7b56d]">
-              <Lock size={32} className="mx-auto text-[#d7b56d] mb-4 opacity-70" />
-              <h3 className="font-marcellus text-xl text-[#000000] mb-2">Login Required</h3>
-              <p className="font-jost text-[#000000] mb-6 text-[14px]">You must be logged in to your account to reserve a suite.</p>
-              <Link 
-                href="/login" 
-                className="inline-flex items-center gap-2 bg-[#000000] hover:bg-[#d7b56d] text-white font-jost font-semibold uppercase tracking-[0.18em] text-[13px] py-3.5 px-8 transition-colors duration-300"
-              >
-                Sign In / Create Account
-                <ArrowRight size={15} />
-              </Link>
+            <div className="py-8 text-center border-t border-gray-200">
+              <h3 className="font-marcellus text-xl text-[#000000] mb-2">Proceed to Reservation</h3>
+              <p className="font-jost text-gray-600 mb-6 text-[14px]">
+                Complete your booking details and upload your payment transfer receipt to secure this suite.
+              </p>
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+                <Link 
+                  href={`/booking?roomId=${room.id}${checkIn ? `&checkin=${checkIn}&checkout=${checkOut}` : ""}`}
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-[#000000] hover:bg-[#d7b56d] text-white hover:text-black font-jost font-semibold uppercase tracking-[0.14em] text-[13px] py-3.5 px-6 transition-colors duration-300"
+                >
+                  Proceed to Checkout & Payment
+                  <ArrowRight size={15} />
+                </Link>
+                <Link 
+                  href="/login" 
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-800 font-jost font-medium text-[13px] py-3.5 px-6 transition-colors duration-300"
+                >
+                  Sign In
+                </Link>
+              </div>
             </div>
           ) : (
 

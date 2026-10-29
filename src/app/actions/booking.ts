@@ -5,6 +5,7 @@ import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { sendGuestConfirmation, sendAdminAlert } from "@/lib/email";
 import { getRoomTotalCount } from "@/utils/room-inventory";
+import { createAdminClient } from "@/utils/supabase/admin";
 
 export type BookingPayload = {
   roomId: string;
@@ -14,6 +15,9 @@ export type BookingPayload = {
   checkIn: string; // YYYY-MM-DD
   checkOut: string; // YYYY-MM-DD
   notes?: string;
+  adults?: number;
+  children?: number;
+  receiptUrl?: string;
 };
 
 export async function createBookingAction(payload: BookingPayload) {
@@ -88,6 +92,15 @@ export async function createBookingAction(payload: BookingPayload) {
     const totalNights = Math.ceil(timeDifference / (1000 * 3600 * 24));
     const totalAmount = totalNights * room.price_per_night;
 
+    const guestCountText = `${payload.adults || 1} Adult${(payload.adults || 1) > 1 ? "s" : ""}${payload.children ? `, ${payload.children} Child${payload.children > 1 ? "ren" : ""}` : ""}`;
+    const formattedNotes = [
+      `Party: ${guestCountText}`,
+      payload.receiptUrl ? `Payment Receipt: ${payload.receiptUrl}` : null,
+      notes?.trim() ? `Special Requests: ${notes.trim()}` : null,
+    ].filter(Boolean).join("\n");
+
+    const paymentStatus = payload.receiptUrl ? "receipt_submitted" : "pay_on_arrival";
+
     // 5. Insert booking into bookings table
     const { data: booking, error: insertError } = await supabase
       .from("bookings")
@@ -99,10 +112,10 @@ export async function createBookingAction(payload: BookingPayload) {
         check_in: checkIn,
         check_out: checkOut,
         total_nights: totalNights,
-        notes: notes || null,
+        notes: formattedNotes || null,
         total_amount: totalAmount,
         status: "confirmed",
-        payment_status: "pay_on_arrival",
+        payment_status: paymentStatus,
         user_id: user ? user.id : null,
       })
       .select()
@@ -250,6 +263,57 @@ export async function getRoomBookedDatesAction(roomId: string) {
   } catch (err) {
     console.error("Failed to get booked dates:", err);
     return [];
+  }
+}
+
+export async function uploadReceiptAction(formData: FormData): Promise<{ success: boolean; url?: string; error?: string }> {
+  try {
+    const file = formData.get("file") as File | null;
+    if (!file || file.size === 0) {
+      return { success: false, error: "Please select a payment receipt file to upload." };
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+      return { success: false, error: "Receipt file size exceeds the 10MB limit." };
+    }
+
+    const adminSupabase = createAdminClient();
+    if (!adminSupabase) {
+      return { success: false, error: "Storage configuration error." };
+    }
+
+    // Ensure bucket exists
+    const { data: buckets } = await adminSupabase.storage.listBuckets();
+    if (!buckets?.some((b) => b.name === "booking-receipts")) {
+      await adminSupabase.storage.createBucket("booking-receipts", { public: true });
+    }
+
+    const bytes = await file.arrayBuffer();
+    const buffer = Buffer.from(bytes);
+    const ext = file.name.split(".").pop() || "jpg";
+    const cleanExt = ext.replace(/[^a-zA-Z0-9]/g, "");
+    const fileName = `receipt-${Date.now()}-${Math.random().toString(36).substring(2, 8)}.${cleanExt}`;
+
+    const { error: uploadError } = await adminSupabase.storage
+      .from("booking-receipts")
+      .upload(fileName, buffer, {
+        contentType: file.type || "image/jpeg",
+        upsert: true,
+      });
+
+    if (uploadError) {
+      console.error("Receipt upload error:", uploadError);
+      return { success: false, error: "Failed to upload payment receipt." };
+    }
+
+    const { data: publicUrlData } = adminSupabase.storage
+      .from("booking-receipts")
+      .getPublicUrl(fileName);
+
+    return { success: true, url: publicUrlData.publicUrl };
+  } catch (err: any) {
+    console.error("uploadReceiptAction exception:", err);
+    return { success: false, error: err.message || "Failed to upload receipt." };
   }
 }
 

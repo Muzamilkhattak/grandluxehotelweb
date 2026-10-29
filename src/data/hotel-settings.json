@@ -3,7 +3,7 @@
   "tagline": "f8 islamabad",
   "contactEmail": "reservations@signaturearthotel.com",
   "contactPhone": "+93457899999",
-  "address": "Islamabad",
+  "address": "F-8, Islamabad, Pakistan",
   "currency": "PKR (₨)",
   "timezone": "Asia/Karachi (GMT+5)",
   "checkInTime": "15:00",
@@ -17,5 +17,10 @@
   "sendAdminAlertEmail": true,
   "emailFooterText": "Thank you for choosing Signature Art Hotel. We look forward to welcoming you.",
   "maintenanceMode": false,
-  "directBookingDiscountText": "Book direct for complimentary welcome beverage & high-speed Wi-Fi."
+  "directBookingDiscountText": "Book direct for complimentary welcome beverage & high-speed Wi-Fi.",
+  "bankName": "Meezan Bank",
+  "accountTitle": "Signature Art Hotel",
+  "accountNumber": "01020304050607",
+  "iban": "PK36MEZN0001020304050607",
+  "paymentInstructions": "Please transfer the total reservation amount to the bank account above and upload the screenshot of your payment receipt below to confirm your stay."
 }

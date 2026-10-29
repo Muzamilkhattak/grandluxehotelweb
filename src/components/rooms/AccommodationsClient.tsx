@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState } from "react";
 import Image from "next/image";
@@ -134,12 +134,12 @@ export default function AccommodationsClient({ initialRooms }: { initialRooms: R
                   ))}
                 </div>
                 <div className="mt-auto flex flex-col gap-4">
-                  <button 
-                    onClick={() => setSelectedRoom(room)}
-                    className="w-full bg-primary text-white font-jost font-medium text-[16px] h-[56px] rounded-full hover:bg-[#323232] transition-colors cursor-pointer"
+                  <Link 
+                    href={`/booking?roomId=${room.id}`}
+                    className="w-full bg-primary text-white font-jost font-medium text-[16px] h-[56px] rounded-full hover:bg-[#323232] transition-colors flex items-center justify-center cursor-pointer"
                   >
-                    Instant Reserve
-                  </button>
+                    Book Now
+                  </Link>
                   <Link href={`/rooms/${room.slug || room.id}`} className="w-full bg-[#FFFFFF] text-primary font-jost font-medium text-[16px] h-[56px] rounded-full hover:bg-[#EAEAEA] transition-colors flex items-center justify-center font-jost font-medium text-[16px]">
                     Explore Suite
                   </Link>

@@ -25,6 +25,11 @@ export interface HotelSettings {
   emailFooterText: string;
   maintenanceMode: boolean;
   directBookingDiscountText: string;
+  bankName?: string;
+  accountTitle?: string;
+  accountNumber?: string;
+  iban?: string;
+  paymentInstructions?: string;
 }
 
 const DEFAULT_SETTINGS: HotelSettings = {
@@ -47,6 +52,11 @@ const DEFAULT_SETTINGS: HotelSettings = {
   emailFooterText: "Thank you for choosing Signature Art Hotel. We look forward to welcoming you.",
   maintenanceMode: false,
   directBookingDiscountText: "Book direct for complimentary welcome beverage & high-speed Wi-Fi.",
+  bankName: "Meezan Bank",
+  accountTitle: "Signature Art Hotel",
+  accountNumber: "01020304050607",
+  iban: "PK36MEZN0001020304050607",
+  paymentInstructions: "Please transfer the total reservation amount to the bank account above and upload the screenshot of your payment receipt below to confirm your stay.",
 };
 
 const SETTINGS_FILE_PATH = path.join(process.cwd(), "src", "data", "hotel-settings.json");

@@ -12,13 +12,14 @@ import {
   Loader2, 
   ShieldAlert, 
   Info,
-  Sparkles
+  Sparkles,
+  CreditCard
 } from "lucide-react";
 import { HotelSettings, saveHotelSettings } from "@/app/actions/admin-settings";
 
 export default function AdminSettingsClient({ initialSettings }: { initialSettings: HotelSettings }) {
   const [settings, setSettings] = useState<HotelSettings>(initialSettings);
-  const [activeTab, setActiveTab] = useState<"general" | "policies" | "notifications" | "financials">("general");
+  const [activeTab, setActiveTab] = useState<"general" | "policies" | "payments" | "notifications" | "financials">("general");
   const [statusMsg, setStatusMsg] = useState<{ type: "success" | "error"; text: string } | null>(null);
   const [isPending, startTransition] = useTransition();
 
@@ -45,6 +46,7 @@ export default function AdminSettingsClient({ initialSettings }: { initialSettin
   const tabs = [
     { id: "general", label: "General Information", icon: <Building2 size={16} /> },
     { id: "policies", label: "Check-in & Policies", icon: <Clock size={16} /> },
+    { id: "payments", label: "Bank & Payments", icon: <CreditCard size={16} /> },
     { id: "notifications", label: "Email & Alerts", icon: <Bell size={16} /> },
     { id: "financials", label: "Rates & Direct Perks", icon: <Receipt size={16} /> },
   ] as const;
@@ -295,7 +297,91 @@ export default function AdminSettingsClient({ initialSettings }: { initialSettin
             </div>
           )}
 
-          {/* TAB 3: Notifications */}
+          {/* TAB 3: Bank & Payment Accounts */}
+          {activeTab === "payments" && (
+            <div className="space-y-5 animate-in fade-in duration-100">
+              <div>
+                <h2 className="text-[15px] font-semibold text-[#1d2327]">Hotel Bank & Payment Accounts</h2>
+                <p className="text-[12.5px] text-[#50575e]">
+                  These bank details are displayed directly to guests during checkout so they can transfer funds and upload their payment screenshot.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5 pt-2">
+                <div>
+                  <label className="block text-[13px] font-semibold text-[#1d2327] mb-1.5">
+                    Bank / Payment Provider Name
+                  </label>
+                  <input
+                    type="text"
+                    value={settings.bankName || ""}
+                    placeholder="e.g. Meezan Bank, HBL, Standard Chartered"
+                    onChange={(e) => handleChange("bankName", e.target.value)}
+                    className="w-full bg-white border border-[#8c8f94] rounded-[3px] px-3 py-2 text-[13.5px] text-[#3c434a] focus:outline-none focus:border-[#2271b1]"
+                  />
+                  <span className="text-[11.5px] text-[#50575e] mt-1 block">The name of your primary commercial bank.</span>
+                </div>
+
+                <div>
+                  <label className="block text-[13px] font-semibold text-[#1d2327] mb-1.5">
+                    Account Title / Beneficiary Name
+                  </label>
+                  <input
+                    type="text"
+                    value={settings.accountTitle || ""}
+                    placeholder="e.g. Signature Art Hotel Ltd."
+                    onChange={(e) => handleChange("accountTitle", e.target.value)}
+                    className="w-full bg-white border border-[#8c8f94] rounded-[3px] px-3 py-2 text-[13.5px] text-[#3c434a] focus:outline-none focus:border-[#2271b1]"
+                  />
+                  <span className="text-[11.5px] text-[#50575e] mt-1 block">Account title as registered with the bank.</span>
+                </div>
+
+                <div>
+                  <label className="block text-[13px] font-semibold text-[#1d2327] mb-1.5">
+                    Account Number
+                  </label>
+                  <input
+                    type="text"
+                    value={settings.accountNumber || ""}
+                    placeholder="e.g. 01020304050607"
+                    onChange={(e) => handleChange("accountNumber", e.target.value)}
+                    className="w-full bg-white border border-[#8c8f94] rounded-[3px] px-3 py-2 text-[13.5px] text-[#3c434a] focus:outline-none focus:border-[#2271b1]"
+                  />
+                  <span className="text-[11.5px] text-[#50575e] mt-1 block">Domestic bank account number.</span>
+                </div>
+
+                <div>
+                  <label className="block text-[13px] font-semibold text-[#1d2327] mb-1.5">
+                    IBAN (International Bank Account Number)
+                  </label>
+                  <input
+                    type="text"
+                    value={settings.iban || ""}
+                    placeholder="e.g. PK36MEZN0001020304050607"
+                    onChange={(e) => handleChange("iban", e.target.value)}
+                    className="w-full bg-white border border-[#8c8f94] rounded-[3px] px-3 py-2 text-[13.5px] text-[#3c434a] focus:outline-none focus:border-[#2271b1]"
+                  />
+                  <span className="text-[11.5px] text-[#50575e] mt-1 block">24-character international bank code.</span>
+                </div>
+
+                <div className="md:col-span-2">
+                  <label className="block text-[13px] font-semibold text-[#1d2327] mb-1.5">
+                    Payment Instructions for Guests
+                  </label>
+                  <textarea
+                    rows={3}
+                    value={settings.paymentInstructions || ""}
+                    placeholder="Instructions shown on the booking page..."
+                    onChange={(e) => handleChange("paymentInstructions", e.target.value)}
+                    className="w-full bg-white border border-[#8c8f94] rounded-[3px] px-3 py-2 text-[13.5px] text-[#3c434a] focus:outline-none focus:border-[#2271b1]"
+                  />
+                  <span className="text-[11.5px] text-[#50575e] mt-1 block">Displayed prominently above the screenshot upload field on checkout.</span>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* TAB 4: Notifications */}
           {activeTab === "notifications" && (
             <div className="space-y-5 animate-in fade-in duration-100">
               <div>

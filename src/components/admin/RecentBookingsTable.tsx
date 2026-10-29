@@ -98,6 +98,9 @@ export default function RecentBookingsTable({ initialBookings }: { initialBookin
                   const checkIn = new Date(booking.check_in);
                   const checkOut = new Date(booking.check_out);
                   const nights = Math.ceil((checkOut.getTime() - checkIn.getTime()) / (1000 * 3600 * 24));
+                  
+                  const receiptMatch = booking.notes?.match(/Payment Receipt:\s*(https?:\/\/[^\s]+)/i);
+                  const receiptUrl = receiptMatch ? receiptMatch[1] : null;
 
                   return (
                     <motion.tr 
@@ -110,8 +113,17 @@ export default function RecentBookingsTable({ initialBookings }: { initialBookin
                       className={`${idx % 2 === 0 ? 'bg-white' : 'bg-[#f6f7f7]'} hover:bg-[#f0f0f1] transition-colors group`}
                     >
                       <td className="px-3 py-3 align-top">
-                        <strong className="text-[#1d2327] block mb-1">{booking.guest_name}</strong>
-                        <div className="flex gap-2 text-[12px] opacity-0 group-hover:opacity-100 transition-opacity">
+                        <strong className="text-[#1d2327] block mb-0.5">{booking.guest_name}</strong>
+                        <div className="text-[11.5px] text-[#50575e] space-y-0.5">
+                          {booking.guest_email && <div>{booking.guest_email}</div>}
+                          {booking.guest_phone && <div>{booking.guest_phone}</div>}
+                          {booking.notes && (
+                            <div className="text-[11px] text-gray-500 line-clamp-1 italic mt-0.5">
+                              {booking.notes.split('\n')[0]}
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex gap-2 text-[12px] opacity-0 group-hover:opacity-100 transition-opacity mt-1.5">
                           {booking.status === 'confirmed' ? (
                             <button
                               onClick={() => handleStatusChange(booking.id, 'cancelled')}
@@ -134,7 +146,17 @@ export default function RecentBookingsTable({ initialBookings }: { initialBookin
                         </div>
                       </td>
                       <td className="px-3 py-3 align-top">
-                        <span className="text-[#2271b1] font-medium">{booking.rooms?.title || "N/A"}</span>
+                        <span className="text-[#2271b1] font-medium block">{booking.rooms?.title || "N/A"}</span>
+                        {receiptUrl && (
+                          <a 
+                            href={receiptUrl} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1 mt-1.5 px-2 py-0.5 bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-300 rounded text-[11px] font-medium"
+                          >
+                            <span>📎 View Payment Receipt</span>
+                          </a>
+                        )}
                       </td>
                       <td className="px-3 py-3 align-top">
                         {booking.check_in} <br/> 

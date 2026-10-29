@@ -44,11 +44,6 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ [
   // Fetch real rooms from DB
   let { data: rooms } = await supabase.from('rooms').select('*').order('price_per_night', { ascending: false });
 
-  if (rooms) {
-    const totalGuests = adults + children;
-    rooms = rooms.filter(room => room.capacity >= totalGuests);
-  }
-
   let unavailableRoomIds: string[] = [];
   if (checkin && checkout && new Date(checkout) > new Date(checkin) && rooms) {
     const { data: overlappingBookings } = await supabase
@@ -80,7 +75,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ [
       {/* CRO Booking Engine */}
       <div className="relative z-30 max-w-6xl w-full mx-auto px-4 -mt-12 sm:-mt-16 md:-mt-24 mb-10 sm:mb-12">
         <div className="bg-white border-2 border-[#000000]/20 shadow-2xl p-5 sm:p-8 flex flex-col rounded-lg">
-          <form action="/#rooms" method="GET" className="flex flex-col md:flex-row items-end gap-3.5 sm:gap-4 w-full">
+          <form action="/search" method="GET" className="flex flex-col md:flex-row items-end gap-3.5 sm:gap-4 w-full">
             <div className="flex-1 w-full relative">
               <label className="block text-[14px] sm:text-[15px] font-jost text-gray-800 font-medium mb-1.5 sm:mb-2">Check-in</label>
               <input name="checkin" defaultValue={checkin} type="date" required className="w-full bg-gray-50 border-2 border-gray-200 rounded-md px-3 text-gray-900 font-jost h-[50px] sm:h-[56px] focus:outline-none focus:border-[#000000] transition-colors text-[14px] sm:text-[15px]" />

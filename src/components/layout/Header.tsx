@@ -158,7 +158,7 @@ export default function Header() {
 
             {/* Book Now Button: guaranteed clickable and touch-responsive */}
             <Link 
-              href="/rooms"
+              href="/search"
               className="relative z-30 pointer-events-auto cursor-pointer touch-manipulation bg-[#d7b56d] hover:bg-[#000000] text-[#000000] hover:text-white font-jost uppercase tracking-[0.12em] sm:tracking-[0.16em] text-[11px] sm:text-[12.5px] font-semibold px-3 sm:px-4 md:px-6 py-2 sm:py-2.5 rounded-full shadow-md transition-all duration-300 active:scale-95 whitespace-nowrap flex items-center justify-center shrink-0 min-h-[34px]"
             >
               <span className="hidden sm:inline">Check Availability</span>

@@ -181,16 +181,12 @@ export default function RoomsSection({
                         {/* Instant Reserve & Explore Suite Buttons */}
                         <div className="flex flex-col sm:flex-row items-center justify-center gap-2.5 w-full max-w-[260px]">
                           {!isUnavailable ? (
-                            <button
-                              onClick={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                setSelectedRoom(room);
-                              }}
-                              className="w-full sm:w-auto bg-[#d7b56d] hover:bg-[#000000] text-[#000000] hover:text-white text-[10px] sm:text-[11px] font-jost font-semibold uppercase tracking-[0.14em] px-4 py-2 rounded-full transition-all duration-300 shadow-md cursor-pointer border border-[#d7b56d] hover:border-white"
+                            <Link
+                              href={`/booking?roomId=${room.id}${searchedDates?.checkin ? `&checkin=${searchedDates.checkin}&checkout=${searchedDates.checkout}` : ""}`}
+                              className="w-full sm:w-auto bg-[#d7b56d] hover:bg-[#000000] text-[#000000] hover:text-white text-[10px] sm:text-[11px] font-jost font-semibold uppercase tracking-[0.14em] px-4 py-2 rounded-full transition-all duration-300 shadow-md cursor-pointer border border-[#d7b56d] hover:border-white text-center"
                             >
-                              Instant Reserve
-                            </button>
+                              Book Now
+                            </Link>
                           ) : (
                             <span className="bg-[#78231C]/95 text-white text-[10px] sm:text-[11px] font-jost font-semibold uppercase tracking-[0.14em] px-4 py-2 rounded-full shadow-md">
                               Booked

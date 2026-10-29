@@ -20,8 +20,10 @@ import {
   ArrowRight
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useRouter } from "next/navigation";
 
 export default function BookingWidget({ room }: { room: any }) {
+  const router = useRouter();
   const [checkIn, setCheckIn] = useState("");
   const [checkOut, setCheckOut] = useState("");
   const [adults, setAdults] = useState("1");
@@ -167,7 +169,14 @@ export default function BookingWidget({ room }: { room: any }) {
     }
 
     if (!showGuestDetails) {
-      setShowGuestDetails(true);
+      // Direct navigation to dedicated checkout page with bank details and screenshot upload
+      const params = new URLSearchParams();
+      params.set("roomId", room.id);
+      if (checkIn) params.set("checkin", checkIn);
+      if (checkOut) params.set("checkout", checkOut);
+      params.set("adults", adults);
+      params.set("children", childrenCount);
+      router.push(`/booking?${params.toString()}`);
       return;
     }
 
