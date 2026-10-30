@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import Image from "next/image";
 import Link from "next/link";
@@ -7,8 +7,22 @@ export default function Footer() {
   return (
     <footer id="contact" className="relative mt-24 md:mt-32 bg-[#0A0A0A] text-white/90 overflow-hidden border-t border-white/10 select-none">
       
+      {/* Background Image with Low Fade & Vignette */}
+      <div className="absolute inset-0 z-0 pointer-events-none">
+        <Image
+          src="/images/about/about-hero.jpg"
+          alt="Signature Art Hotel Atmosphere"
+          fill
+          className="object-cover object-center opacity-15"
+          sizes="100vw"
+        />
+        {/* Soft dark gradient overlays for seamless low fade */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#0A0A0A] via-[#0A0A0A]/75 to-[#0A0A0A]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_40%,transparent_0%,#0A0A0A_85%)]" />
+      </div>
+
       {/* 1. Ambient Center Glow */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_35%,rgba(201,122,79,0.12)_0%,rgba(126,101,46,0.06)_50%,transparent_80%)] pointer-events-none" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_35%,rgba(201,122,79,0.12)_0%,rgba(126,101,46,0.06)_50%,transparent_80%)] pointer-events-none z-0" />
 
       {/* 2. City Skyline Silhouette Backdrop */}
       <div className="absolute inset-x-0 bottom-0 h-44 sm:h-56 md:h-64 pointer-events-none z-0 overflow-hidden opacity-30">
