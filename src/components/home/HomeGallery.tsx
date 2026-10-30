@@ -105,7 +105,6 @@ const DEFAULT_GALLERY_PHOTOS: GalleryPhoto[] = [
 
 export default function HomeGallery() {
   const [photos, setPhotos] = useState<GalleryPhoto[]>(DEFAULT_GALLERY_PHOTOS);
-  const [selectedCategory, setSelectedCategory] = useState<string>("All");
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 
   // References for GSAP ScrollTrigger timeline
@@ -140,11 +139,6 @@ export default function HomeGallery() {
     loadUserGallery();
   }, []);
 
-  // Filter photos based on category
-  const filteredPhotos = selectedCategory === "All"
-    ? photos
-    : photos.filter((p) => p.category === selectedCategory);
-
   // GSAP Scroll-Driven SVG Map & Editorial Animation
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -177,8 +171,16 @@ export default function HomeGallery() {
       });
 
       if (beacon) gsap.set(beacon, { opacity: 0, scale: 0.3, transformOrigin: "center center" });
-      if (introTextChars.length > 0) gsap.set(introTextChars, { opacity: 0, y: 40 });
-      gsap.set(cityContent, { scale: 0.9, opacity: 0.25, y: 80 });
+
+      // Staggered even/odd character offsets matching the reference CodePen
+      introTextChars.forEach((char, i) => {
+        gsap.set(char, {
+          opacity: 0,
+          y: i % 2 === 0 ? 40 : -40,
+        });
+      });
+
+      gsap.set(cityContent, { scale: 0.88, opacity: 0.3 });
 
       // Master Timeline matching the Scroll-Driven Map Editorial pattern
       const tl = gsap.timeline();
@@ -186,7 +188,7 @@ export default function HomeGallery() {
       // 1. Initial Title fades out and scrolls away
       if (title) {
         tl.to(title, {
-          y: -70,
+          y: -80,
           opacity: 0,
           duration: 1.8,
           ease: "power2.inOut",
@@ -259,7 +261,7 @@ export default function HomeGallery() {
           {
             y: 0,
             opacity: 1,
-            stagger: 0.04,
+            stagger: 0.035,
             duration: 1.6,
             ease: "power2.out",
           },
@@ -277,15 +279,14 @@ export default function HomeGallery() {
         "highlight-=0.1"
       );
 
-      // 7. Editorial Photographic Gallery scales up and glides seamlessly into view
+      // 7. Gallery panel glides smoothly into view and scales up
       tl.to(
         cityContent,
         {
           scale: 1,
           opacity: 1,
-          y: 0,
-          duration: 3.8,
-          ease: "power3.out",
+          duration: 3.5,
+          ease: "power2.out",
         },
         "content"
       );
@@ -294,24 +295,24 @@ export default function HomeGallery() {
         tl.to(
           introText,
           {
-            y: -50,
-            opacity: 0.85,
+            y: -120,
+            opacity: 0.9,
+            scale: 0.85,
             duration: 3,
           },
           "content"
         );
       }
 
-      // ScrollTrigger instance pinning the intro presentation
+      // ScrollTrigger instance pinning the intro presentation smoothly
       ScrollTrigger.create({
         animation: tl,
         trigger: introStage,
         start: "top top",
-        end: "+=130%",
+        end: "+=120%",
         scrub: 1.2,
         pin: true,
-        pinSpacing: true,
-        anticipatePin: 1,
+        pinSpacing: false,
       });
 
     }, sectionRef);
@@ -319,10 +320,10 @@ export default function HomeGallery() {
     return () => ctx.revert();
   }, []);
 
-  // Intersection Observer for photographic items (Greyscale to full-color reveal)
+  // Intersection Observer for photographic items: Smooth grayscale-to-color & float entrance
   useEffect(() => {
-    const images = document.querySelectorAll<HTMLElement>(".editorial-img-reveal");
-    if (!images || images.length === 0) return;
+    const cards = document.querySelectorAll<HTMLElement>(".editorial-card");
+    if (!cards || cards.length === 0) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -334,13 +335,16 @@ export default function HomeGallery() {
           }
         });
       },
-      { threshold: 0.15 }
+      { 
+        threshold: 0.08,
+        rootMargin: "0px 0px -40px 0px"
+      }
     );
 
-    images.forEach((img) => observer.observe(img));
+    cards.forEach((card) => observer.observe(card));
 
     return () => observer.disconnect();
-  }, [filteredPhotos]);
+  }, [photos]);
 
   // Lightbox Navigation
   const openLightbox = (index: number) => setLightboxIndex(index);
@@ -348,15 +352,15 @@ export default function HomeGallery() {
 
   const showNext = useCallback(() => {
     if (lightboxIndex !== null) {
-      setLightboxIndex((prev) => (prev! + 1) % filteredPhotos.length);
+      setLightboxIndex((prev) => (prev! + 1) % photos.length);
     }
-  }, [lightboxIndex, filteredPhotos.length]);
+  }, [lightboxIndex, photos.length]);
 
   const showPrev = useCallback(() => {
     if (lightboxIndex !== null) {
-      setLightboxIndex((prev) => (prev! - 1 + filteredPhotos.length) % filteredPhotos.length);
+      setLightboxIndex((prev) => (prev! - 1 + photos.length) % photos.length);
     }
-  }, [lightboxIndex, filteredPhotos.length]);
+  }, [lightboxIndex, photos.length]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -369,7 +373,7 @@ export default function HomeGallery() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [lightboxIndex, showNext, showPrev]);
 
-  const currentPhoto = lightboxIndex !== null ? filteredPhotos[lightboxIndex] : null;
+  const currentPhoto = lightboxIndex !== null ? photos[lightboxIndex] : null;
 
   return (
     <section 
@@ -382,7 +386,7 @@ export default function HomeGallery() {
           ========================================================================= */}
       <div 
         ref={introStageRef}
-        className="relative w-full min-h-screen flex flex-col items-center justify-center overflow-hidden px-4 sm:px-6"
+        className="relative w-full h-screen flex flex-col items-center justify-center overflow-hidden px-4 sm:px-6"
       >
         {/* Subtle Ambient Radial Lighting */}
         <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[700px] h-[700px] bg-[radial-gradient(circle_at_center,rgba(215,181,109,0.12)_0%,transparent_75%)] pointer-events-none" />
@@ -506,7 +510,7 @@ export default function HomeGallery() {
         {/* 4. Character-by-Character Staggered Headline */}
         <div 
           ref={introTextRef}
-          className="absolute bottom-14 sm:bottom-18 z-20 text-center w-full px-4 pointer-events-none"
+          className="absolute bottom-14 sm:bottom-18 z-20 text-center w-full px-4 pointer-events-none transition-transform"
         >
           <div className="font-marcellus text-2xl sm:text-3xl md:text-5xl tracking-widest text-[#d7b56d] flex items-center justify-center gap-1.5 sm:gap-2 flex-wrap">
             {"ISLAMABAD • PAKISTAN".split("").map((char, index) => (
@@ -529,54 +533,30 @@ export default function HomeGallery() {
           ========================================================================= */}
       <div 
         ref={contentPanelRef}
-        className="relative z-30 max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24"
+        className="relative z-30 max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-24"
       >
-        {/* Editorial Section Header */}
-        <div className="flex flex-col md:flex-row items-center justify-between gap-6 mb-12 border-b border-white/10 pb-8">
-          <div>
-            <div className="inline-flex items-center gap-2 text-[#d7b56d] font-jost text-[12px] uppercase tracking-[0.25em] font-semibold mb-2">
-              <Sparkles size={14} />
-              <span>Curated Photographic Chronicles</span>
-            </div>
-            <h2 className="font-marcellus text-3xl sm:text-4xl md:text-5xl text-white tracking-wide">
-              Editorial Visual Gallery
-            </h2>
-          </div>
+        {/* Subtle Ambient Top Fade into Gallery */}
+        <div className="w-full h-12 -mt-6 mb-4 bg-gradient-to-b from-transparent to-[#000000] pointer-events-none" />
 
-          {/* Luxury Filter Chips */}
-          <div className="flex flex-wrap items-center justify-center gap-2">
-            {["All", "Suites", "Architecture", "Dining", "Interior", "Scenic"].map((cat) => (
-              <button
-                key={cat}
-                onClick={() => setSelectedCategory(cat)}
-                className={`px-4 sm:px-5 py-2 rounded-full font-jost text-[12px] uppercase tracking-[0.15em] font-medium transition-all duration-300 cursor-pointer active:scale-95 ${
-                  selectedCategory === cat
-                    ? "bg-[#d7b56d] text-black font-bold shadow-[0_4px_16px_rgba(215,181,109,0.3)] scale-105"
-                    : "bg-[#0a0a0a] text-white/70 border border-white/10 hover:border-[#d7b56d] hover:text-[#d7b56d]"
-                }`}
-              >
-                {cat}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* 3-Column Editorial Masonry Grid — Pure Imagery Without Text Clutter */}
+        {/* 3-Column Editorial Masonry Grid — Pure Imagery With Staggered Reveal Animation */}
         <div className="columns-1 sm:columns-2 lg:columns-3 gap-5 md:gap-6 space-y-5 md:space-y-6">
-          {filteredPhotos.map((photo, index) => (
+          {photos.map((photo, index) => (
             <div
               key={photo.id + index}
               onClick={() => openLightbox(index)}
-              className="group break-inside-avoid relative rounded-xl overflow-hidden bg-[#0a0a0a] border border-white/10 hover:border-[#d7b56d] transition-all duration-500 cursor-pointer shadow-[0_8px_30px_rgba(0,0,0,0.6)] hover:shadow-[0_12px_40px_rgba(215,181,109,0.25)]"
+              className="editorial-card group break-inside-avoid relative rounded-xl overflow-hidden bg-[#0a0a0a] border border-white/10 hover:border-[#d7b56d] cursor-pointer shadow-[0_8px_30px_rgba(0,0,0,0.6)] hover:shadow-[0_12px_40px_rgba(215,181,109,0.25)]"
+              style={{
+                transitionDelay: `${(index % 3) * 90}ms`,
+              }}
             >
-              {/* Pure Photographic Image Frame with Smooth Reveal & Hover Zoom */}
+              {/* Pure Photographic Image Frame with Smooth Grayscale to Color & Hover Zoom */}
               <div className={`relative w-full ${photo.aspect} overflow-hidden`}>
                 <Image
                   src={photo.url}
                   alt="Oslo Elite Hotel Gallery Exhibit"
                   fill
                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                  className="editorial-img-reveal object-cover group-hover:scale-108 transition-all duration-700 ease-out"
+                  className="object-cover group-hover:scale-108 transition-transform duration-700 ease-out"
                   unoptimized={photo.url.startsWith("/uploads/")}
                 />
 
@@ -599,10 +579,10 @@ export default function HomeGallery() {
         </div>
 
         {/* Empty state safeguard */}
-        {filteredPhotos.length === 0 && (
+        {photos.length === 0 && (
           <div className="text-center py-20 text-white/60 font-jost">
             <Compass size={40} className="mx-auto text-[#d7b56d] mb-3 opacity-60" />
-            <p className="text-lg">No photos found in this category.</p>
+            <p className="text-lg">No photos found in gallery.</p>
           </div>
         )}
       </div>
@@ -622,7 +602,7 @@ export default function HomeGallery() {
                 Signature Gallery
               </span>
               <span className="text-white/60 font-jost text-xs tracking-wider">
-                {lightboxIndex! + 1} / {filteredPhotos.length}
+                {lightboxIndex! + 1} / {photos.length}
               </span>
             </div>
 
@@ -680,16 +660,23 @@ export default function HomeGallery() {
         </div>
       )}
 
-      {/* Global Embedded Styles for Intersection Observer Smooth Grayscale Reveal */}
+      {/* Global Embedded Styles for Intersection Observer Smooth Grayscale to Color Reveal */}
       <style jsx global>{`
-        .editorial-img-reveal {
-          filter: grayscale(85%) contrast(105%);
-          opacity: 0.35;
-          transition: filter 1.2s cubic-bezier(0.16, 1, 0.3, 1), opacity 1s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s ease-out;
+        .editorial-card {
+          opacity: 0;
+          filter: grayscale(100%);
+          transform: translateY(32px) scale(0.97);
+          transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1),
+                      filter 1.2s cubic-bezier(0.16, 1, 0.3, 1),
+                      transform 1s cubic-bezier(0.16, 1, 0.3, 1),
+                      border-color 0.4s ease,
+                      box-shadow 0.4s ease;
+          will-change: opacity, filter, transform;
         }
-        .editorial-img-reveal.is-visible {
-          filter: grayscale(0%) contrast(100%);
+        .editorial-card.is-visible {
           opacity: 1;
+          filter: grayscale(0%);
+          transform: translateY(0) scale(1);
         }
       `}</style>
     </section>
