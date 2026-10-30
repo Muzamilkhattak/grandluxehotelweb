@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Sparkles } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useScroll, useTransform, useSpring } from "framer-motion";
 import { RestaurantSettings, MenuItemData } from "@/app/actions/admin-restaurant";
+import Tilt3D from "@/components/ui/Tilt3D";
 
 interface Props {
   settings?: RestaurantSettings;
@@ -14,6 +15,17 @@ interface Props {
 
 export default function RestaurantSection({ settings: propSettings, items: propItems }: Props) {
   const [activeTab, setActiveTab] = useState<string>("all");
+  const sectionRef = useRef<HTMLElement>(null);
+
+  // Vertical Scroll Parallax for Background Image
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start end", "end start"],
+  });
+
+  const smoothProgress = useSpring(scrollYProgress, { stiffness: 90, damping: 25 });
+  const yBg = useTransform(smoothProgress, [0, 1], ["-8%", "8%"]);
+  const scaleBg = useTransform(smoothProgress, [0, 1], [1.08, 1.16]);
 
   const settings = propSettings || {
     tagline: "Restaurant & Dining",
@@ -79,10 +91,17 @@ export default function RestaurantSection({ settings: propSettings, items: propI
     : allItems.filter((item) => item.category === activeTab).slice(0, 8);
 
   return (
-    <section className="relative py-16 sm:py-24 md:py-36 overflow-hidden">
+    <section 
+      ref={sectionRef} 
+      className="relative py-16 sm:py-24 md:py-36 overflow-hidden"
+      style={{ perspective: 1200 }}
+    >
       
-      {/* 1. Background Image with Moody Luxury Overlay */}
-      <div className="absolute inset-0 z-0">
+      {/* 1. Background Image with Vertical Scroll Parallax */}
+      <motion.div 
+        style={{ y: yBg, scale: scaleBg }}
+        className="absolute inset-0 z-0 will-change-transform"
+      >
         <Image
           src={settings.backgroundImage || "/restaurant/interior.jpg"}
           alt="Signature Art Hotel Restaurant Ambiance"
@@ -90,20 +109,20 @@ export default function RestaurantSection({ settings: propSettings, items: propI
           priority
           className="object-cover"
         />
-        {/* Dark Luxury Gradient Overlays for High Contrast & Readability */}
+        {/* Dark Luxury Gradient Overlays */}
         <div className="absolute inset-0 bg-[#000000]/90 backdrop-blur-[2px]" />
         <div className="absolute inset-0 bg-gradient-to-t from-[#000000] via-transparent to-[#000000]" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(201,122,79,0.18)_0%,transparent_75%)]" />
-      </div>
+      </motion.div>
 
       <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        {/* 2. Top Header: Tagline & Solid Modern Title with Smooth Scroll Animation */}
+        {/* 2. Top Header with 3D Entrance */}
         <motion.div 
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0, y: 35, rotateX: 12 }}
+          whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
           viewport={{ once: true, margin: "-80px" }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
+          transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
           className="text-center max-w-3xl mx-auto mb-10 sm:mb-14"
         >
           <div className="inline-flex items-center gap-2 text-[#d7b56d] font-jost text-[12px] sm:text-[14px] uppercase tracking-[0.25em] font-semibold mb-2 sm:mb-3">
@@ -142,7 +161,7 @@ export default function RestaurantSection({ settings: propSettings, items: propI
           </div>
         </motion.div>
 
-        {/* 3. Clean Menu Items List with Smooth Staggered Animation & Animated Presence on Tab Change */}
+        {/* 3. Menu Items List with 3D Tilt Cards & Staggered Reveal */}
         <motion.div 
           layout
           className="grid grid-cols-1 lg:grid-cols-2 gap-x-12 gap-y-8 mb-16"
@@ -152,52 +171,54 @@ export default function RestaurantSection({ settings: propSettings, items: propI
               <motion.div
                 key={item.id}
                 layout
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 25 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.96 }}
                 transition={{ duration: 0.45, delay: idx * 0.05, ease: "easeOut" }}
-                whileHover={{ y: -4, transition: { duration: 0.25 } }}
-                className="group flex items-center gap-4 sm:gap-5 p-4 rounded-xl bg-[#000000]/60 hover:bg-[#000000]/90 border border-white/10 hover:border-[#d7b56d]/50 transition-colors duration-300 shadow-md backdrop-blur-sm"
+                className="w-full"
               >
-                {/* Rounded Picture with smooth zoom on hover */}
-                <div className="relative w-16 h-16 sm:w-20 sm:h-20 shrink-0 rounded-full overflow-hidden border-2 border-[#d7b56d]/60 group-hover:border-[#d7b56d] shadow-lg transition-colors duration-300">
-                  <Image
-                    src={item.image}
-                    alt={item.name}
-                    fill
-                    className="object-cover group-hover:scale-110 transition-transform duration-500 ease-out"
-                  />
-                </div>
+                <Tilt3D maxTilt={5} scale={1.02} glare={true} glareColor="rgba(215, 181, 109, 0.16)">
+                  <div className="group flex items-center gap-4 sm:gap-5 p-4 rounded-xl bg-[#000000]/70 hover:bg-[#000000]/95 border border-white/10 hover:border-[#d7b56d]/60 transition-colors duration-300 shadow-lg backdrop-blur-sm">
+                    {/* Rounded Picture with smooth zoom on hover */}
+                    <div className="relative w-16 h-16 sm:w-20 sm:h-20 shrink-0 rounded-full overflow-hidden border-2 border-[#d7b56d]/60 group-hover:border-[#d7b56d] shadow-lg transition-colors duration-300">
+                      <Image
+                        src={item.image}
+                        alt={item.name}
+                        fill
+                        className="object-cover group-hover:scale-110 transition-transform duration-500 ease-out"
+                      />
+                    </div>
 
-                {/* Item Details */}
-                <div className="flex-1 min-w-0">
-                  {/* Name & Price with Dotted Leader */}
-                  <div className="flex items-baseline justify-between gap-3 mb-1.5">
-                    <h3 className="font-marcellus text-[18px] sm:text-[21px] text-white group-hover:text-[#d7b56d] transition-colors truncate">
-                      {item.name}
-                    </h3>
-                    
-                    {/* Subtle decorative dot/dash line */}
-                    <span className="flex-1 border-b border-dotted border-white/25 hidden sm:inline-block mx-1" />
+                    {/* Item Details */}
+                    <div className="flex-1 min-w-0">
+                      {/* Name & Price with Dotted Leader */}
+                      <div className="flex items-baseline justify-between gap-3 mb-1.5">
+                        <h3 className="font-marcellus text-[18px] sm:text-[21px] text-white group-hover:text-[#d7b56d] transition-colors truncate">
+                          {item.name}
+                        </h3>
+                        
+                        <span className="flex-1 border-b border-dotted border-white/25 hidden sm:inline-block mx-1" />
 
-                    <span className="font-marcellus text-[18px] sm:text-[20px] text-[#d7b56d] shrink-0 font-medium">
-                      {item.price}
-                    </span>
+                        <span className="font-marcellus text-[18px] sm:text-[20px] text-[#d7b56d] shrink-0 font-medium">
+                          {item.price}
+                        </span>
+                      </div>
+
+                      {/* Clean Description */}
+                      <p className="font-jost text-[13px] sm:text-[14px] text-[#FFFFFF]/70 leading-snug line-clamp-2">
+                        {item.description}
+                      </p>
+                    </div>
                   </div>
-
-                  {/* Clean Description */}
-                  <p className="font-jost text-[13px] sm:text-[14px] text-[#FFFFFF]/70 leading-snug line-clamp-2">
-                    {item.description}
-                  </p>
-                </div>
+                </Tilt3D>
               </motion.div>
             ))}
           </AnimatePresence>
         </motion.div>
 
-        {/* 4. Simple Clean CTA Button with Soft Entrance */}
+        {/* 4. Simple Clean CTA Button */}
         <motion.div 
-          initial={{ opacity: 0, y: 15 }}
+          initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-40px" }}
           transition={{ duration: 0.6, delay: 0.2 }}
@@ -205,7 +226,7 @@ export default function RestaurantSection({ settings: propSettings, items: propI
         >
           <Link
             href="/restaurant"
-            className="inline-flex items-center gap-3 bg-[#d7b56d] hover:bg-[#000000] text-[#000000] hover:text-white font-jost uppercase tracking-[0.18em] text-[13.5px] font-semibold px-8 py-4 rounded-full shadow-xl transition-all duration-300 group active:scale-95"
+            className="inline-flex items-center gap-3 bg-[#d7b56d] hover:bg-[#000000] text-[#000000] hover:text-white font-jost uppercase tracking-[0.18em] text-[13.5px] font-semibold px-8 py-4 rounded-full shadow-xl transition-all duration-300 group active:scale-95 border border-[#d7b56d] hover:border-[#000000] hover:-translate-y-0.5"
           >
             <span>{settings.buttonText}</span>
             <ArrowRight size={16} className="transform group-hover:translate-x-1.5 transition-transform duration-300" />

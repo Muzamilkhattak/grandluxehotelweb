@@ -1,11 +1,12 @@
 "use client";
-import { motion, useInView, animate } from "framer-motion";
+import { motion, useInView, animate, useScroll, useTransform, useSpring } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ArrowRight } from "lucide-react";
+import Tilt3D from "@/components/ui/Tilt3D";
 
 function AnimatedCounter({ from, to, duration = 2 }: { from: number, to: number, duration?: number }) {
   const nodeRef = useRef<HTMLSpanElement>(null);
@@ -31,7 +32,22 @@ function AnimatedCounter({ from, to, duration = 2 }: { from: number, to: number,
 }
 
 export default function AboutSection() {
+  const sectionRef = useRef<HTMLElement>(null);
   const textRef = useRef<HTMLHeadingElement>(null);
+
+  // Vertical Scroll Parallax
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start end", "end start"],
+  });
+
+  const smoothProgress = useSpring(scrollYProgress, { stiffness: 120, damping: 25 });
+
+  // Multi-layered parallax translation for the three images
+  const yImageMain = useTransform(smoothProgress, [0, 1], [40, -40]);
+  const yImageOverlap = useTransform(smoothProgress, [0, 1], [80, -80]);
+  const yImageTop = useTransform(smoothProgress, [0, 1], [-30, 40]);
+  const yTextColumn = useTransform(smoothProgress, [0, 1], [25, -25]);
 
   useEffect(() => {
     if (!textRef.current) return;
@@ -55,16 +71,24 @@ export default function AboutSection() {
   }, []);
 
   return (
-    <section id="about" className="py-16 sm:py-24 md:py-32 bg-[#FFFFFF] relative overflow-hidden scroll-mt-20">
+    <section 
+      ref={sectionRef} 
+      id="about" 
+      className="py-16 sm:py-24 md:py-32 bg-[#FFFFFF] relative overflow-hidden scroll-mt-20"
+      style={{ perspective: 1200 }}
+    >
       <div className="max-w-7xl mx-auto px-4 flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
         
-        {/* Text Content: On mobile order-2 (appears below images), on desktop lg:order-1 (left column) */}
-        <div className="w-full lg:w-1/2 space-y-6 sm:space-y-8 md:space-y-10 z-10 order-2 lg:order-1">
+        {/* Text Content */}
+        <motion.div 
+          style={{ y: yTextColumn }}
+          className="w-full lg:w-1/2 space-y-6 sm:space-y-8 md:space-y-10 z-10 order-2 lg:order-1 will-change-transform"
+        >
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
+            initial={{ opacity: 0, y: 35, rotateX: 12 }}
+            whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
+            viewport={{ once: true, margin: "-80px" }}
+            transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
             className="flex flex-col items-start w-full"
           >
             <div className="w-full flex items-center gap-2.5 sm:gap-3 mb-2 sm:mb-4">
@@ -84,8 +108,8 @@ export default function AboutSection() {
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
+            viewport={{ once: true, margin: "-80px" }}
+            transition={{ duration: 0.8, delay: 0.15, ease: "easeOut" }}
             className="font-jost text-[16px] sm:text-[18px] leading-[1.8] text-[#000000]/70 space-y-4 sm:space-y-6"
           >
             <p>
@@ -103,24 +127,24 @@ export default function AboutSection() {
             </ul>
           </motion.div>
 
-          {/* Animated Counters */}
+          {/* Animated Counters with 3D Hover elevation */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.1 }}
-            transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
+            transition={{ duration: 0.8, delay: 0.25, ease: "easeOut" }}
             className="flex items-center gap-8 sm:gap-14 md:gap-16 pt-6 sm:pt-8 border-t border-[#d7b56d]/20"
           >
-            <div className="flex flex-col">
-              <div className="font-marcellus text-4xl sm:text-[50px] md:text-[54px] font-normal text-[#000000] flex items-center leading-none mb-2">
+            <div className="flex flex-col group cursor-default">
+              <div className="font-marcellus text-4xl sm:text-[50px] md:text-[54px] font-normal text-[#000000] flex items-center leading-none mb-2 group-hover:scale-105 transition-transform duration-300">
                 <AnimatedCounter from={0} to={24} duration={1.5} />
               </div>
               <span className="font-jost uppercase tracking-[0.16em] text-[11px] sm:text-[12px] md:text-[13px] font-semibold text-[#8f6618]">
                 Hours Guest Support
               </span>
             </div>
-            <div className="flex flex-col">
-              <div className="font-marcellus text-4xl sm:text-[50px] md:text-[54px] font-normal text-[#000000] flex items-center leading-none mb-2">
+            <div className="flex flex-col group cursor-default">
+              <div className="font-marcellus text-4xl sm:text-[50px] md:text-[54px] font-normal text-[#000000] flex items-center leading-none mb-2 group-hover:scale-105 transition-transform duration-300">
                 <AnimatedCounter from={0} to={855} duration={2} />
                 <span className="text-[#8f6618] ml-1 font-normal">+</span>
               </div>
@@ -132,88 +156,91 @@ export default function AboutSection() {
 
           {/* Luxury CTA Button */}
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 25 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.1 }}
-            transition={{ duration: 0.8, delay: 0.3, ease: "easeOut" }}
+            transition={{ duration: 0.7, delay: 0.35, ease: "easeOut" }}
             className="pt-2 sm:pt-4"
           >
             <Link 
               href="/about" 
-              className="inline-flex items-center gap-3 bg-[#d7b56d] hover:bg-[#000000] text-[#000000] hover:text-white font-jost uppercase tracking-[0.18em] text-[12.5px] sm:text-[13.5px] font-semibold px-8 sm:px-10 py-3.5 sm:py-4 rounded-full shadow-lg hover:shadow-2xl transition-all duration-300 group active:scale-95 border border-[#d7b56d] hover:border-[#000000]"
+              className="inline-flex items-center gap-3 bg-[#d7b56d] hover:bg-[#000000] text-[#000000] hover:text-white font-jost uppercase tracking-[0.18em] text-[12.5px] sm:text-[13.5px] font-semibold px-8 sm:px-10 py-3.5 sm:py-4 rounded-full shadow-lg hover:shadow-2xl transition-all duration-300 group active:scale-95 border border-[#d7b56d] hover:border-[#000000] hover:-translate-y-0.5"
             >
               <span>Discover Our History</span>
               <ArrowRight size={15} className="group-hover:translate-x-1.5 transition-transform duration-300" />
             </Link>
           </motion.div>
-        </div>
+        </motion.div>
 
-        {/* Animated Image Composition: On mobile order-1 (appears before content), on desktop lg:order-2 */}
-        <div className="w-full lg:w-1/2 relative min-h-[380px] sm:min-h-[500px] lg:min-h-[650px] flex items-center justify-center mt-2 lg:mt-0 mb-8 sm:mb-12 lg:mb-0 order-1 lg:order-2">
+        {/* Animated Image Composition with Multi-Layer Scroll Parallax & 3D Tilt */}
+        <div className="w-full lg:w-1/2 relative min-h-[400px] sm:min-h-[520px] lg:min-h-[660px] flex items-center justify-center mt-2 lg:mt-0 mb-8 sm:mb-12 lg:mb-0 order-1 lg:order-2">
           
-          {/* Main Large Image */}
+          {/* Main Large Image with Parallax & 3D Tilt */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.95, rotate: -1 }}
-            whileInView={{ opacity: 1, scale: 1, rotate: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
-            className="relative w-[85%] sm:w-[75%] h-[380px] sm:h-[480px] lg:h-[550px] z-10 shadow-[0_32px_80px_rgba(54,38,24,0.15)] ml-auto"
+            style={{ y: yImageMain }}
+            className="relative w-[85%] sm:w-[75%] h-[380px] sm:h-[480px] lg:h-[550px] z-10 ml-auto will-change-transform"
           >
-            <Image 
-              src="https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?q=80&w=1200&auto=format&fit=crop" 
-              alt="Hotel Exterior" 
-              fill
-              className="object-cover"
-            />
+            <Tilt3D maxTilt={6} scale={1.02} glare={true} glareColor="rgba(215, 181, 109, 0.2)">
+              <div className="relative w-full h-[380px] sm:h-[480px] lg:h-[550px] shadow-[0_32px_80px_rgba(54,38,24,0.18)] rounded-xl overflow-hidden border border-black/5">
+                <Image 
+                  src="https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?q=80&w=1200&auto=format&fit=crop" 
+                  alt="Hotel Exterior" 
+                  fill
+                  className="object-cover transition-transform duration-700 hover:scale-105"
+                />
+              </div>
+            </Tilt3D>
           </motion.div>
 
-          {/* Overlapping Smaller Image (Bottom Right) */}
+          {/* Overlapping Smaller Image (Bottom Right) with Faster Parallax */}
           <motion.div
-            initial={{ opacity: 0, x: 30, y: 30 }}
-            whileInView={{ opacity: 1, x: 0, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 1, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
-            className="absolute bottom-[-10px] sm:bottom-[-20px] right-0 sm:right-[-10px] w-[55%] sm:w-[50%] h-[260px] sm:h-[350px] z-20 border-[6px] sm:border-[10px] border-[#FFFFFF] shadow-[0_24px_64px_rgba(54,38,24,0.12)]"
+            style={{ y: yImageOverlap }}
+            className="absolute bottom-[-10px] sm:bottom-[-20px] right-0 sm:right-[-10px] w-[55%] sm:w-[50%] h-[260px] sm:h-[350px] z-20 will-change-transform"
           >
-            <Image 
-              src="https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?q=80&w=1200&auto=format&fit=crop" 
-              alt="Lobby Details" 
-              fill
-              className="object-cover"
-            />
+            <Tilt3D maxTilt={8} scale={1.03} glare={true}>
+              <div className="relative w-full h-[260px] sm:h-[350px] border-[6px] sm:border-[10px] border-[#FFFFFF] shadow-[0_24px_64px_rgba(54,38,24,0.2)] rounded-xl overflow-hidden">
+                <Image 
+                  src="https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?q=80&w=1200&auto=format&fit=crop" 
+                  alt="Lobby Details" 
+                  fill
+                  className="object-cover transition-transform duration-700 hover:scale-105"
+                />
+              </div>
+            </Tilt3D>
           </motion.div>
 
-          {/* Third Image (Top Left) */}
+          {/* Third Image (Top Left) with Subtle Counter Parallax */}
           <motion.div
-            initial={{ opacity: 0, x: -40, y: -40 }}
-            whileInView={{ opacity: 1, x: 0, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 1, delay: 0.45, ease: [0.16, 1, 0.3, 1] }}
-            className="absolute top-[20px] sm:top-[40px] left-0 w-[40%] h-[200px] sm:h-[280px] z-20 border-[6px] sm:border-[10px] border-[#FFFFFF] shadow-[0_24px_64px_rgba(54,38,24,0.12)] hidden sm:block"
+            style={{ y: yImageTop }}
+            className="absolute top-[20px] sm:top-[40px] left-0 w-[40%] h-[200px] sm:h-[280px] z-20 border-[6px] sm:border-[10px] border-[#FFFFFF] shadow-[0_24px_64px_rgba(54,38,24,0.18)] rounded-xl overflow-hidden hidden sm:block will-change-transform"
           >
-            <Image 
-              src="https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=800&auto=format&fit=crop" 
-              alt="Luxury Amenities" 
-              fill
-              className="object-cover"
-            />
+            <Tilt3D maxTilt={7} scale={1.03} glare={true}>
+              <div className="relative w-full h-[200px] sm:h-[280px]">
+                <Image 
+                  src="https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=800&auto=format&fit=crop" 
+                  alt="Luxury Amenities" 
+                  fill
+                  className="object-cover transition-transform duration-700 hover:scale-105"
+                />
+              </div>
+            </Tilt3D>
           </motion.div>
           
           {/* Decorative Gold Accents */}
           <motion.div
             initial={{ opacity: 0, height: 0 }}
             whileInView={{ opacity: 1, height: "160px" }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 1, delay: 0.6, ease: "easeOut" }}
+            viewport={{ once: true, margin: "-80px" }}
+            transition={{ duration: 1.1, delay: 0.4, ease: "easeOut" }}
             className="absolute -top-12 -left-8 w-[1px] bg-[#d7b56d] z-0 hidden lg:block"
-          ></motion.div>
+          />
           <motion.div
             initial={{ opacity: 0, width: 0 }}
             whileInView={{ opacity: 1, width: "160px" }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 1, delay: 0.6, ease: "easeOut" }}
+            viewport={{ once: true, margin: "-80px" }}
+            transition={{ duration: 1.1, delay: 0.4, ease: "easeOut" }}
             className="absolute -top-12 -left-8 h-[1px] bg-[#d7b56d] z-0 hidden lg:block"
-          ></motion.div>
+          />
         </div>
 
       </div>

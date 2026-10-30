@@ -1,34 +1,90 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { useRef, MouseEvent } from "react";
+import { motion, useScroll, useTransform, useSpring, useMotionValue } from "framer-motion";
+import { Sparkles } from "lucide-react";
 
 export default function HeroSection() {
+  const containerRef = useRef<HTMLElement>(null);
+
+  // Vertical Scroll Parallax
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start start", "end start"],
+  });
+
+  const smoothProgress = useSpring(scrollYProgress, { stiffness: 100, damping: 20 });
+
+  // Video parallax: moves slightly downward, scales gently, and dims
+  const yVideo = useTransform(smoothProgress, [0, 1], ["0%", "28%"]);
+  const scaleVideo = useTransform(smoothProgress, [0, 1], [1, 1.08]);
+  const opacityVideo = useTransform(smoothProgress, [0, 0.9], [1, 0.35]);
+
+  // Content parallax: moves upward faster, fades out gracefully
+  const yContent = useTransform(smoothProgress, [0, 1], ["0%", "-35%"]);
+  const opacityContent = useTransform(smoothProgress, [0, 0.7], [1, 0]);
+
+  // Interactive 3D Mouse Depth
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+  const springX = useSpring(mouseX, { stiffness: 200, damping: 25 });
+  const springY = useSpring(mouseY, { stiffness: 200, damping: 25 });
+
+  const rotateX = useTransform(springY, [-0.5, 0.5], [6, -6]);
+  const rotateY = useTransform(springX, [-0.5, 0.5], [-6, 6]);
+
+  const handleMouseMove = (e: MouseEvent<HTMLElement>) => {
+    if (!containerRef.current) return;
+    const rect = containerRef.current.getBoundingClientRect();
+    const xPct = (e.clientX - rect.left) / rect.width - 0.5;
+    const yPct = (e.clientY - rect.top) / rect.height - 0.5;
+    mouseX.set(xPct);
+    mouseY.set(yPct);
+  };
+
+  const handleMouseLeave = () => {
+    mouseX.set(0);
+    mouseY.set(0);
+  };
+
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.2,
-        delayChildren: 0.3,
+        staggerChildren: 0.18,
+        delayChildren: 0.2,
       },
     },
   };
 
   const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
+    hidden: { opacity: 0, y: 35, rotateX: 25 },
     visible: {
       opacity: 1,
       y: 0,
+      rotateX: 0,
       transition: {
-        duration: 0.8,
-        ease: [0.25, 0.46, 0.45, 0.94] as const,
+        duration: 1,
+        ease: [0.16, 1, 0.3, 1] as const,
       },
     },
   };
 
   return (
-    <section suppressHydrationWarning className="relative h-[85vh] sm:h-[90vh] min-h-[500px] w-full flex flex-col items-center justify-center overflow-hidden">
-      <div className="absolute inset-0 z-0 bg-black">
+    <section 
+      ref={containerRef}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      suppressHydrationWarning 
+      className="relative h-[85vh] sm:h-[90vh] min-h-[520px] w-full flex flex-col items-center justify-center overflow-hidden"
+      style={{ perspective: 1200 }}
+    >
+      {/* Background Video with Vertical Scroll Parallax */}
+      <motion.div 
+        style={{ y: yVideo, scale: scaleVideo, opacity: opacityVideo }}
+        className="absolute inset-0 z-0 bg-black will-change-transform"
+      >
         <video
           autoPlay
           loop
@@ -38,23 +94,55 @@ export default function HeroSection() {
           className="w-full h-full object-cover"
           src="/for-website.webm"
         />
-        {/* Full-coverage cinematic black fade overlay across the entire hero video */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/45 to-black/70 z-10 pointer-events-none" />
-      </div>
+        {/* Cinematic dark luxury gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/45 to-black/75 z-10 pointer-events-none" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.6)_100%)] z-10 pointer-events-none" />
+      </motion.div>
 
-      {/* Hero Content */}
+      {/* Hero Content with 3D Tilt & Scroll Parallax */}
       <motion.div
-        className="relative z-10 flex flex-col items-center text-center px-4 mt-12 sm:mt-16 md:mt-20 max-w-5xl"
+        style={{ 
+          y: yContent, 
+          opacity: opacityContent,
+          rotateX,
+          rotateY,
+          transformStyle: "preserve-3d"
+        }}
+        className="relative z-10 flex flex-col items-center text-center px-4 mt-8 sm:mt-12 md:mt-16 max-w-5xl will-change-transform"
         variants={containerVariants}
         initial="hidden"
         animate="visible"
       >
+        {/* Floating Luxury Pill */}
+        <motion.div 
+          variants={itemVariants}
+          style={{ transform: "translateZ(30px)" }}
+          className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-black/40 backdrop-blur-md border border-[#d7b56d]/40 mb-4 sm:mb-6 shadow-[0_8px_24px_rgba(0,0,0,0.5)]"
+        >
+          <Sparkles size={13} className="text-[#d7b56d] animate-pulse" />
+          <span className="font-vogue text-[#d7b56d] tracking-[0.26em] uppercase text-[10px] sm:text-[11.5px] font-bold">
+            The Pinnacle Of Hospitality
+          </span>
+          <Sparkles size={13} className="text-[#d7b56d] animate-pulse" />
+        </motion.div>
+
+        {/* 3D Headline */}
         <motion.h1
           variants={itemVariants}
-          className="font-marcellus text-4xl sm:text-5xl md:text-[76px] lg:text-[88px] text-white font-light leading-[1.1] md:leading-[0.95]"
+          style={{ transform: "translateZ(50px)" }}
+          className="font-marcellus text-4xl sm:text-5xl md:text-[76px] lg:text-[90px] text-white font-light leading-[1.08] md:leading-[0.95] drop-shadow-[0_12px_32px_rgba(0,0,0,0.7)]"
         >
           A Signature OF <br className="hidden md:block" /> Luxury Living
         </motion.h1>
+
+        {/* Subtitle with depth */}
+        <motion.p
+          variants={itemVariants}
+          style={{ transform: "translateZ(20px)" }}
+          className="mt-4 sm:mt-6 font-jost text-[15px] sm:text-[18px] md:text-[20px] text-white/80 max-w-2xl font-light tracking-wide"
+        >
+          Where timeless elegance meets bespoke artistry in Islamabad F-8
+        </motion.p>
       </motion.div>
     </section>
   );

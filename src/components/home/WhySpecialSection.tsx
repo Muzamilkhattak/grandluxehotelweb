@@ -1,10 +1,11 @@
 "use client";
 import { useEffect, useRef } from "react";
-import { motion } from "framer-motion";
+import { motion, useScroll, useTransform, useSpring } from "framer-motion";
 import { MapPin, UtensilsCrossed, Mountain, ShieldCheck } from "lucide-react";
 import Image from "next/image";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import Tilt3D from "@/components/ui/Tilt3D";
 
 const features = [
   {
@@ -41,6 +42,16 @@ export default function WhySpecialSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const cardsRef = useRef<(HTMLDivElement | null)[]>([]);
 
+  // Vertical Scroll Parallax
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start end", "end start"],
+  });
+
+  const smoothProgress = useSpring(scrollYProgress, { stiffness: 100, damping: 25 });
+  const yHeader = useTransform(smoothProgress, [0, 1], [30, -30]);
+  const yGrid = useTransform(smoothProgress, [0, 1], [40, -20]);
+
   useEffect(() => {
     if (!sectionRef.current) return;
 
@@ -53,9 +64,6 @@ export default function WhySpecialSection() {
         const image = card.querySelector<HTMLElement>(".curtain-reveal-img");
 
         if (curtain && image) {
-          // Horizontal curtain reveal (gate sliding open from left to right / closing across)
-          // Initially hidden with clipPath: inset(0% 100% 0% 0%)
-          // Scales image gently from 1.25 down to 1.05 for a premium parallax zoom feel
           gsap.fromTo(
             curtain,
             { clipPath: "inset(0% 100% 0% 0%)" },
@@ -95,18 +103,31 @@ export default function WhySpecialSection() {
   }, []);
 
   return (
-    <section ref={sectionRef} className="py-16 sm:py-24 md:py-32 bg-[#000000] text-[#FFFFFF] relative overflow-hidden">
-      <div className="max-w-7xl mx-auto px-4">
+    <section 
+      ref={sectionRef} 
+      className="py-16 sm:py-24 md:py-32 bg-[#000000] text-[#FFFFFF] relative overflow-hidden"
+      style={{ perspective: 1200 }}
+    >
+      {/* Ambient Parallax Glows */}
+      <div className="absolute top-1/4 left-10 w-96 h-96 bg-[#d7b56d]/10 rounded-full blur-[140px] pointer-events-none" />
+      <div className="absolute bottom-1/4 right-10 w-96 h-96 bg-[#d7b56d]/10 rounded-full blur-[140px] pointer-events-none" />
+
+      <div className="max-w-7xl mx-auto px-4 relative z-10">
         
-        {/* Header */}
-        <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-16 md:mb-20">
+        {/* Header with 3D Entrance & Parallax */}
+        <motion.div 
+          style={{ y: yHeader }}
+          className="text-center max-w-3xl mx-auto mb-10 sm:mb-16 md:mb-20 will-change-transform"
+        >
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.8 }}
+            initial={{ opacity: 0, y: 30, rotateX: 12 }}
+            whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
+            viewport={{ once: true, margin: "-80px" }}
+            transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
           >
-            <h4 className="font-vogue text-[#d7b56d] tracking-[0.2em] uppercase text-[11px] sm:text-[12px] mb-4 sm:mb-6">The Signature Standard</h4>
+            <h4 className="font-vogue text-[#d7b56d] tracking-[0.2em] uppercase text-[11px] sm:text-[12px] mb-4 sm:mb-6">
+              The Signature Standard
+            </h4>
             <h2 className="font-marcellus text-3xl sm:text-4xl md:text-[52px] lg:text-[56px] leading-[1.12]">
               Why Signature Art Hotel is Special?
             </h2>
@@ -114,58 +135,68 @@ export default function WhySpecialSection() {
               We transcend traditional hospitality by mastering the invisible art of anticipation. Every detail is an orchestrated performance, designed to elevate your stay from ordinary to extraordinary.
             </p>
           </motion.div>
-        </div>
+        </motion.div>
 
-        {/* Bento Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6">
+        {/* Bento Grid with 3D Tilt Cards & Preserved Depth */}
+        <motion.div 
+          style={{ y: yGrid }}
+          className="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6 will-change-transform"
+        >
           {features.map((feature, idx) => (
-            <div
-              key={idx}
-              ref={(el) => { cardsRef.current[idx] = el; }}
-              className={`group relative h-[340px] sm:h-[380px] md:h-[420px] overflow-hidden bg-black rounded-none shadow-[0_24px_48px_rgba(0,0,0,0.3)] ${feature.colSpan}`}
-            >
-              {/* Horizontal Curtain Reveal Wrap with CSS clipPath */}
-              <div 
-                className="curtain-reveal-wrap absolute inset-0 w-full h-full overflow-hidden"
-                style={{ clipPath: "inset(0% 100% 0% 0%)" }}
-              >
-                <div className="curtain-reveal-img relative w-full h-full transform will-change-transform">
-                  <Image 
-                    src={feature.image} 
-                    alt={feature.title} 
-                    fill 
-                    className="object-cover opacity-65 group-hover:scale-110 group-hover:opacity-40 transition-all duration-1000 ease-[0.16,1,0.3,1]"
-                  />
-                </div>
-              </div>
-
-              {/* Ambient overlay gradient */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/25 to-transparent pointer-events-none"></div>
-              
-              {/* Card Content - Responsive on mobile & interactive on hover */}
-              <div className="absolute inset-0 p-6 sm:p-8 md:p-10 flex flex-col justify-end pointer-events-none">
-                <div className="text-[#d7b56d] mb-4 sm:mb-6 transform translate-y-0 md:translate-y-6 md:group-hover:translate-y-0 transition-transform duration-500 ease-out">
-                  {feature.icon}
-                </div>
-                <h3 className="font-marcellus text-2xl sm:text-[28px] md:text-[32px] text-[#FFFFFF] mb-2 sm:mb-3 transform translate-y-0 md:translate-y-6 md:group-hover:translate-y-0 transition-transform duration-500 ease-out">
-                  {feature.title}
-                </h3>
-                
-                {/* Expandable description wrapper */}
-                <div className="grid grid-rows-[1fr] md:grid-rows-[0fr] md:group-hover:grid-rows-[1fr] transition-[grid-template-rows] duration-500 ease-out">
-                  <div className="overflow-hidden">
-                    <p className="font-jost text-[#FFFFFF]/80 text-[13.5px] sm:text-[15px] md:text-[16px] leading-[1.5] sm:leading-[1.6] pt-1.5 sm:pt-2 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-500 delay-100 line-clamp-3 md:line-clamp-none">
-                      {feature.description}
-                    </p>
+            <div key={idx} className={feature.colSpan}>
+              <Tilt3D maxTilt={6} scale={1.015} glare={true} glareColor="rgba(215, 181, 109, 0.16)">
+                <div
+                  ref={(el) => { cardsRef.current[idx] = el; }}
+                  className="group relative h-[340px] sm:h-[380px] md:h-[420px] overflow-hidden bg-black rounded-xl shadow-[0_24px_48px_rgba(0,0,0,0.5)] border border-white/10 hover:border-[#d7b56d]/50 transition-colors duration-500"
+                  style={{ transformStyle: "preserve-3d" }}
+                >
+                  {/* Horizontal Curtain Reveal Wrap with CSS clipPath */}
+                  <div 
+                    className="curtain-reveal-wrap absolute inset-0 w-full h-full overflow-hidden"
+                    style={{ clipPath: "inset(0% 100% 0% 0%)" }}
+                  >
+                    <div className="curtain-reveal-img relative w-full h-full transform will-change-transform">
+                      <Image 
+                        src={feature.image} 
+                        alt={feature.title} 
+                        fill 
+                        className="object-cover opacity-65 group-hover:scale-110 group-hover:opacity-40 transition-all duration-1000 ease-[0.16,1,0.3,1]"
+                      />
+                    </div>
                   </div>
-                </div>
-              </div>
 
-              {/* Top Right Decorative corner */}
-              <div className="absolute top-4 sm:top-6 right-4 sm:right-6 w-6 sm:w-8 h-6 sm:h-8 border-t border-r border-[#FFFFFF]/20 group-hover:border-[#d7b56d]/60 transition-colors duration-500 pointer-events-none"></div>
+                  {/* Ambient overlay gradient */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/30 to-transparent pointer-events-none" />
+                  
+                  {/* Card Content with 3D Z-Depth Pop */}
+                  <div 
+                    className="absolute inset-0 p-6 sm:p-8 md:p-10 flex flex-col justify-end pointer-events-none"
+                    style={{ transform: "translateZ(30px)" }}
+                  >
+                    <div className="text-[#d7b56d] mb-4 sm:mb-6 transform translate-y-0 md:translate-y-6 md:group-hover:translate-y-0 transition-transform duration-500 ease-out">
+                      {feature.icon}
+                    </div>
+                    <h3 className="font-marcellus text-2xl sm:text-[28px] md:text-[32px] text-[#FFFFFF] mb-2 sm:mb-3 transform translate-y-0 md:translate-y-6 md:group-hover:translate-y-0 transition-transform duration-500 ease-out drop-shadow-md">
+                      {feature.title}
+                    </h3>
+                    
+                    {/* Expandable description wrapper */}
+                    <div className="grid grid-rows-[1fr] md:grid-rows-[0fr] md:group-hover:grid-rows-[1fr] transition-[grid-template-rows] duration-500 ease-out">
+                      <div className="overflow-hidden">
+                        <p className="font-jost text-[#FFFFFF]/80 text-[13.5px] sm:text-[15px] md:text-[16px] leading-[1.5] sm:leading-[1.6] pt-1.5 sm:pt-2 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-500 delay-100 line-clamp-3 md:line-clamp-none">
+                          {feature.description}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Top Right Decorative corner */}
+                  <div className="absolute top-4 sm:top-6 right-4 sm:right-6 w-6 sm:w-8 h-6 sm:h-8 border-t border-r border-[#FFFFFF]/25 group-hover:border-[#d7b56d]/80 transition-colors duration-500 pointer-events-none" />
+                </div>
+              </Tilt3D>
             </div>
           ))}
-        </div>
+        </motion.div>
 
       </div>
     </section>
