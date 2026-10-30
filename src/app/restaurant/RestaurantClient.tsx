@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Sparkles, ArrowLeft, UtensilsCrossed, Clock, Phone, CalendarCheck, Flame } from "lucide-react";
+import { Sparkles, ArrowLeft, UtensilsCrossed, Phone, CalendarCheck } from "lucide-react";
 import { RestaurantSettings, MenuItemData } from "@/app/actions/admin-restaurant";
 
 interface Props {
@@ -61,7 +61,7 @@ export default function RestaurantClient({ initialSettings, initialItems }: Prop
     <div className="bg-[#000000] min-h-screen text-white selection:bg-[#d7b56d] selection:text-black">
       {/* Restaurant Hero Section with Background Image */}
       <section className="relative bg-[#000000] text-white py-28 md:py-36 overflow-hidden border-b border-white/10">
-        {/* Background Image - Clean & Natural without any fade or color overlays */}
+        {/* Background Image */}
         <div className="absolute inset-0 z-0">
           <Image
             src={heroBgImage}
@@ -74,6 +74,9 @@ export default function RestaurantClient({ initialSettings, initialItems }: Prop
           />
         </div>
 
+        {/* Subtle Black Fade on Hero Background Image */}
+        <div className="absolute inset-0 bg-black/40 z-10" />
+
         {/* Hero Content */}
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-20 text-center">
           <Link 
@@ -83,38 +86,12 @@ export default function RestaurantClient({ initialSettings, initialItems }: Prop
             <ArrowLeft size={14} /> Back to Home
           </Link>
 
-          <div className="flex justify-center mb-4">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-black/75 border border-[#d7b56d]/60 backdrop-blur-md shadow-xl">
-              <Sparkles size={14} className="text-[#d7b56d]" />
-              <span className="font-vogue text-[#d7b56d] tracking-[0.25em] uppercase text-[11px] font-semibold">
-                {settings.tagline}
-              </span>
-              <Sparkles size={14} className="text-[#d7b56d]" />
-            </div>
-          </div>
-
           <h1 className="font-marcellus text-4xl sm:text-5xl md:text-6xl text-white tracking-tight mb-4 drop-shadow-[0_4px_16px_rgba(0,0,0,0.95)]">
             {settings.heading}
           </h1>
-          <p className="font-jost text-[16px] sm:text-[18px] md:text-[20px] text-white leading-relaxed max-w-2xl mx-auto font-medium drop-shadow-[0_2px_10px_rgba(0,0,0,0.95)] mb-8">
+          <p className="font-jost text-[16px] sm:text-[18px] md:text-[20px] text-white leading-relaxed max-w-2xl mx-auto font-medium drop-shadow-[0_2px_10px_rgba(0,0,0,0.95)]">
             {settings.subheading}
           </p>
-
-          {/* Quick Info Badges */}
-          <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-6 text-xs sm:text-sm text-white font-jost">
-            <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/75 border border-white/20 backdrop-blur-md shadow-lg">
-              <Clock size={14} className="text-[#d7b56d]" />
-              <span>Daily: 06:30 – 23:30</span>
-            </div>
-            <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/75 border border-white/20 backdrop-blur-md shadow-lg">
-              <Flame size={14} className="text-[#d7b56d]" />
-              <span>Birch Woodfire & Fresh Fjord Catches</span>
-            </div>
-            <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/75 border border-white/20 backdrop-blur-md shadow-lg">
-              <Phone size={14} className="text-[#d7b56d]" />
-              <span>Reservations: +47 22 00 55 00</span>
-            </div>
-          </div>
         </div>
       </section>
 
