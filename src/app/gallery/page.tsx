@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import { Sparkles, ArrowLeft } from "lucide-react";
 import { getGalleryImages } from "@/app/actions/admin-gallery";
 import GalleryGridClient from "@/components/gallery/GalleryGridClient";
@@ -25,7 +25,7 @@ export default async function GalleryPage() {
   const dynamicImages = await getGalleryImages();
 
   return (
-    <main className="bg-[#0a0a0a] min-h-screen text-white">
+    <main className="bg-[#FFFFFF] min-h-screen text-[#000000]">
       {/* Header Banner */}
       <section className="relative bg-[#000000] text-white py-28 md:py-36 overflow-hidden border-b border-white/10">
         <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-black/80 z-10" />
