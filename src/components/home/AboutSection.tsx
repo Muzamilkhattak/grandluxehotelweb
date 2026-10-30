@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { ArrowRight, Sparkles, Star } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import Tilt3D from "@/components/ui/Tilt3D";
 
 function AnimatedCounter({ from, to, duration = 2 }: { from: number, to: number, duration?: number }) {
@@ -258,40 +258,6 @@ export default function AboutSection() {
                 />
               </div>
             </Tilt3D>
-          </motion.div>
-
-          {/* Floating Luxury Stamp / Seal */}
-          <motion.div
-            variants={{
-              hidden: { opacity: 0, scale: 0, rotate: -25 },
-              visible: { 
-                opacity: 1, 
-                scale: 1, 
-                rotate: 0,
-                transition: { duration: 0.9, delay: 0.5, ease: "backOut" }
-              }
-            }}
-            animate={{
-              rotate: [0, 3, 0, -3, 0],
-              transition: {
-                duration: 8,
-                repeat: Infinity,
-                ease: "easeInOut"
-              }
-            }}
-            className="absolute bottom-6 left-2 sm:left-6 z-30 bg-[#0a0a0a]/92 backdrop-blur-md border border-[#d7b56d]/50 rounded-2xl p-3 sm:p-3.5 shadow-2xl flex items-center gap-3 cursor-default"
-          >
-            <div className="w-9 h-9 rounded-full bg-[#d7b56d] text-black flex items-center justify-center font-marcellus font-bold text-xs shadow-md">
-              <Star size={14} className="fill-black text-black" />
-            </div>
-            <div>
-              <p className="font-vogue text-[10px] sm:text-[11px] text-[#d7b56d] uppercase tracking-[0.2em] font-semibold">
-                Signature Heritage
-              </p>
-              <p className="font-jost text-[9px] sm:text-[10px] text-white/70 uppercase tracking-wider">
-                Islamabad F-8
-              </p>
-            </div>
           </motion.div>
           
           {/* Decorative Gold Accents */}
