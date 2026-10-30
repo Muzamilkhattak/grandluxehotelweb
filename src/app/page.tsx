@@ -184,21 +184,6 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ [
       {/* Automated Testimonial Slider */}
       <TestimonialSection />
 
-      {/* 8. Social Proof & Trust Architecture */}
-      <section className="py-12 sm:py-16 md:py-[48px] bg-[#FFFFFF] border-y border-faint">
-        <div className="max-w-7xl mx-auto px-4 text-center">
-          <h4 className="font-jost text-[14px] sm:text-[16px] md:text-[18px] text-muted mb-6 sm:mb-8 md:mb-[32px] uppercase tracking-wider">
-            Internationally Acclaimed By
-          </h4>
-          <div className="flex flex-wrap justify-center items-center gap-6 sm:gap-8 md:gap-[48px] opacity-70 grayscale">
-            <span className="font-marcellus text-xl sm:text-2xl md:text-[32px] text-primary">Architectural Digest</span>
-            <span className="font-vogue text-lg sm:text-xl md:text-[28px] text-primary uppercase">Condé Nast</span>
-            <span className="font-marcellus text-xl sm:text-2xl md:text-[32px] text-primary italic">Forbes Travel</span>
-            <span className="font-vogue text-xl sm:text-2xl md:text-[36px] text-primary uppercase">Vogue</span>
-          </div>
-        </div>
-      </section>
-
     </main>
   );
 }
