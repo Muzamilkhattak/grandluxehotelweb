@@ -7,17 +7,18 @@ export default function Footer() {
   return (
     <footer id="contact" className="relative mt-24 md:mt-32 bg-[#0A0A0A] text-white/90 overflow-hidden border-t border-white/10 select-none">
       
-      {/* Background Image with Rich Visibility & Soft Gradient */}
+      {/* Background Image with Gentle Black Fade */}
       <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
         <Image
           src="/images/about/about-hero.jpg"
           alt="Signature Art Hotel Atmosphere"
           fill
-          className="object-cover object-center opacity-45 sm:opacity-50"
+          className="object-cover object-center"
           sizes="100vw"
         />
-        {/* Soft dark gradient overlays so the image is properly visible while keeping text crisp */}
-        <div className="absolute inset-0 bg-gradient-to-b from-[#0A0A0A]/85 via-[#0A0A0A]/50 to-[#0A0A0A]/95" />
+        {/* Halka sa black fade layer for soft, elegant dark wash */}
+        <div className="absolute inset-0 bg-black/65" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#0A0A0A]/85 via-transparent to-[#0A0A0A]" />
       </div>
 
       {/* 1. Ambient Center Glow */}
