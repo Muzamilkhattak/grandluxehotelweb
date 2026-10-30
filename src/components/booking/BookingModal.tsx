@@ -80,7 +80,25 @@ export default function BookingModal({
 
   if (!isOpen) return null;
 
-  const today = new Date().toISOString().split("T")[0];
+  const getTodayStr = () => {
+    const d = new Date();
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
+
+  const getNextDayStr = (dateStr: string) => {
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return getTodayStr();
+    d.setDate(d.getDate() + 1);
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
+
+  const today = getTodayStr();
 
   const verifyDates = async (inVal: string, outVal: string) => {
     if (!inVal || !outVal) {
@@ -350,7 +368,7 @@ export default function BookingModal({
                   name="checkOut" 
                   type="date" 
                   required 
-                  min={checkIn || today}
+                  min={checkIn ? getNextDayStr(checkIn) : getNextDayStr(today)}
                   value={checkOut}
                   onChange={(e) => handleDateChange("out", e.target.value)}
                   className={`w-full bg-[#FFFFFF] border-2 ${

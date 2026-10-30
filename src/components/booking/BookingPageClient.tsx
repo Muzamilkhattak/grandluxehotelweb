@@ -72,9 +72,31 @@ export default function BookingPageClient({
 }: BookingPageClientProps) {
   const router = useRouter();
 
+  const getTodayStr = () => {
+    const d = new Date();
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
+
+  const getNextDayStr = (dateStr: string) => {
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return getTodayStr();
+    d.setDate(d.getDate() + 1);
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
+
+  const todayStr = getTodayStr();
+  const safeInitialIn = initialCheckIn && initialCheckIn >= todayStr ? initialCheckIn : todayStr;
+  const safeInitialOut = initialCheckOut && initialCheckOut > safeInitialIn ? initialCheckOut : getNextDayStr(safeInitialIn);
+
   // Form Fields
-  const [checkIn, setCheckIn] = useState(initialCheckIn);
-  const [checkOut, setCheckOut] = useState(initialCheckOut);
+  const [checkIn, setCheckIn] = useState(safeInitialIn);
+  const [checkOut, setCheckOut] = useState(safeInitialOut);
   const [adults, setAdults] = useState(initialAdults);
   const [children, setChildren] = useState(initialChildren);
 
@@ -174,6 +196,11 @@ export default function BookingPageClient({
 
     if (!checkIn || !checkOut) {
       setErrorMsg("Check-in and check-out dates are required.");
+      return;
+    }
+
+    if (checkIn < todayStr) {
+      setErrorMsg("Check-in date cannot be in the past. Please select today or a future date.");
       return;
     }
 
@@ -377,8 +404,15 @@ export default function BookingPageClient({
                   </label>
                   <input
                     type="date"
+                    min={todayStr}
                     value={checkIn}
-                    onChange={(e) => setCheckIn(e.target.value)}
+                    onChange={(e) => {
+                      const newIn = e.target.value;
+                      setCheckIn(newIn);
+                      if (checkOut && newIn >= checkOut) {
+                        setCheckOut(getNextDayStr(newIn));
+                      }
+                    }}
                     required
                     className="w-full bg-white border border-gray-300 hover:border-gray-400 focus:border-[#d7b56d] focus:ring-1 focus:ring-[#d7b56d] text-gray-900 font-medium text-[14.5px] h-[46px] px-3.5 rounded-md transition-colors focus:outline-none"
                   />
@@ -390,6 +424,7 @@ export default function BookingPageClient({
                   </label>
                   <input
                     type="date"
+                    min={checkIn ? getNextDayStr(checkIn) : getNextDayStr(todayStr)}
                     value={checkOut}
                     onChange={(e) => setCheckOut(e.target.value)}
                     required

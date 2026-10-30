@@ -55,8 +55,30 @@ export default function SearchResultsClient({
 }: SearchResultsClientProps) {
   const router = useRouter();
 
-  const [checkIn, setCheckIn] = useState(initialCheckIn);
-  const [checkOut, setCheckOut] = useState(initialCheckOut);
+  const getTodayStr = () => {
+    const d = new Date();
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
+
+  const getNextDayStr = (dateStr: string) => {
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return getTodayStr();
+    d.setDate(d.getDate() + 1);
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
+
+  const todayStr = getTodayStr();
+  const safeInitialIn = initialCheckIn && initialCheckIn >= todayStr ? initialCheckIn : todayStr;
+  const safeInitialOut = initialCheckOut && initialCheckOut > safeInitialIn ? initialCheckOut : getNextDayStr(safeInitialIn);
+
+  const [checkIn, setCheckIn] = useState(safeInitialIn);
+  const [checkOut, setCheckOut] = useState(safeInitialOut);
   const [adults, setAdults] = useState(initialAdults);
   const [children, setChildren] = useState(initialChildren);
 
@@ -272,8 +294,15 @@ export default function SearchResultsClient({
             </label>
             <input
               type="date"
+              min={todayStr}
               value={checkIn}
-              onChange={(e) => setCheckIn(e.target.value)}
+              onChange={(e) => {
+                const newIn = e.target.value;
+                setCheckIn(newIn);
+                if (checkOut && newIn >= checkOut) {
+                  setCheckOut(getNextDayStr(newIn));
+                }
+              }}
               required
               className="w-full bg-gray-50 border-2 border-gray-200 rounded-md px-3 text-gray-900 font-jost h-[48px] focus:outline-none focus:border-black transition-colors text-[14px]"
             />
@@ -285,6 +314,7 @@ export default function SearchResultsClient({
             </label>
             <input
               type="date"
+              min={checkIn ? getNextDayStr(checkIn) : getNextDayStr(todayStr)}
               value={checkOut}
               onChange={(e) => setCheckOut(e.target.value)}
               required

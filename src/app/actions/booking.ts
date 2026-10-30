@@ -46,6 +46,15 @@ export async function createBookingAction(payload: BookingPayload) {
     const checkInDate = new Date(checkIn);
     const checkOutDate = new Date(checkOut);
 
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+    const inStart = new Date(checkIn);
+    inStart.setHours(0, 0, 0, 0);
+
+    if (inStart < todayStart) {
+      return { success: false, error: "Check-in date cannot be in the past. Please choose today or a future date." };
+    }
+
     // 1. Validation: Ensure checkOut date is strictly after checkIn date
     if (checkOutDate <= checkInDate) {
       return { success: false, error: "Check-out date must be strictly after the check-in date." };
@@ -183,6 +192,15 @@ export async function checkRoomAvailabilityAction(
 
     if (isNaN(inDate.getTime()) || isNaN(outDate.getTime())) {
       return { available: false, error: "Please enter valid dates." };
+    }
+
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+    const inDateMidnight = new Date(checkIn);
+    inDateMidnight.setHours(0, 0, 0, 0);
+
+    if (inDateMidnight < todayStart) {
+      return { available: false, error: "Check-in date cannot be in the past." };
     }
 
     if (outDate <= inDate) {

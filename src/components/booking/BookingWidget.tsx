@@ -61,7 +61,26 @@ export default function BookingWidget({ room }: { room: any }) {
 
   const nights = calculateNights();
   const totalAmount = nights > 0 ? nights * room.price_per_night : 0;
-  const today = new Date().toISOString().split("T")[0];
+  
+  const getTodayStr = () => {
+    const d = new Date();
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
+
+  const getNextDayStr = (dateStr: string) => {
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return getTodayStr();
+    d.setDate(d.getDate() + 1);
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
+
+  const today = getTodayStr();
 
   const verifyAvailability = async (inVal: string, outVal: string) => {
     if (!inVal || !outVal) {
@@ -330,7 +349,7 @@ export default function BookingWidget({ room }: { room: any }) {
             <input 
               required 
               type="date" 
-              min={checkIn || today} 
+              min={checkIn ? getNextDayStr(checkIn) : getNextDayStr(today)} 
               value={checkOut} 
               onChange={(e) => handleDateChange("out", e.target.value)} 
               className={`w-full bg-white text-[#000000] font-jost text-[14.5px] px-4 py-3 rounded-[12px] border ${

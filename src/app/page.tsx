@@ -38,8 +38,24 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ [
   const resolvedParams = await searchParams;
   const adults = parseInt((resolvedParams.adults as string) || "2");
   const children = parseInt((resolvedParams.children as string) || "0");
-  const checkin = (resolvedParams.checkin as string) || "";
-  const checkout = (resolvedParams.checkout as string) || "";
+
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, "0");
+  const day = String(today.getDate()).padStart(2, "0");
+  const todayStr = `${year}-${month}-${day}`;
+
+  const tomorrow = new Date(today);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const nextYear = tomorrow.getFullYear();
+  const nextMonth = String(tomorrow.getMonth() + 1).padStart(2, "0");
+  const nextDate = String(tomorrow.getDate()).padStart(2, "0");
+  const tomorrowStr = `${nextYear}-${nextMonth}-${nextDate}`;
+
+  const rawCheckin = (resolvedParams.checkin as string) || "";
+  const rawCheckout = (resolvedParams.checkout as string) || "";
+  const checkin = (rawCheckin && rawCheckin >= todayStr) ? rawCheckin : todayStr;
+  const checkout = (rawCheckout && rawCheckout > checkin) ? rawCheckout : tomorrowStr;
 
   // Fetch real rooms from DB
   let { data: rooms } = await supabase.from('rooms').select('*').order('price_per_night', { ascending: false });
@@ -78,11 +94,11 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ [
           <form action="/search" method="GET" className="flex flex-col md:flex-row items-end gap-3.5 sm:gap-4 w-full">
             <div className="flex-1 w-full relative">
               <label className="block text-[14px] sm:text-[15px] font-jost text-gray-800 font-medium mb-1.5 sm:mb-2">Check-in</label>
-              <input name="checkin" defaultValue={checkin} type="date" required className="w-full bg-gray-50 border-2 border-gray-200 rounded-md px-3 text-gray-900 font-jost h-[50px] sm:h-[56px] focus:outline-none focus:border-[#000000] transition-colors text-[14px] sm:text-[15px]" />
+              <input name="checkin" defaultValue={checkin} min={todayStr} type="date" required className="w-full bg-gray-50 border-2 border-gray-200 rounded-md px-3 text-gray-900 font-jost h-[50px] sm:h-[56px] focus:outline-none focus:border-[#000000] transition-colors text-[14px] sm:text-[15px]" />
             </div>
             <div className="flex-1 w-full relative">
               <label className="block text-[14px] sm:text-[15px] font-jost text-gray-800 font-medium mb-1.5 sm:mb-2">Check-out</label>
-              <input name="checkout" defaultValue={checkout} type="date" required className="w-full bg-gray-50 border-2 border-gray-200 rounded-md px-3 text-gray-900 font-jost h-[50px] sm:h-[56px] focus:outline-none focus:border-[#000000] transition-colors text-[14px] sm:text-[15px]" />
+              <input name="checkout" defaultValue={checkout} min={checkin || todayStr} type="date" required className="w-full bg-gray-50 border-2 border-gray-200 rounded-md px-3 text-gray-900 font-jost h-[50px] sm:h-[56px] focus:outline-none focus:border-[#000000] transition-colors text-[14px] sm:text-[15px]" />
             </div>
             <div className="w-full md:w-[120px] relative">
               <label className="block text-[14px] sm:text-[15px] font-jost text-gray-800 font-medium mb-1.5 sm:mb-2">Adults</label>

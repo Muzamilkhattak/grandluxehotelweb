@@ -66,16 +66,25 @@ export default async function BookingPage({
     };
   }
 
-  // 4. Default dates
+  // 4. Default dates (ensuring no past dates)
   const today = new Date();
-  const tomorrow = new Date(today);
-  tomorrow.setDate(tomorrow.getDate() + 2);
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, "0");
+  const day = String(today.getDate()).padStart(2, "0");
+  const defaultCheckIn = `${year}-${month}-${day}`;
 
-  const defaultCheckIn = today.toISOString().split("T")[0];
-  const defaultCheckOut = tomorrow.toISOString().split("T")[0];
+  const nextDay = new Date(today);
+  nextDay.setDate(nextDay.getDate() + 2);
+  const nextYear = nextDay.getFullYear();
+  const nextMonth = String(nextDay.getMonth() + 1).padStart(2, "0");
+  const nextDate = String(nextDay.getDate()).padStart(2, "0");
+  const defaultCheckOut = `${nextYear}-${nextMonth}-${nextDate}`;
 
-  const checkin = (resolvedParams.checkin as string) || defaultCheckIn;
-  const checkout = (resolvedParams.checkout as string) || defaultCheckOut;
+  const rawCheckin = (resolvedParams.checkin as string) || "";
+  const rawCheckout = (resolvedParams.checkout as string) || "";
+
+  const checkin = (rawCheckin && rawCheckin >= defaultCheckIn) ? rawCheckin : defaultCheckIn;
+  const checkout = (rawCheckout && rawCheckout > checkin) ? rawCheckout : defaultCheckOut;
   const adults = parseInt((resolvedParams.adults as string) || "2", 10) || 2;
   const children = parseInt((resolvedParams.children as string) || "0", 10) || 0;
 
