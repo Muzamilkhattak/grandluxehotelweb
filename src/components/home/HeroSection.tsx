@@ -2,7 +2,6 @@
 
 import { useRef, MouseEvent } from "react";
 import { motion, useScroll, useTransform, useSpring, useMotionValue } from "framer-motion";
-import { Sparkles } from "lucide-react";
 
 export default function HeroSection() {
   const containerRef = useRef<HTMLElement>(null);
@@ -113,19 +112,6 @@ export default function HeroSection() {
         initial="hidden"
         animate="visible"
       >
-        {/* Floating Luxury Pill */}
-        <motion.div 
-          variants={itemVariants}
-          style={{ transform: "translateZ(30px)" }}
-          className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-black/40 backdrop-blur-md border border-[#d7b56d]/40 mb-4 sm:mb-6 shadow-[0_8px_24px_rgba(0,0,0,0.5)]"
-        >
-          <Sparkles size={13} className="text-[#d7b56d] animate-pulse" />
-          <span className="font-vogue text-[#d7b56d] tracking-[0.26em] uppercase text-[10px] sm:text-[11.5px] font-bold">
-            The Pinnacle Of Hospitality
-          </span>
-          <Sparkles size={13} className="text-[#d7b56d] animate-pulse" />
-        </motion.div>
-
         {/* 3D Headline */}
         <motion.h1
           variants={itemVariants}
@@ -134,15 +120,6 @@ export default function HeroSection() {
         >
           A Signature OF <br className="hidden md:block" /> Luxury Living
         </motion.h1>
-
-        {/* Subtitle with depth */}
-        <motion.p
-          variants={itemVariants}
-          style={{ transform: "translateZ(20px)" }}
-          className="mt-4 sm:mt-6 font-jost text-[15px] sm:text-[18px] md:text-[20px] text-white/80 max-w-2xl font-light tracking-wide"
-        >
-          Where timeless elegance meets bespoke artistry in Islamabad F-8
-        </motion.p>
       </motion.div>
     </section>
   );
