@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Sparkles, Star } from "lucide-react";
 import Tilt3D from "@/components/ui/Tilt3D";
 
 function AnimatedCounter({ from, to, duration = 2 }: { from: number, to: number, duration?: number }) {
@@ -155,44 +155,62 @@ export default function AboutSection() {
           </motion.div>
         </div>
 
-        {/* Animated Image Composition with 3D Tilt */}
-        <div className="w-full lg:w-1/2 relative min-h-[400px] sm:min-h-[520px] lg:min-h-[660px] flex items-center justify-center mt-2 lg:mt-0 mb-8 sm:mb-12 lg:mb-0 order-1 lg:order-2">
-          
-          {/* Main Large Image with 3D Tilt */}
-          <div
+        {/* Animated Image Composition with 3D Tilt & Multi-Layer Floating Effects */}
+        <motion.div 
+          className="w-full lg:w-1/2 relative min-h-[440px] sm:min-h-[540px] lg:min-h-[660px] flex items-center justify-center mt-4 lg:mt-0 mb-8 sm:mb-12 lg:mb-0 order-1 lg:order-2"
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.2 }}
+        >
+          {/* 1. Main Large Image with 3D Tilt & Entrance Fade-In-Scale */}
+          <motion.div
+            variants={{
+              hidden: { opacity: 0, scale: 0.9, y: 40 },
+              visible: { 
+                opacity: 1, 
+                scale: 1, 
+                y: 0,
+                transition: { duration: 1, ease: [0.16, 1, 0.3, 1] }
+              }
+            }}
             className="relative w-[85%] sm:w-[75%] h-[380px] sm:h-[480px] lg:h-[550px] z-10 ml-auto"
           >
             <Tilt3D maxTilt={6} scale={1.02} glare={true} glareColor="rgba(215, 181, 109, 0.2)">
-              <div className="relative w-full h-[380px] sm:h-[480px] lg:h-[550px] shadow-[0_32px_80px_rgba(54,38,24,0.18)] rounded-xl overflow-hidden border border-black/5">
+              <div className="relative w-full h-[380px] sm:h-[480px] lg:h-[550px] shadow-[0_32px_80px_rgba(54,38,24,0.18)] rounded-2xl overflow-hidden border border-black/5 group">
                 <Image 
                   src="https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?q=80&w=1200&auto=format&fit=crop" 
                   alt="Hotel Exterior" 
                   fill
-                  className="object-cover transition-transform duration-700 hover:scale-105"
+                  sizes="(max-width: 768px) 85vw, 45vw"
+                  className="object-cover transition-transform duration-700 ease-out group-hover:scale-106"
                 />
+                {/* Subtle Luxury Gradient Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
               </div>
             </Tilt3D>
-          </div>
+          </motion.div>
 
-          {/* Overlapping Smaller Image (Bottom Right) */}
-          <div
-            className="absolute bottom-[-10px] sm:bottom-[-20px] right-0 sm:right-[-10px] w-[55%] sm:w-[50%] h-[260px] sm:h-[350px] z-20"
-          >
-            <Tilt3D maxTilt={8} scale={1.03} glare={true}>
-              <div className="relative w-full h-[260px] sm:h-[350px] border-[6px] sm:border-[10px] border-[#FFFFFF] shadow-[0_24px_64px_rgba(54,38,24,0.2)] rounded-xl overflow-hidden">
-                <Image 
-                  src="https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?q=80&w=1200&auto=format&fit=crop" 
-                  alt="Lobby Details" 
-                  fill
-                  className="object-cover transition-transform duration-700 hover:scale-105"
-                />
-              </div>
-            </Tilt3D>
-          </div>
-
-          {/* Third Image (Top Left) */}
-          <div
-            className="absolute top-[20px] sm:top-[40px] left-0 w-[40%] h-[200px] sm:h-[280px] z-20 border-[6px] sm:border-[10px] border-[#FFFFFF] shadow-[0_24px_64px_rgba(54,38,24,0.18)] rounded-xl overflow-hidden hidden sm:block"
+          {/* 2. Top-Left Floating Image (Sliding from Left + Floating Drift) */}
+          <motion.div
+            variants={{
+              hidden: { opacity: 0, x: -60, y: -20, rotate: -4 },
+              visible: { 
+                opacity: 1, 
+                x: 0, 
+                y: 0, 
+                rotate: 0,
+                transition: { duration: 1.1, delay: 0.2, ease: [0.16, 1, 0.3, 1] }
+              }
+            }}
+            animate={{
+              y: [0, -10, 0],
+              transition: {
+                duration: 5.5,
+                repeat: Infinity,
+                ease: "easeInOut"
+              }
+            }}
+            className="absolute top-[20px] sm:top-[35px] left-0 w-[42%] sm:w-[40%] h-[200px] sm:h-[280px] z-20 border-[6px] sm:border-[10px] border-[#FFFFFF] shadow-[0_24px_64px_rgba(54,38,24,0.22)] rounded-2xl overflow-hidden hidden sm:block group hover:border-[#d7b56d]/40 transition-colors duration-500"
           >
             <Tilt3D maxTilt={7} scale={1.03} glare={true}>
               <div className="relative w-full h-[200px] sm:h-[280px]">
@@ -200,11 +218,81 @@ export default function AboutSection() {
                   src="https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=800&auto=format&fit=crop" 
                   alt="Luxury Amenities" 
                   fill
-                  className="object-cover transition-transform duration-700 hover:scale-105"
+                  sizes="(max-width: 768px) 40vw, 25vw"
+                  className="object-cover transition-transform duration-700 ease-out group-hover:scale-108"
                 />
               </div>
             </Tilt3D>
-          </div>
+          </motion.div>
+
+          {/* 3. Bottom-Right Floating Image (Sliding from Right + Counter-Floating Drift) */}
+          <motion.div
+            variants={{
+              hidden: { opacity: 0, x: 50, y: 60, rotate: 4 },
+              visible: { 
+                opacity: 1, 
+                x: 0, 
+                y: 0, 
+                rotate: 0,
+                transition: { duration: 1.1, delay: 0.35, ease: [0.16, 1, 0.3, 1] }
+              }
+            }}
+            animate={{
+              y: [0, 10, 0],
+              transition: {
+                duration: 6.5,
+                repeat: Infinity,
+                ease: "easeInOut"
+              }
+            }}
+            className="absolute bottom-[-10px] sm:bottom-[-20px] right-0 sm:right-[-10px] w-[56%] sm:w-[50%] h-[260px] sm:h-[350px] z-20 border-[6px] sm:border-[10px] border-[#FFFFFF] shadow-[0_28px_70px_rgba(54,38,24,0.25)] rounded-2xl overflow-hidden group hover:border-[#d7b56d]/40 transition-colors duration-500"
+          >
+            <Tilt3D maxTilt={8} scale={1.03} glare={true}>
+              <div className="relative w-full h-[260px] sm:h-[350px]">
+                <Image 
+                  src="https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?q=80&w=1200&auto=format&fit=crop" 
+                  alt="Lobby Details" 
+                  fill
+                  sizes="(max-width: 768px) 50vw, 30vw"
+                  className="object-cover transition-transform duration-700 ease-out group-hover:scale-108"
+                />
+              </div>
+            </Tilt3D>
+          </motion.div>
+
+          {/* Floating Luxury Stamp / Seal */}
+          <motion.div
+            variants={{
+              hidden: { opacity: 0, scale: 0, rotate: -25 },
+              visible: { 
+                opacity: 1, 
+                scale: 1, 
+                rotate: 0,
+                transition: { duration: 0.9, delay: 0.5, ease: "backOut" }
+              }
+            }}
+            animate={{
+              rotate: [0, 3, 0, -3, 0],
+              transition: {
+                duration: 8,
+                repeat: Infinity,
+                ease: "easeInOut"
+              }
+            }}
+            className="absolute bottom-6 left-2 sm:left-6 z-30 bg-[#0a0a0a]/92 backdrop-blur-md border border-[#d7b56d]/50 rounded-2xl p-3 sm:p-3.5 shadow-2xl flex items-center gap-3 cursor-default"
+          >
+            <div className="w-9 h-9 rounded-full bg-[#d7b56d] text-black flex items-center justify-center font-marcellus font-bold text-xs shadow-md">
+              <Star size={14} className="fill-black text-black" />
+            </div>
+            <div>
+              <p className="font-vogue text-[10px] sm:text-[11px] text-[#d7b56d] uppercase tracking-[0.2em] font-semibold">
+                Signature Heritage
+              </p>
+              <p className="font-jost text-[9px] sm:text-[10px] text-white/70 uppercase tracking-wider">
+                Islamabad F-8
+              </p>
+            </div>
+          </motion.div>
           
           {/* Decorative Gold Accents */}
           <motion.div
@@ -221,7 +309,7 @@ export default function AboutSection() {
             transition={{ duration: 1.1, delay: 0.4, ease: "easeOut" }}
             className="absolute -top-12 -left-8 h-[1px] bg-[#d7b56d] z-0 hidden lg:block"
           />
-        </div>
+        </motion.div>
 
       </div>
     </section>
