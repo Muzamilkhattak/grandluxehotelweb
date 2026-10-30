@@ -24,27 +24,7 @@ export default function Footer() {
       {/* 1. Ambient Center Glow */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_35%,rgba(201,122,79,0.12)_0%,rgba(126,101,46,0.06)_50%,transparent_80%)] pointer-events-none z-0" />
 
-      {/* 2. City Skyline Silhouette Backdrop */}
-      <div className="absolute inset-x-0 bottom-0 h-44 sm:h-56 md:h-64 pointer-events-none z-0 overflow-hidden opacity-30">
-        <svg 
-          viewBox="0 0 1440 220" 
-          preserveAspectRatio="none" 
-          className="w-full h-full text-white/10 fill-current"
-        >
-          {/* Far background silhouettes */}
-          <path 
-            d="M0,220 L0,110 L35,110 L35,80 L75,80 L75,130 L110,130 L110,70 L145,70 L145,140 L190,140 L190,95 L230,95 L230,120 L270,120 L270,60 L295,45 L320,60 L320,135 L370,135 L370,85 L415,85 L415,115 L460,115 L460,50 L480,30 L500,50 L500,125 L555,125 L555,75 L600,75 L600,110 L645,110 L645,65 L690,65 L690,130 L740,130 L740,80 L785,80 L785,120 L830,120 L830,55 L850,35 L870,55 L870,140 L920,140 L920,70 L965,70 L965,115 L1010,115 L1010,85 L1055,85 L1055,130 L1100,130 L1100,60 L1130,40 L1160,60 L1160,125 L1210,125 L1210,75 L1255,75 L1255,110 L1300,110 L1300,85 L1345,85 L1345,135 L1390,135 L1390,95 L1440,95 L1440,220 Z" 
-            opacity="0.45"
-          />
-          {/* Near foreground silhouettes */}
-          <path 
-            d="M0,220 L0,140 L45,140 L45,115 L90,115 L90,150 L140,150 L140,105 L180,105 L180,135 L225,135 L225,90 L260,90 L260,145 L310,145 L310,120 L355,120 L355,160 L400,160 L400,100 L445,100 L445,140 L490,140 L490,110 L535,110 L535,155 L580,155 L580,95 L625,95 L625,135 L670,135 L670,115 L715,115 L715,150 L760,150 L760,105 L805,105 L805,140 L850,140 L850,95 L895,95 L895,130 L940,130 L940,110 L985,110 L985,150 L1030,150 L1030,100 L1075,100 L1075,135 L1120,135 L1120,115 L1165,115 L1165,155 L1210,155 L1210,105 L1255,105 L1255,140 L1300,140 L1300,95 L1345,95 L1345,145 L1390,145 L1390,120 L1440,120 L1440,220 Z" 
-            opacity="0.85"
-          />
-        </svg>
-      </div>
-
-      {/* 3. Main Footer Content Area */}
+      {/* Main Footer Content Area */}
       <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 pt-16 md:pt-20 pb-8 md:pb-10 flex flex-col items-center">
         
         {/* Top Tagline */}
