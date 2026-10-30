@@ -61,7 +61,7 @@ export default function RestaurantClient({ initialSettings, initialItems }: Prop
     <div className="bg-[#000000] min-h-screen text-white selection:bg-[#d7b56d] selection:text-black">
       {/* Restaurant Hero Section with Background Image */}
       <section className="relative bg-[#000000] text-white py-28 md:py-36 overflow-hidden border-b border-white/10">
-        {/* Background Image with subtle zoom on load */}
+        {/* Background Image - Clean & Natural without any fade or color overlays */}
         <div className="absolute inset-0 z-0">
           <Image
             src={heroBgImage}
@@ -74,22 +74,17 @@ export default function RestaurantClient({ initialSettings, initialItems }: Prop
           />
         </div>
 
-        {/* Dark Luxury Gradient Overlays for optimal readability */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#000000] via-black/65 to-black/80 z-10" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(215,181,109,0.15)_0%,transparent_75%)] z-10" />
-        <div className="absolute top-1/4 left-1/3 w-[600px] h-[600px] bg-[#d7b56d]/15 rounded-full blur-[150px] pointer-events-none z-10" />
-
         {/* Hero Content */}
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-20 text-center">
           <Link 
             href="/" 
-            className="inline-flex items-center gap-2 text-[#d7b56d] hover:text-white transition-colors mb-6 text-[12px] uppercase tracking-widest font-medium"
+            className="inline-flex items-center gap-2 text-[#d7b56d] hover:text-white transition-colors mb-6 text-[12px] uppercase tracking-widest font-bold drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]"
           >
             <ArrowLeft size={14} /> Back to Home
           </Link>
 
           <div className="flex justify-center mb-4">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-black/60 border border-[#d7b56d]/40 backdrop-blur-md shadow-lg">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-black/75 border border-[#d7b56d]/60 backdrop-blur-md shadow-xl">
               <Sparkles size={14} className="text-[#d7b56d]" />
               <span className="font-vogue text-[#d7b56d] tracking-[0.25em] uppercase text-[11px] font-semibold">
                 {settings.tagline}
@@ -98,24 +93,24 @@ export default function RestaurantClient({ initialSettings, initialItems }: Prop
             </div>
           </div>
 
-          <h1 className="font-marcellus text-4xl sm:text-5xl md:text-6xl text-white tracking-tight mb-4 drop-shadow-md">
+          <h1 className="font-marcellus text-4xl sm:text-5xl md:text-6xl text-white tracking-tight mb-4 drop-shadow-[0_4px_16px_rgba(0,0,0,0.95)]">
             {settings.heading}
           </h1>
-          <p className="font-jost text-[16px] sm:text-[18px] md:text-[20px] text-gray-200 leading-relaxed max-w-2xl mx-auto font-light drop-shadow mb-8">
+          <p className="font-jost text-[16px] sm:text-[18px] md:text-[20px] text-white leading-relaxed max-w-2xl mx-auto font-medium drop-shadow-[0_2px_10px_rgba(0,0,0,0.95)] mb-8">
             {settings.subheading}
           </p>
 
           {/* Quick Info Badges */}
-          <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-6 text-xs sm:text-sm text-gray-300 font-jost">
-            <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/5 border border-white/10 backdrop-blur-sm">
+          <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-6 text-xs sm:text-sm text-white font-jost">
+            <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/75 border border-white/20 backdrop-blur-md shadow-lg">
               <Clock size={14} className="text-[#d7b56d]" />
               <span>Daily: 06:30 – 23:30</span>
             </div>
-            <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/5 border border-white/10 backdrop-blur-sm">
+            <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/75 border border-white/20 backdrop-blur-md shadow-lg">
               <Flame size={14} className="text-[#d7b56d]" />
               <span>Birch Woodfire & Fresh Fjord Catches</span>
             </div>
-            <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/5 border border-white/10 backdrop-blur-sm">
+            <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/75 border border-white/20 backdrop-blur-md shadow-lg">
               <Phone size={14} className="text-[#d7b56d]" />
               <span>Reservations: +47 22 00 55 00</span>
             </div>
