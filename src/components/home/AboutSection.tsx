@@ -9,12 +9,13 @@ import { ArrowRight } from "lucide-react";
 
 function AnimatedCounter({ from, to, duration = 2 }: { from: number, to: number, duration?: number }) {
   const nodeRef = useRef<HTMLSpanElement>(null);
-  const inView = useInView(nodeRef, { once: true, margin: "-50px" });
+  const inView = useInView(nodeRef, { once: true, amount: 0.1 });
 
   useEffect(() => {
     if (inView) {
       const node = nodeRef.current;
       if (!node) return;
+      node.textContent = from.toString();
       const controls = animate(from, to, {
         duration,
         ease: "easeOut",
@@ -26,7 +27,7 @@ function AnimatedCounter({ from, to, duration = 2 }: { from: number, to: number,
     }
   }, [from, to, inView, duration]);
 
-  return <span ref={nodeRef} />;
+  return <span ref={nodeRef}>{to}</span>;
 }
 
 export default function AboutSection() {
@@ -106,8 +107,8 @@ export default function AboutSection() {
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.8, delay: 0.4, ease: "easeOut" }}
+            viewport={{ once: true, amount: 0.1 }}
+            transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
             className="flex items-center gap-8 sm:gap-14 md:gap-16 pt-6 sm:pt-8 border-t border-[#d7b56d]/20"
           >
             <div className="flex flex-col">
@@ -133,8 +134,8 @@ export default function AboutSection() {
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.8, delay: 0.6, ease: "easeOut" }}
+            viewport={{ once: true, amount: 0.1 }}
+            transition={{ duration: 0.8, delay: 0.3, ease: "easeOut" }}
             className="pt-2 sm:pt-4"
           >
             <Link 
