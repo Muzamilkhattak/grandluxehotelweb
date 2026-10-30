@@ -99,7 +99,7 @@ export default function RestaurantSection({ settings: propSettings, items: propI
         {/* Dark Luxury Gradient Overlays */}
         <div className="absolute inset-0 bg-[#000000]/90 backdrop-blur-[2px]" />
         <div className="absolute inset-0 bg-gradient-to-t from-[#000000] via-transparent to-[#000000]" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(201,122,79,0.18)_0%,transparent_75%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(215,181,109,0.15)_0%,transparent_75%)]" />
       </div>
 
       <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -165,9 +165,9 @@ export default function RestaurantSection({ settings: propSettings, items: propI
                 className="w-full"
               >
                 <Tilt3D maxTilt={5} scale={1.02} glare={true} glareColor="rgba(215, 181, 109, 0.16)">
-                  <div className="group flex items-center gap-4 sm:gap-5 p-4 rounded-xl bg-[#000000]/70 hover:bg-[#000000]/95 border border-white/10 hover:border-[#d7b56d]/60 transition-colors duration-300 shadow-lg backdrop-blur-sm">
+                  <div className="group flex items-center gap-4 sm:gap-5 p-4 rounded-xl bg-[#000000]/70 hover:bg-[#000000]/95 border border-white/15 hover:border-[#d7b56d] transition-all duration-300 shadow-lg hover:shadow-[0_8px_25px_rgba(215,181,109,0.2)] backdrop-blur-sm">
                     {/* Rounded Picture with smooth zoom on hover */}
-                    <div className="relative w-16 h-16 sm:w-20 sm:h-20 shrink-0 rounded-full overflow-hidden border-2 border-[#d7b56d]/60 group-hover:border-[#d7b56d] shadow-lg transition-colors duration-300">
+                    <div className="relative w-16 h-16 sm:w-20 sm:h-20 shrink-0 rounded-full overflow-hidden border-2 border-[#d7b56d] group-hover:border-[#d7b56d] shadow-[0_0_12px_rgba(215,181,109,0.3)] transition-colors duration-300">
                       <Image
                         src={item.image}
                         alt={item.name}
@@ -186,13 +186,13 @@ export default function RestaurantSection({ settings: propSettings, items: propI
                         
                         <span className="flex-1 border-b border-dotted border-white/25 hidden sm:inline-block mx-1" />
 
-                        <span className="font-marcellus text-[18px] sm:text-[20px] text-[#d7b56d] shrink-0 font-medium">
+                        <span className="font-marcellus text-[18px] sm:text-[20px] text-[#d7b56d] group-hover:text-[#d7b56d] shrink-0 font-bold drop-shadow-[0_2px_8px_rgba(215,181,109,0.35)]">
                           {item.price}
                         </span>
                       </div>
 
                       {/* Clean Description */}
-                      <p className="font-jost text-[13px] sm:text-[14px] text-[#FFFFFF]/70 leading-snug line-clamp-2">
+                      <p className="font-jost text-[13.5px] sm:text-[14px] text-gray-300 group-hover:text-white/90 leading-snug line-clamp-2 transition-colors">
                         {item.description}
                       </p>
                     </div>

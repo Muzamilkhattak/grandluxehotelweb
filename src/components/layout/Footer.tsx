@@ -22,7 +22,7 @@ export default function Footer() {
       </div>
 
       {/* 1. Ambient Center Glow */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_35%,rgba(201,122,79,0.12)_0%,rgba(126,101,46,0.06)_50%,transparent_80%)] pointer-events-none z-0" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_35%,rgba(215,181,109,0.12)_0%,rgba(215,181,109,0.04)_50%,transparent_80%)] pointer-events-none z-0" />
 
       {/* Main Footer Content Area */}
       <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 pt-16 md:pt-20 pb-8 md:pb-10 flex flex-col items-center">
@@ -44,7 +44,7 @@ export default function Footer() {
             width={380}
             height={200}
             priority
-            className="h-[75px] sm:h-[90px] md:h-[105px] lg:h-[115px] w-auto object-contain drop-shadow-[0_4px_24px_rgba(201,122,79,0.3)] group-hover:brightness-115 transition-all duration-300"
+            className="h-[75px] sm:h-[90px] md:h-[105px] lg:h-[115px] w-auto object-contain drop-shadow-[0_4px_24px_rgba(215,181,109,0.25)] group-hover:brightness-115 transition-all duration-300"
           />
         </Link>
 
