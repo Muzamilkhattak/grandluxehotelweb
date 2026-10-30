@@ -45,9 +45,13 @@ export default function SignatureAmenities() {
           transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
           className="text-center mb-8 sm:mb-12 md:mb-16 will-change-transform"
         >
-          <span className="font-vogue text-[#d7b56d] tracking-[0.24em] uppercase text-[11px] sm:text-[12px] font-bold block mb-2 sm:mb-3">
-            Pure Indulgence
-          </span>
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#8f6618]/10 border border-[#8f6618]/25 mb-3 sm:mb-4 shadow-xs">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#8f6618]" />
+            <span className="font-jost text-[#8f6618] tracking-[0.22em] uppercase text-[12px] sm:text-[13px] font-bold">
+              Pure Indulgence
+            </span>
+            <span className="w-1.5 h-1.5 rounded-full bg-[#8f6618]" />
+          </div>
           <h2 className="font-marcellus text-3xl sm:text-4xl md:text-[52px] lg:text-[60px] text-primary">
             Signature Amenities
           </h2>

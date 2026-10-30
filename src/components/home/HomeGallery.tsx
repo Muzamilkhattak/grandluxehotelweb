@@ -69,12 +69,12 @@ export default function HomeGallery() {
             viewport={{ once: true, margin: "-60px" }}
             transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
           >
-            <div className="inline-flex items-center gap-2 px-3.5 sm:px-4 py-1.5 rounded-full bg-[#000000]/5 border border-[#000000]/10 mb-2 sm:mb-3">
-              <Sparkles size={13} className="text-[#d7b56d]" />
-              <span className="font-vogue text-[#d7b56d] tracking-[0.25em] uppercase text-[10.5px] sm:text-[11px] font-bold">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#8f6618]/10 border border-[#8f6618]/25 mb-2.5 sm:mb-3.5 shadow-xs">
+              <Sparkles size={13} className="text-[#8f6618]" />
+              <span className="font-jost text-[#8f6618] tracking-[0.22em] uppercase text-[12px] sm:text-[13px] font-bold">
                 Visual Journey
               </span>
-              <Sparkles size={13} className="text-[#d7b56d]" />
+              <Sparkles size={13} className="text-[#8f6618]" />
             </div>
             
             <h2 className="font-marcellus text-2xl sm:text-3xl md:text-[48px] text-[#000000] leading-[1.15] font-medium tracking-wide">

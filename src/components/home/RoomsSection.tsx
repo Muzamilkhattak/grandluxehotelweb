@@ -70,9 +70,13 @@ export default function RoomsSection({
           transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
           className="text-center mb-10 sm:mb-14 md:mb-16 max-w-2xl will-change-transform"
         >
-          <span className="font-vogue text-[#d7b56d] tracking-[0.26em] uppercase text-[11px] sm:text-[12px] font-bold block mb-2 sm:mb-3">
-            Accommodations
-          </span>
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#8f6618]/10 border border-[#8f6618]/25 mb-3 sm:mb-4 shadow-xs">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#8f6618]" />
+            <span className="font-jost text-[#8f6618] tracking-[0.22em] uppercase text-[12px] sm:text-[13px] font-bold">
+              Accommodations
+            </span>
+            <span className="w-1.5 h-1.5 rounded-full bg-[#8f6618]" />
+          </div>
           <h2 className="font-marcellus text-3xl sm:text-4xl md:text-[52px] lg:text-[60px] text-primary leading-tight font-normal">
             Curated Suites
           </h2>
