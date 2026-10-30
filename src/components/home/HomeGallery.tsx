@@ -2,10 +2,11 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import Image from "next/image";
-import { Sparkles, X, ChevronLeft, ChevronRight, Maximize2, MapPin, Compass, ArrowDown } from "lucide-react";
+import { Sparkles, X, ChevronLeft, ChevronRight, Maximize2, Compass, ArrowDown } from "lucide-react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { getGalleryImages } from "@/app/actions/admin-gallery";
+import pakistanPaths from "@/data/pakistan-map-paths.json";
 
 interface GalleryPhoto {
   id: string;
@@ -161,26 +162,33 @@ export default function HomeGallery() {
       if (!introStage || !introSVG || !cityContent) return;
 
       const introPaths = introSVG.querySelectorAll<SVGPathElement>(".map-path");
-      const hotelSectorPath = introSVG.querySelector<SVGPathElement>("#hotel-sector");
-      const hotelPin = introSVG.querySelector<SVGGElement>("#hotel-pin");
+      const capitalPath = introSVG.querySelector<SVGPathElement>("#PKIS");
+      const nonCapitalPaths = introSVG.querySelectorAll<SVGPathElement>(".map-path:not(#PKIS)");
+      const beacon = introSVG.querySelector<SVGGElement>("#islamabad-beacon");
       const introTextChars = introText ? introText.querySelectorAll<HTMLSpanElement>(".char-span") : [];
 
-      // Initial state setup for timeline
-      gsap.set(introPaths, { strokeDasharray: 900, strokeDashoffset: 900, fill: "transparent" });
-      gsap.set(hotelSectorPath, { strokeDasharray: 600, strokeDashoffset: 600, fill: "transparent" });
-      if (hotelPin) gsap.set(hotelPin, { opacity: 0, scale: 0.2, transformOrigin: "center center" });
-      if (introTextChars.length > 0) gsap.set(introTextChars, { opacity: 0, y: 35 });
-      gsap.set(cityContent, { scale: 0.9, opacity: 0.3, y: 80 });
+      // Initial state setup for timeline: strokeDasharray & offset
+      introPaths.forEach((path) => {
+        let len = 2500;
+        try {
+          len = Math.ceil(path.getTotalLength()) || 2500;
+        } catch {}
+        gsap.set(path, { strokeDasharray: len + 30, strokeDashoffset: len + 30, fill: "transparent" });
+      });
 
-      // Master Timeline
+      if (beacon) gsap.set(beacon, { opacity: 0, scale: 0.3, transformOrigin: "center center" });
+      if (introTextChars.length > 0) gsap.set(introTextChars, { opacity: 0, y: 40 });
+      gsap.set(cityContent, { scale: 0.9, opacity: 0.25, y: 80 });
+
+      // Master Timeline matching the Scroll-Driven Map Editorial pattern
       const tl = gsap.timeline();
 
       // 1. Initial Title fades out and scrolls away
       if (title) {
         tl.to(title, {
-          y: -60,
+          y: -70,
           opacity: 0,
-          duration: 1.6,
+          duration: 1.8,
           ease: "power2.inOut",
         }, "intro");
       }
@@ -188,17 +196,17 @@ export default function HomeGallery() {
       // Scroll hint fades
       if (scrollIndicator) {
         tl.to(scrollIndicator, {
-          y: 30,
+          y: 40,
           opacity: 0,
-          duration: 1,
+          duration: 1.2,
           ease: "power2.out",
         }, "intro");
       }
 
-      // 2. SVG Map enters and paths draw with vector precision
+      // 2. SVG Pakistan Map enters and provincial vector boundaries draw
       tl.fromTo(
         introSVG,
-        { scale: 0.92, opacity: 0.1 },
+        { scale: 0.92, opacity: 0.15 },
         { scale: 1, opacity: 1, duration: 2, ease: "power2.out" },
         "intro+=0.2"
       );
@@ -207,75 +215,76 @@ export default function HomeGallery() {
         introPaths,
         {
           strokeDashoffset: 0,
-          stagger: 0.04,
-          fill: "rgba(215, 181, 109, 0.02)",
+          stagger: 0.08,
+          fill: "rgba(215, 181, 109, 0.03)",
           duration: 3,
           ease: "power2.inOut",
         },
         "intro+=0.4"
       );
 
-      // 3. Highlight Sector F-8 in Hotel Brand Gold #d7b56d
-      if (hotelSectorPath) {
+      // 3. Highlight Islamabad Capital Territory (#PKIS) in Hotel Brand Gold #d7b56d
+      if (capitalPath) {
         tl.to(
-          hotelSectorPath,
+          capitalPath,
           {
-            strokeDashoffset: 0,
-            duration: 2.2,
+            duration: 2.5,
             stroke: "#d7b56d",
-            fill: "rgba(215, 181, 109, 0.22)",
+            strokeWidth: 3,
+            fill: "rgba(215, 181, 109, 0.45)",
             ease: "power2.out",
           },
           "highlight"
         );
       }
 
-      if (hotelPin) {
+      // 4. Pinpoint Beacon & Coordinate Callout illumination
+      if (beacon) {
         tl.to(
-          hotelPin,
+          beacon,
           {
             opacity: 1,
             scale: 1,
             duration: 1.8,
             ease: "back.out(2)",
           },
-          "highlight+=0.2"
+          "highlight+=0.1"
         );
       }
 
-      // 4. Staggered character reveal of "ISLAMABAD • SECTOR F-8"
+      // 5. Staggered character reveal of "ISLAMABAD • PAKISTAN"
       if (introTextChars.length > 0) {
         tl.to(
           introTextChars,
           {
             y: 0,
             opacity: 1,
-            stagger: 0.05,
-            duration: 1.4,
+            stagger: 0.04,
+            duration: 1.6,
             ease: "power2.out",
           },
-          "highlight+=0.1"
+          "highlight-=0.1"
         );
       }
 
-      // Dim non-highlighted paths slightly to make Sector F-8 stand out
+      // 6. Dim surrounding provincial paths to make Islamabad stand out
       tl.to(
-        introPaths,
+        nonCapitalPaths,
         {
           opacity: 0.35,
-          duration: 2,
+          duration: 2.5,
         },
-        "highlight+=0.3"
+        "highlight-=0.1"
       );
 
-      // 5. The Editorial Photographic Gallery scales up and glides seamlessly into view
+      // 7. Editorial Photographic Gallery scales up and glides seamlessly into view
       tl.to(
         cityContent,
         {
           scale: 1,
           opacity: 1,
           y: 0,
-          duration: 3.5,
+          duration: 3.8,
           ease: "power3.out",
         },
         "content"
@@ -285,9 +294,9 @@ export default function HomeGallery() {
         tl.to(
           introText,
           {
-            y: -40,
+            y: -50,
             opacity: 0.85,
-            duration: 2.5,
+            duration: 3,
           },
           "content"
         );
@@ -369,7 +378,7 @@ export default function HomeGallery() {
       className="bg-[#000000] text-[#FFFFFF] relative overflow-hidden scroll-mt-20 selection:bg-[#d7b56d] selection:text-black"
     >
       {/* =========================================================================
-          STAGE 1: CINEMATIC SCROLL-DRIVEN SVG MAP INTRO
+          STAGE 1: CINEMATIC SCROLL-DRIVEN SVG MAP INTRO (PAKISTAN VECTOR MAP)
           ========================================================================= */}
       <div 
         ref={introStageRef}
@@ -387,7 +396,7 @@ export default function HomeGallery() {
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#0a0a0a]/90 border border-[#d7b56d]/40 mb-4 shadow-xl backdrop-blur-md">
             <Sparkles size={13} className="text-[#d7b56d]" />
             <span className="font-vogue text-[#d7b56d] tracking-[0.25em] uppercase text-[11px] sm:text-[12px] font-semibold">
-              Visual Journey • Vector Map Edition
+              Visual Journey • Geographic Edition
             </span>
             <Sparkles size={13} className="text-[#d7b56d]" />
           </div>
@@ -414,132 +423,77 @@ export default function HomeGallery() {
           </div>
         </div>
 
-        {/* 3. Architectural Vector SVG Map of Islamabad Capital Grid */}
-        <div className="relative w-full max-w-5xl h-[70vh] flex items-center justify-center z-10">
+        {/* 3. Authentic Geographic Vector SVG Map of Pakistan with Islamabad Highlight */}
+        <div className="relative w-full max-w-4xl h-[72vh] flex items-center justify-center z-10">
           <svg
             ref={introSVGRef}
-            viewBox="0 0 1000 600"
-            className="w-full h-full max-h-[620px] will-change-transform drop-shadow-[0_0_30px_rgba(0,0,0,0.8)]"
+            viewBox="0 0 1000 959"
+            className="w-full h-full max-h-[660px] will-change-transform drop-shadow-[0_0_40px_rgba(0,0,0,0.95)]"
             preserveAspectRatio="xMidYMid meet"
           >
             <defs>
               <radialGradient id="beaconGlow" cx="50%" cy="50%" r="50%">
-                <stop offset="0%" stopColor="#d7b56d" stopOpacity="0.8" />
-                <stop offset="60%" stopColor="#d7b56d" stopOpacity="0.25" />
+                <stop offset="0%" stopColor="#d7b56d" stopOpacity="0.95" />
+                <stop offset="50%" stopColor="#d7b56d" stopOpacity="0.35" />
                 <stop offset="100%" stopColor="#d7b56d" stopOpacity="0" />
               </radialGradient>
-              <filter id="goldGlow" x="-20%" y="-20%" width="140%" height="140%">
-                <feGaussianBlur stdDeviation="4" result="blur" />
+              <filter id="goldGlow" x="-50%" y="-50%" width="200%" height="200%">
+                <feGaussianBlur stdDeviation="5" result="blur" />
                 <feComposite in="SourceGraphic" in2="blur" operator="over" />
               </filter>
             </defs>
 
-            {/* Margalla Hills Ridge Contours */}
-            <g className="margalla-contours opacity-45">
-              <path d="M 40,110 Q 250,55 520,85 T 960,65" className="map-path" stroke="rgba(255,255,255,0.2)" strokeWidth="1.5" fill="none" />
-              <path d="M 60,145 Q 290,95 560,125 T 940,95" className="map-path" stroke="rgba(255,255,255,0.18)" strokeWidth="1.5" fill="none" />
-              <path d="M 90,180 Q 340,135 610,165 T 910,135" className="map-path" stroke="rgba(255,255,255,0.15)" strokeWidth="1.5" fill="none" />
-              <text x="120" y="100" fill="rgba(215,181,109,0.4)" fontSize="10" fontFamily="sans-serif" letterSpacing="4">
-                MARGALLA HILLS RIDGELINE
-              </text>
+            {/* Pakistan Real Geographic Vector Map */}
+            <g id="pakistan-provinces">
+              {pakistanPaths.map((province) => (
+                <path
+                  key={province.id}
+                  id={province.id}
+                  d={province.d}
+                  className={`map-path ${province.id === "PKIS" ? "capital-path" : "province-path"}`}
+                  stroke={province.id === "PKIS" ? "#d7b56d" : "rgba(255, 255, 255, 0.45)"}
+                  strokeWidth={province.id === "PKIS" ? "2.5" : "1.8"}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  fill="transparent"
+                />
+              ))}
             </g>
 
-            {/* Primary Sector Arterial Roads */}
-            <g className="arteries">
-              {/* Margalla Road (Khayaban-e-Iqbal) */}
-              <path d="M 120,200 L 890,165" className="map-path" stroke="rgba(255,255,255,0.28)" strokeWidth="2.5" fill="none" />
-              {/* Jinnah Avenue */}
-              <path d="M 160,295 L 870,260" className="map-path" stroke="rgba(255,255,255,0.28)" strokeWidth="2.5" fill="none" />
-              {/* Srinagar / Kashmir Highway */}
-              <path d="M 80,420 L 920,420" className="map-path" stroke="rgba(255,255,255,0.3)" strokeWidth="3" fill="none" />
-
-              {/* Faisal Avenue (Central Spine) */}
-              <path d="M 520,100 L 520,570" className="map-path" stroke="rgba(255,255,255,0.35)" strokeWidth="3" fill="none" />
-              {/* 7th Avenue */}
-              <path d="M 680,110 L 680,570" className="map-path" stroke="rgba(255,255,255,0.25)" strokeWidth="2" fill="none" />
-              {/* 9th Avenue */}
-              <path d="M 360,130 L 360,570" className="map-path" stroke="rgba(255,255,255,0.25)" strokeWidth="2" fill="none" />
-            </g>
-
-            {/* Capital Sector Blocks */}
-            <g className="sector-blocks">
-              {/* Sector E-7 */}
-              <path d="M 540,210 L 660,200 L 660,278 L 540,288 Z" className="map-path" stroke="rgba(255,255,255,0.18)" strokeWidth="1.5" />
-              <text x="585" y="250" fill="rgba(255,255,255,0.3)" fontSize="11" fontFamily="sans-serif">E-7</text>
-
-              {/* Sector E-8 */}
-              <path d="M 380,224 L 500,214 L 500,292 L 380,302 Z" className="map-path" stroke="rgba(255,255,255,0.18)" strokeWidth="1.5" />
-              <text x="425" y="264" fill="rgba(255,255,255,0.3)" fontSize="11" fontFamily="sans-serif">E-8</text>
-
-              {/* Sector F-6 */}
-              <path d="M 700,278 L 840,268 L 840,378 L 700,388 Z" className="map-path" stroke="rgba(255,255,255,0.18)" strokeWidth="1.5" />
-              <text x="755" y="335" fill="rgba(255,255,255,0.3)" fontSize="11" fontFamily="sans-serif">F-6</text>
-
-              {/* Sector F-7 */}
-              <path d="M 540,298 L 660,288 L 660,398 L 540,408 Z" className="map-path" stroke="rgba(255,255,255,0.18)" strokeWidth="1.5" />
-              <text x="585" y="355" fill="rgba(255,255,255,0.3)" fontSize="11" fontFamily="sans-serif">F-7</text>
-
-              {/* Sector F-9 (Fatima Jinnah Park) */}
-              <path d="M 220,332 L 340,322 L 340,432 L 220,442 Z" className="map-path" stroke="rgba(255,255,255,0.18)" strokeWidth="1.5" />
-              <text x="255" y="388" fill="rgba(255,255,255,0.3)" fontSize="11" fontFamily="sans-serif">F-9 PARK</text>
-
-              {/* Sector G-6, G-7, G-8 */}
-              <path d="M 700,430 L 840,430 L 840,540 L 700,540 Z" className="map-path" stroke="rgba(255,255,255,0.15)" strokeWidth="1.5" />
-              <text x="755" y="490" fill="rgba(255,255,255,0.25)" fontSize="11" fontFamily="sans-serif">G-6</text>
-
-              <path d="M 540,430 L 660,430 L 660,540 L 540,540 Z" className="map-path" stroke="rgba(255,255,255,0.15)" strokeWidth="1.5" />
-              <text x="585" y="490" fill="rgba(255,255,255,0.25)" fontSize="11" fontFamily="sans-serif">G-7</text>
-
-              <path d="M 380,430 L 500,430 L 500,540 L 380,540 Z" className="map-path" stroke="rgba(255,255,255,0.15)" strokeWidth="1.5" />
-              <text x="425" y="490" fill="rgba(255,255,255,0.25)" fontSize="11" fontFamily="sans-serif">G-8</text>
-
-              {/* =========================================================
-                  TARGET HIGHLIGHT: SECTOR F-8 (SIGNATURE ART HOTEL)
-                  ========================================================= */}
-              <path 
-                id="hotel-sector" 
-                d="M 380,312 L 500,302 L 500,412 L 380,422 Z" 
-                stroke="#d7b56d" 
-                strokeWidth="2.5" 
-                fill="none" 
-              />
-              <text x="425" y="338" fill="#d7b56d" fontSize="12" fontWeight="bold" fontFamily="sans-serif" letterSpacing="1">
-                SECTOR F-8
-              </text>
-            </g>
-
-            {/* TARGET HOTEL LOCATION PIN & ILLUMINATION BEACON */}
-            <g id="hotel-pin" filter="url(#goldGlow)">
+            {/* Authentic Islamabad Location Pinpoint Beacon (PKIS center: 730, 278) */}
+            <g id="islamabad-beacon" transform="translate(730, 278)" filter="url(#goldGlow)">
               {/* Outer Pulsing Beacon Circles */}
-              <circle cx="440" cy="372" r="34" fill="url(#beaconGlow)" className="animate-ping" style={{ animationDuration: "3s" }} />
-              <circle cx="440" cy="372" r="18" fill="none" stroke="#d7b56d" strokeWidth="1" strokeDasharray="3 3" />
-              <circle cx="440" cy="372" r="8" fill="#d7b56d" />
+              <circle r="42" fill="url(#beaconGlow)" className="animate-ping" style={{ animationDuration: "2.5s" }} />
+              <circle r="20" fill="none" stroke="#d7b56d" strokeWidth="1.5" strokeDasharray="4 4" />
+              <circle r="7" fill="#d7b56d" />
 
-              {/* Pinpoint Needle */}
+              {/* Pin Needle */}
               <path 
-                d="M 440,350 C 433,350 428,355 428,362 C 428,373 440,387 440,387 C 440,387 452,373 452,362 C 452,355 447,350 440,350 Z" 
+                d="M 0,-30 C -7,-30 -13,-24 -13,-17 C -13,-5 0,0 0,0 C 0,0 13,-5 13,-17 C 13,-24 7,-30 0,-30 Z" 
                 fill="#d7b56d" 
-                stroke="#000" 
+                stroke="#000000" 
                 strokeWidth="1.5" 
               />
-              <circle cx="440" cy="360" r="3" fill="#000" />
+              <circle cx="0" cy="-17" r="3.5" fill="#000000" />
 
               {/* Crosshair target lines */}
-              <line x1="410" y1="372" x2="470" y2="372" stroke="#d7b56d" strokeWidth="0.75" strokeDasharray="2 2" />
-              <line x1="440" y1="342" x2="440" y2="402" stroke="#d7b56d" strokeWidth="0.75" strokeDasharray="2 2" />
+              <line x1="-28" y1="0" x2="28" y2="0" stroke="#d7b56d" strokeWidth="0.8" strokeDasharray="3 3" />
+              <line x1="0" y1="-28" x2="0" y2="28" stroke="#d7b56d" strokeWidth="0.8" strokeDasharray="3 3" />
 
               {/* Landmark Callout Card */}
-              <rect x="460" y="340" width="175" height="42" rx="6" fill="#0a0a0a" stroke="#d7b56d" strokeWidth="1.2" />
-              <text x="472" y="356" fill="#d7b56d" fontSize="9" fontWeight="bold" letterSpacing="1.5" fontFamily="sans-serif">
-                SIGNATURE ART HOTEL
-              </text>
-              <text x="472" y="372" fill="#FFFFFF" fontSize="8" fontFamily="monospace" opacity="0.8">
-                33.7182° N, 73.0445° E
-              </text>
+              <g transform="translate(22, -38)">
+                <rect x="0" y="0" width="168" height="42" rx="6" fill="#0a0a0a" stroke="#d7b56d" strokeWidth="1.5" />
+                <text x="12" y="17" fill="#d7b56d" fontSize="9.5" fontWeight="bold" letterSpacing="2" fontFamily="sans-serif">
+                  ISLAMABAD • F-8
+                </text>
+                <text x="12" y="32" fill="#FFFFFF" fontSize="8" fontFamily="monospace" opacity="0.85">
+                  33.7182° N, 73.0445° E
+                </text>
+              </g>
             </g>
 
-            {/* Architectural Compass in Bottom Right */}
-            <g className="compass-rose opacity-60" transform="translate(860, 480)">
+            {/* Authentic Architectural Compass */}
+            <g className="compass-rose opacity-60" transform="translate(890, 860)">
               <circle cx="0" cy="0" r="30" stroke="rgba(215,181,109,0.3)" strokeWidth="1" fill="none" />
               <circle cx="0" cy="0" r="24" stroke="rgba(255,255,255,0.15)" strokeWidth="0.75" strokeDasharray="2 2" fill="none" />
               <polygon points="0,-22 4,-6 0,0 -4,-6" fill="#d7b56d" />
@@ -552,10 +506,10 @@ export default function HomeGallery() {
         {/* 4. Character-by-Character Staggered Headline */}
         <div 
           ref={introTextRef}
-          className="absolute bottom-16 sm:bottom-20 z-20 text-center w-full px-4 pointer-events-none"
+          className="absolute bottom-14 sm:bottom-18 z-20 text-center w-full px-4 pointer-events-none"
         >
           <div className="font-marcellus text-2xl sm:text-3xl md:text-5xl tracking-widest text-[#d7b56d] flex items-center justify-center gap-1.5 sm:gap-2 flex-wrap">
-            {"ISLAMABAD • SECTOR F-8".split("").map((char, index) => (
+            {"ISLAMABAD • PAKISTAN".split("").map((char, index) => (
               <span 
                 key={index} 
                 className="char-span inline-block will-change-transform drop-shadow-[0_2px_12px_rgba(215,181,109,0.4)]"
@@ -564,8 +518,8 @@ export default function HomeGallery() {
               </span>
             ))}
           </div>
-          <p className="font-jost text-[12px] sm:text-[14px] text-white/60 tracking-[0.3em] uppercase mt-2">
-            The Pinnacle Of Hospitality &bull; Coordinates Verified
+          <p className="font-jost text-[11px] sm:text-[13px] text-white/60 tracking-[0.3em] uppercase mt-2">
+            Signature Art Hotel &bull; Sector F-8
           </p>
         </div>
       </div>
@@ -607,54 +561,38 @@ export default function HomeGallery() {
           </div>
         </div>
 
-        {/* 3-Column Editorial Masonry Grid */}
+        {/* 3-Column Editorial Masonry Grid — Pure Imagery Without Text Clutter */}
         <div className="columns-1 sm:columns-2 lg:columns-3 gap-5 md:gap-6 space-y-5 md:space-y-6">
           {filteredPhotos.map((photo, index) => (
             <div
               key={photo.id + index}
               onClick={() => openLightbox(index)}
-              className="group break-inside-avoid relative rounded-xl overflow-hidden bg-[#0a0a0a] border border-white/10 hover:border-[#d7b56d] transition-all duration-500 cursor-pointer shadow-[0_8px_30px_rgba(0,0,0,0.6)] hover:shadow-[0_12px_40px_rgba(215,181,109,0.22)]"
+              className="group break-inside-avoid relative rounded-xl overflow-hidden bg-[#0a0a0a] border border-white/10 hover:border-[#d7b56d] transition-all duration-500 cursor-pointer shadow-[0_8px_30px_rgba(0,0,0,0.6)] hover:shadow-[0_12px_40px_rgba(215,181,109,0.25)]"
             >
-              {/* Image Frame with Editorial Reveal Animation */}
+              {/* Pure Photographic Image Frame with Smooth Reveal & Hover Zoom */}
               <div className={`relative w-full ${photo.aspect} overflow-hidden`}>
                 <Image
                   src={photo.url}
-                  alt={photo.name}
+                  alt="Oslo Elite Hotel Gallery Exhibit"
                   fill
                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                   className="editorial-img-reveal object-cover group-hover:scale-108 transition-all duration-700 ease-out"
                   unoptimized={photo.url.startsWith("/uploads/")}
                 />
 
-                {/* Dark Luxury Gradient Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent opacity-60 group-hover:opacity-90 transition-opacity duration-300 pointer-events-none" />
+                {/* Subtle Luxury Darkening on Hover */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-60 transition-opacity duration-300 pointer-events-none" />
 
-                {/* Category Pill Tag */}
-                <div className="absolute top-4 left-4 z-10">
-                  <span className="font-vogue text-[9.5px] uppercase tracking-[0.2em] text-[#d7b56d] bg-black/80 px-2.5 py-1 rounded-full border border-[#d7b56d]/40 backdrop-blur-md shadow-md">
-                    {photo.category}
-                  </span>
-                </div>
-
-                {/* Hover Maximize Action Icon */}
-                <div className="absolute top-4 right-4 z-10 w-9 h-9 rounded-full bg-black/70 border border-white/20 text-white group-hover:bg-[#d7b56d] group-hover:text-black group-hover:border-[#d7b56d] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 shadow-xl group-hover:scale-110">
-                  <Maximize2 size={15} />
-                </div>
-
-                {/* Bottom Editorial Caption */}
-                <div className="absolute bottom-0 inset-x-0 p-5 z-10 transform translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
-                  <h3 className="font-marcellus text-[18px] sm:text-[20px] text-white group-hover:text-[#d7b56d] transition-colors leading-snug drop-shadow-md">
-                    {photo.name}
-                  </h3>
-                  <div className="flex items-center gap-2 mt-1 text-[11px] font-jost uppercase tracking-widest text-white/60">
-                    <MapPin size={11} className="text-[#d7b56d]" />
-                    <span>Sector F-8, Islamabad</span>
+                {/* Centered Expand Action Pill on Hover */}
+                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none">
+                  <div className="w-12 h-12 rounded-full bg-black/80 border border-[#d7b56d] text-[#d7b56d] flex items-center justify-center shadow-2xl backdrop-blur-md transform scale-75 group-hover:scale-100 transition-transform duration-300">
+                    <Maximize2 size={18} />
                   </div>
                 </div>
 
-                {/* Luxury Gold Corner Accents */}
-                <div className="absolute top-2 right-2 w-3 h-3 border-t border-r border-[#d7b56d]/40 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
-                <div className="absolute bottom-2 left-2 w-3 h-3 border-b border-l border-[#d7b56d]/40 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+                {/* Luxury Gold Corner Accents on Hover */}
+                <div className="absolute top-2.5 right-2.5 w-3.5 h-3.5 border-t border-r border-[#d7b56d]/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+                <div className="absolute bottom-2.5 left-2.5 w-3.5 h-3.5 border-b border-l border-[#d7b56d]/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
               </div>
             </div>
           ))}
@@ -680,8 +618,8 @@ export default function HomeGallery() {
           {/* Top Bar */}
           <div className="flex items-center justify-between z-10 w-full max-w-6xl mx-auto">
             <div className="flex items-center gap-3">
-              <span className="font-vogue text-[11px] uppercase tracking-[0.25em] text-[#d7b56d] bg-black/80 px-3 py-1 rounded-full border border-[#d7b56d]/40">
-                {currentPhoto.category}
+              <span className="font-vogue text-[11px] uppercase tracking-[0.25em] text-[#d7b56d] bg-black/80 px-3.5 py-1.5 rounded-full border border-[#d7b56d]/40">
+                Signature Gallery
               </span>
               <span className="text-white/60 font-jost text-xs tracking-wider">
                 {lightboxIndex! + 1} / {filteredPhotos.length}
@@ -690,7 +628,7 @@ export default function HomeGallery() {
 
             <button
               onClick={closeLightbox}
-              className="p-2.5 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer border border-white/15"
+              className="p-2.5 rounded-full bg-white/10 hover:bg-[#d7b56d] hover:text-black text-white transition-colors cursor-pointer border border-white/15"
               aria-label="Close Lightbox"
             >
               <X size={20} />
@@ -712,10 +650,10 @@ export default function HomeGallery() {
             </button>
 
             {/* Lightbox Image */}
-            <div className="relative w-full h-full max-h-[75vh] rounded-xl overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.9)] border border-white/15">
+            <div className="relative w-full h-full max-h-[78vh] rounded-xl overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.9)] border border-white/15">
               <Image
                 src={currentPhoto.url}
-                alt={currentPhoto.name}
+                alt="Oslo Elite Hotel Gallery Photograph"
                 fill
                 priority
                 className="object-contain"
@@ -733,12 +671,9 @@ export default function HomeGallery() {
             </button>
           </div>
 
-          {/* Bottom Caption Bar */}
+          {/* Bottom Minimal Indicator */}
           <div className="z-10 text-center max-w-xl mx-auto">
-            <h4 className="font-marcellus text-xl sm:text-2xl text-white drop-shadow">
-              {currentPhoto.name}
-            </h4>
-            <p className="font-jost text-xs text-[#d7b56d] uppercase tracking-[0.2em] mt-1 font-medium">
+            <p className="font-jost text-xs text-[#d7b56d] uppercase tracking-[0.25em] font-medium">
               Signature Art Hotel &bull; Sector F-8, Islamabad
             </p>
           </div>
