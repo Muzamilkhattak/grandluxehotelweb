@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Sparkles } from "lucide-react";
-import { motion, AnimatePresence, useScroll, useTransform, useSpring } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { RestaurantSettings, MenuItemData } from "@/app/actions/admin-restaurant";
 import Tilt3D from "@/components/ui/Tilt3D";
 
@@ -15,17 +15,6 @@ interface Props {
 
 export default function RestaurantSection({ settings: propSettings, items: propItems }: Props) {
   const [activeTab, setActiveTab] = useState<string>("all");
-  const sectionRef = useRef<HTMLElement>(null);
-
-  // Vertical Scroll Parallax for Background Image
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ["start end", "end start"],
-  });
-
-  const smoothProgress = useSpring(scrollYProgress, { stiffness: 90, damping: 25 });
-  const yBg = useTransform(smoothProgress, [0, 1], ["-8%", "8%"]);
-  const scaleBg = useTransform(smoothProgress, [0, 1], [1.08, 1.16]);
 
   const settings = propSettings || {
     tagline: "Restaurant & Dining",
@@ -92,15 +81,13 @@ export default function RestaurantSection({ settings: propSettings, items: propI
 
   return (
     <section 
-      ref={sectionRef} 
       className="relative py-16 sm:py-24 md:py-36 overflow-hidden"
       style={{ perspective: 1200 }}
     >
       
-      {/* 1. Background Image with Vertical Scroll Parallax */}
-      <motion.div 
-        style={{ y: yBg, scale: scaleBg }}
-        className="absolute inset-0 z-0 will-change-transform"
+      {/* 1. Background Image */}
+      <div 
+        className="absolute inset-0 z-0"
       >
         <Image
           src={settings.backgroundImage || "/restaurant/interior.jpg"}
@@ -113,7 +100,7 @@ export default function RestaurantSection({ settings: propSettings, items: propI
         <div className="absolute inset-0 bg-[#000000]/90 backdrop-blur-[2px]" />
         <div className="absolute inset-0 bg-gradient-to-t from-[#000000] via-transparent to-[#000000]" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(201,122,79,0.18)_0%,transparent_75%)]" />
-      </motion.div>
+      </div>
 
       <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         

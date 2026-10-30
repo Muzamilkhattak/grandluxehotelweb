@@ -1,7 +1,6 @@
 "use client";
 
-import { useRef } from "react";
-import { motion, useScroll, useTransform, useSpring } from "framer-motion";
+import { motion } from "framer-motion";
 import { BedDouble, ShowerHead, Sun, Wifi, Utensils, Droplet, UserCheck, Plane, GlassWater, Waves, Anchor } from "lucide-react";
 import Tilt3D from "@/components/ui/Tilt3D";
 
@@ -17,28 +16,14 @@ const amenities = [
 ];
 
 export default function SignatureAmenities() {
-  const sectionRef = useRef<HTMLElement>(null);
-
-  // Vertical Scroll Parallax
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ["start end", "end start"],
-  });
-
-  const smoothProgress = useSpring(scrollYProgress, { stiffness: 100, damping: 25 });
-  const yHeader = useTransform(smoothProgress, [0, 1], [25, -25]);
-  const yGrid = useTransform(smoothProgress, [0, 1], [35, -20]);
-
   return (
     <section 
-      ref={sectionRef} 
       className="py-14 sm:py-20 md:py-28 px-4 bg-canvas relative overflow-hidden"
       style={{ perspective: 1200 }}
     >
       <div className="max-w-7xl mx-auto">
         {/* Heading with 3D Entrance */}
         <motion.div 
-          style={{ y: yHeader }}
           initial={{ opacity: 0, y: 30, rotateX: 12 }}
           whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
           viewport={{ once: true, margin: "-80px" }}
@@ -59,10 +44,7 @@ export default function SignatureAmenities() {
         </motion.div>
         
         {/* 3D Interactive Cards Grid */}
-        <motion.div 
-          style={{ y: yGrid }}
-          className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 md:gap-6 will-change-transform"
-        >
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 md:gap-6 will-change-transform">
           {amenities.map((amenity, i) => (
             <motion.div
               key={i}
@@ -92,7 +74,7 @@ export default function SignatureAmenities() {
               </Tilt3D>
             </motion.div>
           ))}
-        </motion.div>
+        </div>
       </div>
     </section>
   );

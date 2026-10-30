@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
-import { motion, AnimatePresence, useScroll, useTransform, useSpring } from "framer-motion";
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight, Quote, Star } from "lucide-react";
 import Tilt3D from "@/components/ui/Tilt3D";
@@ -36,18 +36,6 @@ const testimonials = [
 export default function TestimonialSection() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [autoplay, setAutoplay] = useState(true);
-  const sectionRef = useRef<HTMLElement>(null);
-
-  // Vertical Scroll Parallax for Background Image
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ["start end", "end start"],
-  });
-
-  const smoothProgress = useSpring(scrollYProgress, { stiffness: 90, damping: 25 });
-  const yBg = useTransform(smoothProgress, [0, 1], ["-10%", "10%"]);
-  const scaleBg = useTransform(smoothProgress, [0, 1], [1.08, 1.18]);
-  const yQuote = useTransform(smoothProgress, [0, 1], [-40, 40]);
 
   useEffect(() => {
     if (!autoplay) return;
@@ -69,14 +57,12 @@ export default function TestimonialSection() {
 
   return (
     <section 
-      ref={sectionRef}
       className="relative py-16 sm:py-24 md:py-32 w-full overflow-hidden flex items-center justify-center min-h-[580px] sm:min-h-[680px] md:min-h-[750px]"
       style={{ perspective: 1200 }}
     >
-      {/* Background Image with Vertical Scroll Parallax */}
-      <motion.div 
-        style={{ y: yBg, scale: scaleBg }}
-        className="absolute inset-0 z-0 will-change-transform"
+      {/* Background Image */}
+      <div 
+        className="absolute inset-0 z-0"
       >
         <Image 
           src="https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=2000&auto=format&fit=crop" 
@@ -86,7 +72,7 @@ export default function TestimonialSection() {
         />
         <div className="absolute inset-0 bg-[#000000]/90 mix-blend-multiply" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-black/75" />
-      </motion.div>
+      </div>
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 w-full flex flex-col items-center">
         
@@ -113,13 +99,12 @@ export default function TestimonialSection() {
         </div>
 
         <div className="relative w-full max-w-4xl mx-auto">
-          {/* Quote Icon Background with Counter Parallax */}
-          <motion.div 
-            style={{ y: yQuote }}
-            className="absolute -top-16 -left-12 text-[#d7b56d]/15 z-0 hidden md:block will-change-transform pointer-events-none"
+          {/* Quote Icon Background */}
+          <div 
+            className="absolute -top-16 -left-12 text-[#d7b56d]/15 z-0 hidden md:block pointer-events-none"
           >
             <Quote size={180} className="transform rotate-180" strokeWidth={0.5} />
-          </motion.div>
+          </div>
 
           {/* 3D Perspective Slider Container */}
           <div className="relative min-h-[420px] sm:min-h-[340px] md:min-h-[320px] w-full" style={{ perspective: 1200 }}>

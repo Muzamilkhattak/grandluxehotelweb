@@ -1,11 +1,11 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { Sparkles, X, Maximize2, ChevronLeft, ChevronRight } from "lucide-react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Navigation, Pagination } from "swiper/modules";
-import { motion, useScroll, useTransform, useSpring } from "framer-motion";
+import { motion } from "framer-motion";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
@@ -21,17 +21,6 @@ interface GalleryItem {
 export default function HomeGallery() {
   const [images, setImages] = useState<GalleryItem[]>([]);
   const [selectedImage, setSelectedImage] = useState<GalleryItem | null>(null);
-  const sectionRef = useRef<HTMLElement>(null);
-
-  // Vertical Scroll Parallax
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ["start end", "end start"],
-  });
-
-  const smoothProgress = useSpring(scrollYProgress, { stiffness: 100, damping: 25 });
-  const yHeader = useTransform(smoothProgress, [0, 1], [25, -25]);
-  const yGallery = useTransform(smoothProgress, [0, 1], [35, -20]);
 
   useEffect(() => {
     async function loadGallery() {
@@ -51,18 +40,14 @@ export default function HomeGallery() {
 
   return (
     <section 
-      ref={sectionRef}
       id="gallery" 
       className="py-14 sm:py-20 md:py-24 bg-[#FFFFFF] text-[#1A1A1A] relative overflow-hidden border-t border-[#EAEAEA] scroll-mt-20"
       style={{ perspective: 1200 }}
     >
       <div className="max-w-[1400px] mx-auto px-4 md:px-8 relative z-10">
         
-        {/* Header with 3D Entrance & Parallax */}
-        <motion.div 
-          style={{ y: yHeader }}
-          className="flex flex-col md:flex-row items-center justify-between gap-4 sm:gap-6 mb-8 sm:mb-12 max-w-7xl mx-auto will-change-transform"
-        >
+        {/* Header with 3D Entrance */}
+        <div className="flex flex-col md:flex-row items-center justify-between gap-4 sm:gap-6 mb-8 sm:mb-12 max-w-7xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 30, rotateX: 12 }}
             whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
@@ -101,13 +86,10 @@ export default function HomeGallery() {
               </button>
             </div>
           )}
-        </motion.div>
+        </div>
 
         {/* Auto-sliding Gallery Swiper with 3D Tilt Cards */}
-        <motion.div 
-          style={{ y: yGallery }}
-          className="max-w-7xl mx-auto will-change-transform"
-        >
+        <div className="max-w-7xl mx-auto">
           <Swiper
             modules={[Autoplay, Navigation, Pagination]}
             spaceBetween={24}
@@ -124,7 +106,7 @@ export default function HomeGallery() {
             }}
             pagination={{
               clickable: true,
-              bulletActiveClass: "!bg-[#d7b56d] !w-6",
+              bulletActiveClass: "!bg-[#8f6618] !w-6",
               bulletClass: "inline-block w-2.5 h-2.5 rounded-full bg-gray-300 transition-all duration-300 cursor-pointer mx-1",
             }}
             breakpoints={{
@@ -167,7 +149,7 @@ export default function HomeGallery() {
               </SwiperSlide>
             ))}
           </Swiper>
-        </motion.div>
+        </div>
 
         {/* Modal Lightbox */}
         {selectedImage && (

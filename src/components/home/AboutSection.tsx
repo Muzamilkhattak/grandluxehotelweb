@@ -1,5 +1,5 @@
 "use client";
-import { motion, useInView, animate, useScroll, useTransform, useSpring } from "framer-motion";
+import { motion, useInView, animate } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef } from "react";
@@ -32,22 +32,7 @@ function AnimatedCounter({ from, to, duration = 2 }: { from: number, to: number,
 }
 
 export default function AboutSection() {
-  const sectionRef = useRef<HTMLElement>(null);
   const textRef = useRef<HTMLHeadingElement>(null);
-
-  // Vertical Scroll Parallax
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ["start end", "end start"],
-  });
-
-  const smoothProgress = useSpring(scrollYProgress, { stiffness: 120, damping: 25 });
-
-  // Multi-layered parallax translation for the three images
-  const yImageMain = useTransform(smoothProgress, [0, 1], [40, -40]);
-  const yImageOverlap = useTransform(smoothProgress, [0, 1], [80, -80]);
-  const yImageTop = useTransform(smoothProgress, [0, 1], [-30, 40]);
-  const yTextColumn = useTransform(smoothProgress, [0, 1], [25, -25]);
 
   useEffect(() => {
     if (!textRef.current) return;
@@ -72,7 +57,6 @@ export default function AboutSection() {
 
   return (
     <section 
-      ref={sectionRef} 
       id="about" 
       className="py-16 sm:py-24 md:py-32 bg-[#FFFFFF] relative overflow-hidden scroll-mt-20"
       style={{ perspective: 1200 }}
@@ -80,9 +64,8 @@ export default function AboutSection() {
       <div className="max-w-7xl mx-auto px-4 flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
         
         {/* Text Content */}
-        <motion.div 
-          style={{ y: yTextColumn }}
-          className="w-full lg:w-1/2 space-y-6 sm:space-y-8 md:space-y-10 z-10 order-2 lg:order-1 will-change-transform"
+        <div 
+          className="w-full lg:w-1/2 space-y-6 sm:space-y-8 md:space-y-10 z-10 order-2 lg:order-1"
         >
           <motion.div
             initial={{ opacity: 0, y: 35, rotateX: 12 }}
@@ -170,15 +153,14 @@ export default function AboutSection() {
               <ArrowRight size={15} className="group-hover:translate-x-1.5 transition-transform duration-300" />
             </Link>
           </motion.div>
-        </motion.div>
+        </div>
 
-        {/* Animated Image Composition with Multi-Layer Scroll Parallax & 3D Tilt */}
+        {/* Animated Image Composition with 3D Tilt */}
         <div className="w-full lg:w-1/2 relative min-h-[400px] sm:min-h-[520px] lg:min-h-[660px] flex items-center justify-center mt-2 lg:mt-0 mb-8 sm:mb-12 lg:mb-0 order-1 lg:order-2">
           
-          {/* Main Large Image with Parallax & 3D Tilt */}
-          <motion.div
-            style={{ y: yImageMain }}
-            className="relative w-[85%] sm:w-[75%] h-[380px] sm:h-[480px] lg:h-[550px] z-10 ml-auto will-change-transform"
+          {/* Main Large Image with 3D Tilt */}
+          <div
+            className="relative w-[85%] sm:w-[75%] h-[380px] sm:h-[480px] lg:h-[550px] z-10 ml-auto"
           >
             <Tilt3D maxTilt={6} scale={1.02} glare={true} glareColor="rgba(215, 181, 109, 0.2)">
               <div className="relative w-full h-[380px] sm:h-[480px] lg:h-[550px] shadow-[0_32px_80px_rgba(54,38,24,0.18)] rounded-xl overflow-hidden border border-black/5">
@@ -190,12 +172,11 @@ export default function AboutSection() {
                 />
               </div>
             </Tilt3D>
-          </motion.div>
+          </div>
 
-          {/* Overlapping Smaller Image (Bottom Right) with Faster Parallax */}
-          <motion.div
-            style={{ y: yImageOverlap }}
-            className="absolute bottom-[-10px] sm:bottom-[-20px] right-0 sm:right-[-10px] w-[55%] sm:w-[50%] h-[260px] sm:h-[350px] z-20 will-change-transform"
+          {/* Overlapping Smaller Image (Bottom Right) */}
+          <div
+            className="absolute bottom-[-10px] sm:bottom-[-20px] right-0 sm:right-[-10px] w-[55%] sm:w-[50%] h-[260px] sm:h-[350px] z-20"
           >
             <Tilt3D maxTilt={8} scale={1.03} glare={true}>
               <div className="relative w-full h-[260px] sm:h-[350px] border-[6px] sm:border-[10px] border-[#FFFFFF] shadow-[0_24px_64px_rgba(54,38,24,0.2)] rounded-xl overflow-hidden">
@@ -207,12 +188,11 @@ export default function AboutSection() {
                 />
               </div>
             </Tilt3D>
-          </motion.div>
+          </div>
 
-          {/* Third Image (Top Left) with Subtle Counter Parallax */}
-          <motion.div
-            style={{ y: yImageTop }}
-            className="absolute top-[20px] sm:top-[40px] left-0 w-[40%] h-[200px] sm:h-[280px] z-20 border-[6px] sm:border-[10px] border-[#FFFFFF] shadow-[0_24px_64px_rgba(54,38,24,0.18)] rounded-xl overflow-hidden hidden sm:block will-change-transform"
+          {/* Third Image (Top Left) */}
+          <div
+            className="absolute top-[20px] sm:top-[40px] left-0 w-[40%] h-[200px] sm:h-[280px] z-20 border-[6px] sm:border-[10px] border-[#FFFFFF] shadow-[0_24px_64px_rgba(54,38,24,0.18)] rounded-xl overflow-hidden hidden sm:block"
           >
             <Tilt3D maxTilt={7} scale={1.03} glare={true}>
               <div className="relative w-full h-[200px] sm:h-[280px]">
@@ -224,7 +204,7 @@ export default function AboutSection() {
                 />
               </div>
             </Tilt3D>
-          </motion.div>
+          </div>
           
           {/* Decorative Gold Accents */}
           <motion.div

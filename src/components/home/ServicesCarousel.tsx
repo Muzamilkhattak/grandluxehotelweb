@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState } from "react";
 import Link from "next/link";
-import { motion, useScroll, useTransform, useSpring } from "framer-motion";
+import { motion } from "framer-motion";
 import { 
   ChevronLeft, 
   ChevronRight, 
@@ -86,38 +86,22 @@ const servicesData: ServiceItem[] = [
 
 export default function ServicesCarousel() {
   const [activeIndex, setActiveIndex] = useState(0);
-  const sectionRef = useRef<HTMLElement>(null);
-
-  // Vertical Scroll Parallax
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ["start end", "end start"],
-  });
-
-  const smoothProgress = useSpring(scrollYProgress, { stiffness: 90, damping: 25 });
-  const yOrb1 = useTransform(smoothProgress, [0, 1], [-60, 60]);
-  const yOrb2 = useTransform(smoothProgress, [0, 1], [60, -60]);
-  const yContent = useTransform(smoothProgress, [0, 1], [30, -20]);
 
   return (
     <section 
-      ref={sectionRef}
       className="py-16 sm:py-24 md:py-36 bg-[#000000] relative overflow-hidden text-[#FFFFFF]"
       style={{ perspective: 1200 }}
     >
-      {/* Ambient Luxury Lighting Accents with Scroll Parallax */}
-      <motion.div 
-        style={{ y: yOrb1 }}
-        className="absolute top-0 left-1/4 w-[650px] h-[350px] bg-[#d7b56d]/15 blur-[140px] pointer-events-none rounded-full will-change-transform" 
+      {/* Ambient Luxury Lighting Accents */}
+      <div 
+        className="absolute top-0 left-1/4 w-[650px] h-[350px] bg-[#d7b56d]/15 blur-[140px] pointer-events-none rounded-full" 
       />
-      <motion.div 
-        style={{ y: yOrb2 }}
-        className="absolute bottom-0 right-1/4 w-[550px] h-[350px] bg-[#d7b56d]/20 blur-[150px] pointer-events-none rounded-full will-change-transform" 
+      <div 
+        className="absolute bottom-0 right-1/4 w-[550px] h-[350px] bg-[#d7b56d]/20 blur-[150px] pointer-events-none rounded-full" 
       />
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-[radial-gradient(circle_at_center,rgba(0,0,0,0.5)_0%,rgba(0,0,0,0.97)_100%)] pointer-events-none" />
 
-      <motion.div 
-        style={{ y: yContent }}
+      <div 
         className="max-w-[1400px] mx-auto px-4 md:px-8 relative z-10 will-change-transform"
       >
         
@@ -268,7 +252,7 @@ export default function ServicesCarousel() {
           <div className="swiper-pagination-custom flex items-center justify-center gap-2"></div>
         </div>
 
-      </motion.div>
+      </div>
 
       <style jsx global>{`
         .services-swiper {

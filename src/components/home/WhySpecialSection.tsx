@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useRef } from "react";
-import { motion, useScroll, useTransform, useSpring } from "framer-motion";
+import { motion } from "framer-motion";
 import { MapPin, UtensilsCrossed, Mountain, ShieldCheck } from "lucide-react";
 import Image from "next/image";
 import gsap from "gsap";
@@ -41,16 +41,6 @@ const features = [
 export default function WhySpecialSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const cardsRef = useRef<(HTMLDivElement | null)[]>([]);
-
-  // Vertical Scroll Parallax
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ["start end", "end start"],
-  });
-
-  const smoothProgress = useSpring(scrollYProgress, { stiffness: 100, damping: 25 });
-  const yHeader = useTransform(smoothProgress, [0, 1], [30, -30]);
-  const yGrid = useTransform(smoothProgress, [0, 1], [40, -20]);
 
   useEffect(() => {
     if (!sectionRef.current) return;
@@ -114,10 +104,9 @@ export default function WhySpecialSection() {
 
       <div className="max-w-7xl mx-auto px-4 relative z-10">
         
-        {/* Header with 3D Entrance & Parallax */}
-        <motion.div 
-          style={{ y: yHeader }}
-          className="text-center max-w-3xl mx-auto mb-10 sm:mb-16 md:mb-20 will-change-transform"
+        {/* Header with 3D Entrance */}
+        <div 
+          className="text-center max-w-3xl mx-auto mb-10 sm:mb-16 md:mb-20"
         >
           <motion.div
             initial={{ opacity: 0, y: 30, rotateX: 12 }}
@@ -135,12 +124,11 @@ export default function WhySpecialSection() {
               We transcend traditional hospitality by mastering the invisible art of anticipation. Every detail is an orchestrated performance, designed to elevate your stay from ordinary to extraordinary.
             </p>
           </motion.div>
-        </motion.div>
+        </div>
 
         {/* Bento Grid with 3D Tilt Cards & Preserved Depth */}
-        <motion.div 
-          style={{ y: yGrid }}
-          className="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6 will-change-transform"
+        <div 
+          className="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6"
         >
           {features.map((feature, idx) => (
             <div key={idx} className={feature.colSpan}>
@@ -196,7 +184,7 @@ export default function WhySpecialSection() {
               </Tilt3D>
             </div>
           ))}
-        </motion.div>
+        </div>
 
       </div>
     </section>

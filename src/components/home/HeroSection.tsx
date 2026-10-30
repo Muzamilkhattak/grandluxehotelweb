@@ -6,22 +6,17 @@ import { motion, useScroll, useTransform, useSpring, useMotionValue } from "fram
 export default function HeroSection() {
   const containerRef = useRef<HTMLElement>(null);
 
-  // Vertical Scroll Parallax
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start start", "end start"],
-  });
-
-  const smoothProgress = useSpring(scrollYProgress, { stiffness: 100, damping: 20 });
+  // Window scroll (no target ref needed, 100% hydration-safe)
+  const { scrollY } = useScroll();
 
   // Video parallax: moves slightly downward, scales gently, and dims
-  const yVideo = useTransform(smoothProgress, [0, 1], ["0%", "28%"]);
-  const scaleVideo = useTransform(smoothProgress, [0, 1], [1, 1.08]);
-  const opacityVideo = useTransform(smoothProgress, [0, 0.9], [1, 0.35]);
+  const yVideo = useTransform(scrollY, [0, 800], ["0%", "28%"]);
+  const scaleVideo = useTransform(scrollY, [0, 800], [1, 1.08]);
+  const opacityVideo = useTransform(scrollY, [0, 600], [1, 0.35]);
 
   // Content parallax: moves upward faster, fades out gracefully
-  const yContent = useTransform(smoothProgress, [0, 1], ["0%", "-35%"]);
-  const opacityContent = useTransform(smoothProgress, [0, 0.7], [1, 0]);
+  const yContent = useTransform(scrollY, [0, 800], ["0%", "-35%"]);
+  const opacityContent = useTransform(scrollY, [0, 450], [1, 0]);
 
   // Interactive 3D Mouse Depth
   const mouseX = useMotionValue(0);
