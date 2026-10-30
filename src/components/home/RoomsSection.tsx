@@ -4,10 +4,8 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import BookingModal from "@/components/booking/BookingModal";
-import { ChevronLeft, ChevronRight, CalendarX, MoveHorizontal } from "lucide-react";
-import { motion, useScroll, useTransform, useSpring } from "framer-motion";
-import gsap from "gsap";
-import { Draggable } from "gsap/Draggable";
+import { ChevronLeft, ChevronRight, CalendarX, Sparkles } from "lucide-react";
+import { motion, useScroll, useTransform, useSpring, AnimatePresence } from "framer-motion";
 
 export type Room = {
   id: string;
@@ -27,30 +25,16 @@ export type RoomsSectionProps = {
   searchedDates?: { checkin: string; checkout: string };
 };
 
-const TOTAL_SLOTS = 10;
-const ANGLE_STEP = 360 / TOTAL_SLOTS; // 36 degrees per card
-
 export default function RoomsSection({ 
   rooms, 
   unavailableRoomIds = [], 
   searchedDates 
 }: RoomsSectionProps) {
   const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
-  const stageRef = useRef<HTMLDivElement>(null);
-  const ringRef = useRef<HTMLDivElement>(null);
-  const draggerRef = useRef<HTMLDivElement>(null);
-  const cardsRef = useRef<(HTMLDivElement | null)[]>([]);
-  const isDraggingRef = useRef(false);
-
-  // Responsive ring geometry
-  const [dimensions, setDimensions] = useState({
-    cardWidth: 300,
-    cardHeight: 460,
-    radius: 500,
-    containerHeight: 560,
-    perspective: 2000,
-  });
 
   // Vertical Scroll Parallax for Section Header
   const { scrollYProgress } = useScroll({
@@ -63,197 +47,69 @@ export default function RoomsSection({
 
   const displayRooms = rooms || [];
 
-  // Generate continuous items for the ring
-  const ringRooms = displayRooms.length > 0 
-    ? Array.from({ length: TOTAL_SLOTS }).map((_, i) => displayRooms[i % displayRooms.length])
+  // Expand list to at least 5 items for continuous 3D coverflow
+  const items: Room[] = displayRooms.length > 0
+    ? displayRooms.length >= 5
+      ? displayRooms
+      : displayRooms.length >= 3
+        ? [...displayRooms, ...displayRooms]
+        : [...displayRooms, ...displayRooms, ...displayRooms, ...displayRooms]
     : [];
 
-  // Handle screen resize for responsive 3D ring radius
-  useEffect(() => {
-    const handleResize = () => {
-      const w = window.innerWidth;
-      if (w < 640) {
-        setDimensions({
-          cardWidth: 230,
-          cardHeight: 380,
-          radius: 350,
-          containerHeight: 470,
-          perspective: 1300,
-        });
-      } else if (w < 1024) {
-        setDimensions({
-          cardWidth: 270,
-          cardHeight: 420,
-          radius: 430,
-          containerHeight: 520,
-          perspective: 1650,
-        });
-      } else {
-        setDimensions({
-          cardWidth: 300,
-          cardHeight: 460,
-          radius: 500,
-          containerHeight: 560,
-          perspective: 2000,
-        });
-      }
-    };
+  const total = items.length;
 
-    handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
-  // Update parallax background position for each image in the ring
-  const updateBgPositions = useCallback(() => {
-    if (!ringRef.current) return;
-    const currentRot = gsap.getProperty(ringRef.current, "rotationY") as number;
-
-    cardsRef.current.forEach((cardEl, i) => {
-      if (!cardEl) return;
-      const imgEl = cardEl.querySelector<HTMLElement>(".ring-card-bg");
-      if (!imgEl) return;
-
-      // Calculate smooth wrapped relative angle around camera
-      const wrapped = gsap.utils.wrap(-180, 180, currentRot - 180 - i * ANGLE_STEP);
-      // Counter parallax translation in pixels
-      const xOffset = -(wrapped / 180) * 140;
-      imgEl.style.backgroundPosition = `calc(50% + ${xOffset}px) center`;
-    });
-  }, []);
-
-  // Initialize Draggable 3D Ring with GSAP
+  // Autoplay
   useEffect(() => {
-    if (typeof window === "undefined" || ringRooms.length === 0) return;
+    if (isPaused || total <= 1) return;
+    const timer = setInterval(() => {
+      setActiveIndex((prev) => (prev + 1) % total);
+    }, 5500);
+    return () => clearInterval(timer);
+  }, [isPaused, total]);
 
-    gsap.registerPlugin(Draggable);
+  const handleNext = useCallback(() => {
+    if (total <= 1) return;
+    setActiveIndex((prev) => (prev + 1) % total);
+  }, [total]);
 
-    const ring = ringRef.current;
-    const dragger = draggerRef.current;
-    const container = stageRef.current;
-    if (!ring || !dragger || !container) return;
+  const handlePrev = useCallback(() => {
+    if (total <= 1) return;
+    setActiveIndex((prev) => (prev - 1 + total) % total);
+  }, [total]);
 
-    const currentRadius = dimensions.radius;
-
-    // Set initial ring rotation
-    gsap.set(dragger, { opacity: 0 });
-    gsap.set(ring, { rotationY: 180 });
-
-    // Position each card along the 3D ring cylinder
-    cardsRef.current.forEach((cardEl, i) => {
-      if (!cardEl) return;
-      gsap.set(cardEl, {
-        rotateY: i * -ANGLE_STEP,
-        transformOrigin: `50% 50% ${currentRadius}px`,
-        z: -currentRadius,
-        backfaceVisibility: "hidden",
-      });
-    });
-
-    updateBgPositions();
-
-    // Cinematic entrance animation: cards rise into 3D formation
-    gsap.from(cardsRef.current.filter(Boolean), {
-      duration: 1.4,
-      y: 180,
-      opacity: 0,
-      stagger: 0.08,
-      ease: "expo.out",
-    });
-
-    let xPos = 0;
-    let startX = 0;
-
-    const draggableInstances = Draggable.create(dragger, {
-      type: "x",
-      trigger: container,
-      allowContextMenu: true,
-      onDragStart: function(e) {
-        isDraggingRef.current = false;
-        const clientX = "touches" in e && e.touches ? e.touches[0].clientX : (e as MouseEvent).clientX;
-        xPos = Math.round(clientX);
-        startX = xPos;
-      },
-      onDrag: function(e) {
-        const clientX = "touches" in e && e.touches ? e.touches[0].clientX : (e as MouseEvent).clientX;
-        const currentX = Math.round(clientX);
-        const diff = currentX - xPos;
-
-        if (Math.abs(currentX - startX) > 6) {
-          isDraggingRef.current = true;
-        }
-
-        // Rotate ring with cursor tracking
-        gsap.to(ring, {
-          rotationY: "+=" + (diff * 0.75),
-          duration: 0.1,
-          ease: "none",
-          overwrite: "auto",
-          onUpdate: updateBgPositions,
-        });
-
-        xPos = currentX;
-      },
-      onDragEnd: function() {
-        const currentRot = gsap.getProperty(ring, "rotationY") as number;
-        const snappedRot = Math.round(currentRot / ANGLE_STEP) * ANGLE_STEP;
-
-        gsap.to(ring, {
-          rotationY: snappedRot,
-          duration: 0.7,
-          ease: "power2.out",
-          onUpdate: updateBgPositions,
-        });
-
-        gsap.set(dragger, { x: 0, y: 0 });
-
-        setTimeout(() => {
-          isDraggingRef.current = false;
-        }, 120);
-      },
-    });
-
-    return () => {
-      draggableInstances.forEach(d => d.kill());
+  // Keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "ArrowLeft") handlePrev();
+      if (e.key === "ArrowRight") handleNext();
     };
-  }, [dimensions.radius, ringRooms.length, updateBgPositions]);
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [handleNext, handlePrev]);
 
-  // Rotate ring via chevron controls
-  const rotateRing = (direction: "prev" | "next") => {
-    if (!ringRef.current) return;
-    const currentRot = gsap.getProperty(ringRef.current, "rotationY") as number;
-    const delta = direction === "next" ? -ANGLE_STEP : ANGLE_STEP;
-    const target = Math.round((currentRot + delta) / ANGLE_STEP) * ANGLE_STEP;
-
-    gsap.to(ringRef.current, {
-      rotationY: target,
-      duration: 0.75,
-      ease: "power2.out",
-      onUpdate: updateBgPositions,
-    });
+  // Compute 3D offset distance relative to active index
+  const getOffset = (index: number) => {
+    let diff = index - activeIndex;
+    while (diff > total / 2) diff -= total;
+    while (diff < -total / 2) diff += total;
+    return diff;
   };
 
-  // Click card to bring to front if clicked on a side card
-  const handleCardClick = (index: number) => {
-    if (isDraggingRef.current || !ringRef.current) return;
-    const currentRot = gsap.getProperty(ringRef.current, "rotationY") as number;
-    const relativeAngle = gsap.utils.wrap(-180, 180, currentRot - 180 - index * ANGLE_STEP);
-
-    if (Math.abs(relativeAngle) > 10) {
-      const target = currentRot - relativeAngle;
-      gsap.to(ringRef.current, {
-        rotationY: target,
-        duration: 0.75,
-        ease: "power2.out",
-        onUpdate: updateBgPositions,
-      });
-    }
-  };
-
-  const handleLinkClick = (e: React.MouseEvent) => {
-    if (isDraggingRef.current) {
-      e.preventDefault();
-      e.stopPropagation();
+  // Drag / Swipe handler
+  const handleDragEnd = (_: any, info: { offset: { x: number; y: number }; velocity: { x: number } }) => {
+    if (info.offset.x < -45 || info.velocity.x < -300) {
+      handleNext();
+    } else if (info.offset.x > 45 || info.velocity.x > 300) {
+      handlePrev();
     }
   };
 
@@ -316,156 +172,242 @@ export default function RoomsSection({
             No suites are currently available matching your criteria.
           </div>
         ) : (
-          <div className="w-full relative flex flex-col items-center">
+          <div 
+            onMouseEnter={() => setIsPaused(true)}
+            onMouseLeave={() => setIsPaused(false)}
+            className="w-full relative flex flex-col items-center select-none"
+          >
             
-            {/* Draggable 3D Parallax Image Ring Container */}
-            <div 
-              ref={stageRef}
-              className="relative w-full overflow-hidden select-none flex items-center justify-center cursor-grab active:cursor-grabbing"
+            {/* 3D Cinematic Slider Stage */}
+            <motion.div
+              drag="x"
+              dragConstraints={{ left: 0, right: 0 }}
+              dragElastic={0.16}
+              onDragEnd={handleDragEnd}
+              className="relative w-full h-[470px] sm:h-[520px] md:h-[570px] flex items-center justify-center overflow-visible cursor-grab active:cursor-grabbing touch-pan-y"
               style={{
-                height: `${dimensions.containerHeight}px`,
-                perspective: `${dimensions.perspective}px`,
-                touchAction: "pan-y",
+                perspective: isMobile ? 1200 : 1600,
+                transformStyle: "preserve-3d",
               }}
             >
-              {/* Invisible GSAP Drag Layer */}
-              <div 
-                ref={draggerRef} 
-                id="dragger"
-                className="absolute inset-0 z-20 cursor-grab active:cursor-grabbing"
-              />
+              {items.map((room, i) => {
+                const offset = getOffset(i);
+                const isCenter = offset === 0;
+                const isVisible = Math.abs(offset) <= 2;
+                const isUnavailable = unavailableRoomIds.includes(room.id);
 
-              {/* 3D Ring */}
-              <div 
-                ref={ringRef} 
-                id="ring"
-                className="relative"
-                style={{
-                  width: `${dimensions.cardWidth}px`,
-                  height: `${dimensions.cardHeight}px`,
-                  transformStyle: "preserve-3d",
-                }}
-              >
-                {ringRooms.map((room, i) => {
-                  const isUnavailable = unavailableRoomIds.includes(room.id);
+                if (!isVisible) return null;
 
-                  return (
-                    <div
-                      key={`${room.id}-${i}`}
-                      ref={(el) => { cardsRef.current[i] = el; }}
-                      onClick={() => handleCardClick(i)}
-                      className="ring-card group absolute inset-0 rounded-t-[130px] sm:rounded-t-[160px] md:rounded-t-[180px] overflow-hidden bg-neutral-900 border border-[#d7b56d]/35 shadow-[0_24px_50px_rgba(0,0,0,0.35)] cursor-pointer select-none"
+                // 3D positioning calculations for cinematic depth
+                let xTranslate = "0%";
+                let zTranslate = 0;
+                let yRotate = 0;
+                let scaleVal = 1;
+                let opacityVal = 1;
+                let zIndexVal = 10;
+                let brightnessVal = 1;
+
+                if (isCenter) {
+                  xTranslate = "0%";
+                  zTranslate = isMobile ? 40 : 80;
+                  yRotate = 0;
+                  scaleVal = isMobile ? 1.02 : 1.06;
+                  opacityVal = 1;
+                  zIndexVal = 30;
+                  brightnessVal = 1;
+                } else if (offset === -1) {
+                  xTranslate = isMobile ? "-58%" : "-74%";
+                  zTranslate = isMobile ? -100 : -140;
+                  yRotate = isMobile ? 32 : 38;
+                  scaleVal = isMobile ? 0.86 : 0.88;
+                  opacityVal = 0.78;
+                  zIndexVal = 20;
+                  brightnessVal = 0.7;
+                } else if (offset === 1) {
+                  xTranslate = isMobile ? "58%" : "74%";
+                  zTranslate = isMobile ? -100 : -140;
+                  yRotate = isMobile ? -32 : -38;
+                  scaleVal = isMobile ? 0.86 : 0.88;
+                  opacityVal = 0.78;
+                  zIndexVal = 20;
+                  brightnessVal = 0.7;
+                } else if (offset === -2) {
+                  xTranslate = isMobile ? "-90%" : "-124%";
+                  zTranslate = isMobile ? -200 : -270;
+                  yRotate = isMobile ? 45 : 52;
+                  scaleVal = isMobile ? 0.72 : 0.74;
+                  opacityVal = isMobile ? 0 : 0.4;
+                  zIndexVal = 10;
+                  brightnessVal = 0.45;
+                } else if (offset === 2) {
+                  xTranslate = isMobile ? "90%" : "124%";
+                  zTranslate = isMobile ? -200 : -270;
+                  yRotate = isMobile ? -45 : -52;
+                  scaleVal = isMobile ? 0.72 : 0.74;
+                  opacityVal = isMobile ? 0 : 0.4;
+                  zIndexVal = 10;
+                  brightnessVal = 0.45;
+                }
+
+                return (
+                  <motion.div
+                    key={`${room.id}-${i}`}
+                    onClick={() => {
+                      if (!isCenter) setActiveIndex(i);
+                    }}
+                    animate={{
+                      x: xTranslate,
+                      z: zTranslate,
+                      rotateY: yRotate,
+                      scale: scaleVal,
+                      opacity: opacityVal,
+                    }}
+                    transition={{
+                      type: "spring",
+                      stiffness: 240,
+                      damping: 26,
+                    }}
+                    style={{
+                      zIndex: zIndexVal,
+                      transformStyle: "preserve-3d",
+                    }}
+                    className={`absolute w-[260px] sm:w-[310px] md:w-[350px] h-[390px] sm:h-[450px] md:h-[490px] rounded-t-[140px] sm:rounded-t-[170px] md:rounded-t-[190px] overflow-hidden bg-neutral-900 transition-shadow duration-500 will-change-transform ${
+                      isCenter
+                        ? "border-2 border-[#d7b56d] shadow-[0_30px_70px_rgba(215,181,109,0.35)] cursor-default"
+                        : "border border-[#d7b56d]/30 shadow-[0_20px_45px_rgba(0,0,0,0.5)] cursor-pointer hover:border-[#d7b56d]/70"
+                    }`}
+                  >
+                    {/* Full Room Image */}
+                    <div 
+                      className="absolute inset-0 w-full h-full transition-transform duration-700 ease-out"
                       style={{
-                        transformStyle: "preserve-3d",
-                        backfaceVisibility: "hidden",
+                        transform: isCenter ? "scale(1.04)" : "scale(1)",
+                        filter: `brightness(${brightnessVal}) ${isUnavailable ? "grayscale(40%)" : ""}`,
                       }}
                     >
-                      {/* Parallax Background Image Window */}
-                      <div
-                        className="ring-card-bg absolute inset-0 w-full h-full rounded-t-[130px] sm:rounded-t-[160px] md:rounded-t-[180px] will-change-transform"
-                        style={{
-                          backgroundImage: `url(${room.image_url || "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?q=80&w=1200&auto=format&fit=crop"})`,
-                          backgroundSize: "160% 100%",
-                          backgroundRepeat: "no-repeat",
-                          backgroundPosition: "center center",
-                          filter: isUnavailable ? "grayscale(40%)" : "none",
-                        }}
-                      />
-
-                      {/* Dark Atmospheric Overlays */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/55 to-transparent pointer-events-none rounded-t-[130px] sm:rounded-t-[160px] md:rounded-t-[180px]" />
-                      <div className="absolute inset-0 bg-black/20 pointer-events-none rounded-t-[130px] sm:rounded-t-[160px] md:rounded-t-[180px]" />
-
-                      {/* Unavailable Overlay Badge */}
-                      {isUnavailable && (
-                        <div className="absolute top-7 left-1/2 -translate-x-1/2 bg-[#78231C]/95 text-white border border-red-500/50 px-3.5 py-1 rounded-full font-jost text-[11px] font-semibold tracking-wider flex items-center gap-1.5 shadow-lg z-20 whitespace-nowrap">
-                          <CalendarX size={12} />
-                          <span>Booked on Dates</span>
+                      {room.image_url ? (
+                        <Image
+                          src={room.image_url}
+                          alt={room.title}
+                          fill
+                          className="object-cover"
+                          sizes="(max-width: 640px) 260px, (max-width: 1024px) 310px, 350px"
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-neutral-800 flex items-center justify-center text-neutral-400 font-jost">
+                          No Image Available
                         </div>
                       )}
-
-                      {/* Room Card Information Inside 3D Frame */}
-                      <div className="absolute inset-x-0 bottom-0 p-5 sm:p-6 flex flex-col items-center text-center z-10 pointer-events-auto">
-                        
-                        {/* Rate / Price Tag */}
-                        <span className="font-jost text-white/75 text-[11px] sm:text-[12px] uppercase tracking-[0.2em] font-medium mb-0.5">
-                          From
-                        </span>
-                        <div className="font-marcellus text-[#d7b56d] text-[22px] sm:text-[26px] leading-tight mb-2 drop-shadow-md font-normal">
-                          {room.price_per_night ? `PKR ${room.price_per_night.toLocaleString()}` : "Price on Request"}
-                        </div>
-
-                        {/* Title */}
-                        <h3 className="font-marcellus text-white text-[19px] sm:text-[22px] font-normal leading-snug mb-1 drop-shadow-md truncate max-w-full px-2">
-                          {room.title}
-                        </h3>
-
-                        {/* Specs */}
-                        <div className="font-jost text-[#FFFFFF]/85 text-[12px] sm:text-[13px] font-light tracking-wider flex items-center justify-center gap-2.5 mb-3.5">
-                          <span>{room.bed_type || "2 Guests"}</span>
-                          <span className="opacity-40">•</span>
-                          <span>{room.size_sqft ? `${room.size_sqft} ft` : "30 ft"}</span>
-                        </div>
-
-                        {/* Action Buttons */}
-                        <div className="flex items-center justify-center gap-2 w-full max-w-[240px]">
-                          {!isUnavailable ? (
-                            <Link
-                              href={`/booking?roomId=${room.id}${searchedDates?.checkin ? `&checkin=${searchedDates.checkin}&checkout=${searchedDates.checkout}` : ""}`}
-                              onClick={handleLinkClick}
-                              className="flex-1 bg-[#d7b56d] hover:bg-[#000000] text-[#000000] hover:text-white text-[10px] sm:text-[11px] font-jost font-semibold uppercase tracking-[0.12em] py-2 px-3 rounded-full transition-all duration-300 shadow-md text-center border border-[#d7b56d] hover:border-white active:scale-95"
-                            >
-                              Book Now
-                            </Link>
-                          ) : (
-                            <span className="flex-1 bg-[#78231C]/95 text-white text-[10px] sm:text-[11px] font-jost font-semibold uppercase tracking-[0.12em] py-2 px-3 rounded-full text-center">
-                              Booked
-                            </span>
-                          )}
-
-                          <Link
-                            href={`/rooms/${room.slug || room.id}`}
-                            onClick={handleLinkClick}
-                            className="flex-1 bg-white/15 hover:bg-white text-white hover:text-black border border-white/60 text-[10px] sm:text-[11px] font-jost font-semibold uppercase tracking-[0.12em] py-2 px-3 rounded-full transition-all duration-300 shadow-md text-center active:scale-95"
-                          >
-                            Explore
-                          </Link>
-                        </div>
-
-                      </div>
                     </div>
-                  );
-                })}
-              </div>
 
-              {/* Side Vignettes for cinematic edge fade */}
-              <div className="pointer-events-none absolute inset-y-0 left-0 w-16 sm:w-36 md:w-56 bg-gradient-to-r from-white via-white/85 to-transparent z-20" />
-              <div className="pointer-events-none absolute inset-y-0 right-0 w-16 sm:w-36 md:w-56 bg-gradient-to-l from-white via-white/85 to-transparent z-20" />
+                    {/* Dark Dramatic Gradient Overlays */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/50 to-transparent pointer-events-none" />
+                    
+                    {/* Dim Overlay on Side Cards to Draw Attention to Centerpiece */}
+                    {!isCenter && (
+                      <div className="absolute inset-0 bg-black/35 pointer-events-none backdrop-blur-[0.5px] transition-opacity duration-500" />
+                    )}
 
-              {/* Left Chevron Button */}
-              <button
-                onClick={(e) => { e.stopPropagation(); rotateRing("prev"); }}
-                aria-label="Previous suite"
-                className="absolute left-2 sm:left-6 md:left-12 top-1/2 -translate-y-1/2 z-30 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[#d7b56d] hover:bg-[#000000] text-[#000000] hover:text-white flex items-center justify-center shadow-xl transition-all duration-300 cursor-pointer active:scale-95 border border-[#d7b56d]"
-              >
-                <ChevronLeft size={20} />
-              </button>
+                    {/* Unavailable Badge */}
+                    {isUnavailable && (
+                      <div className="absolute top-7 left-1/2 -translate-x-1/2 bg-[#78231C]/95 text-white border border-red-500/50 px-3.5 py-1 rounded-full font-jost text-[11px] font-semibold tracking-wider flex items-center gap-1.5 shadow-lg z-20 whitespace-nowrap">
+                        <CalendarX size={12} />
+                        <span>Booked on Dates</span>
+                      </div>
+                    )}
 
-              {/* Right Chevron Button */}
-              <button
-                onClick={(e) => { e.stopPropagation(); rotateRing("next"); }}
-                aria-label="Next suite"
-                className="absolute right-2 sm:right-6 md:right-12 top-1/2 -translate-y-1/2 z-30 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[#d7b56d] hover:bg-[#000000] text-[#000000] hover:text-white flex items-center justify-center shadow-xl transition-all duration-300 cursor-pointer active:scale-95 border border-[#d7b56d]"
-              >
-                <ChevronRight size={20} />
-              </button>
-            </div>
+                    {/* Card Content Footer */}
+                    <div className="absolute inset-x-0 bottom-0 p-5 sm:p-6 flex flex-col items-center text-center z-10 pointer-events-auto">
+                      
+                      {/* Price Tag with Luxury Crown Accent */}
+                      <span className="font-jost text-white/80 text-[11px] sm:text-[12px] uppercase tracking-[0.2em] font-medium mb-0.5">
+                        From
+                      </span>
+                      <div className="font-marcellus text-[#d7b56d] text-[22px] sm:text-[26px] md:text-[28px] leading-tight mb-2 drop-shadow-md font-normal">
+                        {room.price_per_night ? `PKR ${room.price_per_night.toLocaleString()}` : "Price on Request"}
+                      </div>
 
-            {/* Drag to Spin 3D Hint */}
-            <div className="mt-3 sm:mt-4 flex items-center justify-center gap-2 text-gray-500 font-jost text-[12px] sm:text-[13px] tracking-widest uppercase">
-              <MoveHorizontal size={14} className="text-[#8f6618] animate-pulse" />
-              <span>Drag or swipe to spin in 3D</span>
-              <MoveHorizontal size={14} className="text-[#8f6618] animate-pulse" />
+                      {/* Title */}
+                      <h3 className="font-marcellus text-white text-[19px] sm:text-[22px] md:text-[24px] font-normal leading-snug mb-1 drop-shadow-md truncate max-w-full px-2">
+                        {room.title}
+                      </h3>
+
+                      {/* Specs */}
+                      <div className="font-jost text-[#FFFFFF]/85 text-[12px] sm:text-[13px] font-light tracking-wider flex items-center justify-center gap-2.5 mb-3.5 sm:mb-4">
+                        <span>{room.bed_type || "2 Guests"}</span>
+                        <span className="opacity-40">•</span>
+                        <span>{room.size_sqft ? `${room.size_sqft} ft` : "30 ft"}</span>
+                      </div>
+
+                      {/* Action Buttons for Central Card */}
+                      <div 
+                        className={`flex items-center justify-center gap-2.5 w-full max-w-[250px] transition-opacity duration-300 ${
+                          isCenter ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+                        }`}
+                      >
+                        {!isUnavailable ? (
+                          <Link
+                            href={`/booking?roomId=${room.id}${searchedDates?.checkin ? `&checkin=${searchedDates.checkin}&checkout=${searchedDates.checkout}` : ""}`}
+                            className="flex-1 bg-[#d7b56d] hover:bg-[#000000] text-[#000000] hover:text-white text-[10.5px] sm:text-[11.5px] font-jost font-semibold uppercase tracking-[0.14em] py-2 px-3.5 rounded-full transition-all duration-300 shadow-md text-center border border-[#d7b56d] hover:border-white active:scale-95"
+                          >
+                            Book Now
+                          </Link>
+                        ) : (
+                          <span className="flex-1 bg-[#78231C]/95 text-white text-[10.5px] sm:text-[11.5px] font-jost font-semibold uppercase tracking-[0.14em] py-2 px-3.5 rounded-full text-center shadow-md">
+                            Booked
+                          </span>
+                        )}
+
+                        <Link
+                          href={`/rooms/${room.slug || room.id}`}
+                          className="flex-1 bg-white/15 hover:bg-white text-white hover:text-black border border-white/60 text-[10.5px] sm:text-[11.5px] font-jost font-semibold uppercase tracking-[0.14em] py-2 px-3.5 rounded-full transition-all duration-300 shadow-md text-center active:scale-95"
+                        >
+                          Explore
+                        </Link>
+                      </div>
+
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </motion.div>
+
+            {/* Side Vignettes for Cinematic Depth Edge Fade */}
+            <div className="pointer-events-none absolute inset-y-0 left-0 w-8 sm:w-24 md:w-40 bg-gradient-to-r from-white via-white/80 to-transparent z-25" />
+            <div className="pointer-events-none absolute inset-y-0 right-0 w-8 sm:w-24 md:w-40 bg-gradient-to-l from-white via-white/80 to-transparent z-25" />
+
+            {/* Left Chevron Button */}
+            <button
+              onClick={handlePrev}
+              aria-label="Previous suite"
+              className="absolute left-2 sm:left-6 md:left-12 top-1/2 -translate-y-1/2 z-35 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[#d7b56d] hover:bg-[#000000] text-[#000000] hover:text-white flex items-center justify-center shadow-xl transition-all duration-300 cursor-pointer active:scale-95 border border-[#d7b56d]"
+            >
+              <ChevronLeft size={20} />
+            </button>
+
+            {/* Right Chevron Button */}
+            <button
+              onClick={handleNext}
+              aria-label="Next suite"
+              className="absolute right-2 sm:right-6 md:right-12 top-1/2 -translate-y-1/2 z-35 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[#d7b56d] hover:bg-[#000000] text-[#000000] hover:text-white flex items-center justify-center shadow-xl transition-all duration-300 cursor-pointer active:scale-95 border border-[#d7b56d]"
+            >
+              <ChevronRight size={20} />
+            </button>
+
+            {/* Navigation Dots / Pills Indicator */}
+            <div className="flex items-center justify-center gap-2 mt-4 sm:mt-6 z-30">
+              {displayRooms.map((_, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => setActiveIndex(idx)}
+                  className={`transition-all duration-500 rounded-full cursor-pointer ${
+                    (activeIndex % displayRooms.length) === idx
+                      ? "w-8 h-1.5 bg-[#8f6618] shadow-[0_0_10px_rgba(143,102,24,0.6)]"
+                      : "w-2.5 h-1.5 bg-gray-300 hover:bg-[#8f6618]/60"
+                  }`}
+                  aria-label={`Go to suite ${idx + 1}`}
+                />
+              ))}
             </div>
 
           </div>
