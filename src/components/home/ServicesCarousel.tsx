@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { 
@@ -85,7 +84,6 @@ const servicesData: ServiceItem[] = [
 ];
 
 export default function ServicesCarousel() {
-  const [activeIndex, setActiveIndex] = useState(0);
 
   return (
     <section 
@@ -173,7 +171,6 @@ export default function ServicesCarousel() {
                 spaceBetween: 32,
               },
             }}
-            onSlideChange={(swiper) => setActiveIndex(swiper.realIndex)}
             navigation={{
               nextEl: '.swiper-button-next-custom',
               prevEl: '.swiper-button-prev-custom',

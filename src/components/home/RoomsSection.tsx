@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import BookingModal from "@/components/booking/BookingModal";
@@ -36,7 +36,7 @@ export default function RoomsSection({
   searchedDates 
 }: RoomsSectionProps) {
   const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
-  const [swiperInstance, setSwiperInstance] = useState<SwiperType | null>(null);
+  const swiperRef = useRef<SwiperType | null>(null);
 
   const displayRooms = rooms || [];
 
@@ -81,7 +81,7 @@ export default function RoomsSection({
             
             {/* Left Chevron Button */}
             <button
-              onClick={() => swiperInstance?.slidePrev()}
+              onClick={() => swiperRef.current?.slidePrev()}
               aria-label="Previous suite"
               className="absolute left-0 top-1/2 -translate-y-1/2 z-20 w-8 h-8 sm:w-11 sm:h-11 rounded-full bg-[#d7b56d] hover:bg-[#000000] text-[#000000] hover:text-white flex items-center justify-center shadow-xl transition-all duration-300 cursor-pointer active:scale-95 border border-[#d7b56d]"
             >
@@ -90,7 +90,7 @@ export default function RoomsSection({
 
             {/* Right Chevron Button */}
             <button
-              onClick={() => swiperInstance?.slideNext()}
+              onClick={() => swiperRef.current?.slideNext()}
               aria-label="Next suite"
               className="absolute right-0 top-1/2 -translate-y-1/2 z-20 w-8 h-8 sm:w-11 sm:h-11 rounded-full bg-[#d7b56d] hover:bg-[#000000] text-[#000000] hover:text-white flex items-center justify-center shadow-xl transition-all duration-300 cursor-pointer active:scale-95 border border-[#d7b56d]"
             >
@@ -99,7 +99,9 @@ export default function RoomsSection({
 
             {/* Arched Rooms Carousel */}
             <Swiper
-              onSwiper={setSwiperInstance}
+              onSwiper={(swiper) => {
+                swiperRef.current = swiper;
+              }}
               modules={[Navigation, Autoplay]}
               spaceBetween={28}
               slidesPerView={1}

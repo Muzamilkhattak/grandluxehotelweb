@@ -118,10 +118,11 @@ export default function HomeGallery() {
 
   // Load user uploaded gallery images if any exist
   useEffect(() => {
+    let isMounted = true;
     async function loadUserGallery() {
       try {
         const userUploaded = await getGalleryImages();
-        if (userUploaded && userUploaded.length > 0) {
+        if (isMounted && userUploaded && userUploaded.length > 0) {
           const dynamicPhotos: GalleryPhoto[] = userUploaded.map((u: any, idx: number) => ({
             id: u.id || `uploaded-${idx}`,
             name: "Signature Gallery Exhibit",
@@ -130,13 +131,18 @@ export default function HomeGallery() {
             aspect: idx % 3 === 0 ? "aspect-[4/5]" : idx % 3 === 1 ? "aspect-[16/10]" : "aspect-[1/1]",
           }));
           // Prepend user uploads to the editorial gallery
-          setPhotos([...dynamicPhotos, ...DEFAULT_GALLERY_PHOTOS]);
+          if (isMounted) {
+            setPhotos([...dynamicPhotos, ...DEFAULT_GALLERY_PHOTOS]);
+          }
         }
       } catch (err) {
         console.error("Gallery loading error:", err);
       }
     }
     loadUserGallery();
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   // GSAP Scroll-Driven SVG Map & Editorial Animation
