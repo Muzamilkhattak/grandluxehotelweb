@@ -8,21 +8,27 @@ import { ChevronLeft, ChevronRight, Quote, Star } from "lucide-react";
 const testimonials = [
   {
     id: 1,
-    quote: "An absolute masterpiece of hospitality. The attention to detail in the suite and the anticipatory service from the butler exceeded every expectation we had for a luxury stay.",
-    name: "Eleanor Vance",
-    title: "Diplomat, UK"
+    quote: "Hands down the best hotel in Islamabad F-8. We stayed for four nights during a corporate conference and Signature Art Hotel exceeded every expectation. Spotless executive suites, peaceful sector F-8 location, and the concierge hospitality is truly second to none.",
+    name: "Hamza Tariq",
+    title: "Corporate Director, Karachi"
   },
   {
     id: 2,
-    quote: "The dining experience while overlooking the skyline was unforgettable. Signature Art Hotel has set a new standard for luxury. Every interaction was flawlessly executed.",
-    name: "Marcus Sterling",
-    title: "CEO, Sterling Global"
+    quote: "Finding a calm, aesthetic sanctuary in the capital can be difficult, but Signature Art Hotel in F-8 Islamabad is a true masterclass. Beautifully curated art decor, ultra-comfortable beds, and delicious dining. Undoubtedly the best hotel in Islamabad F-8 for luxury stays.",
+    name: "Dr. Ayesha Malik",
+    title: "Healthcare Consultant, Islamabad"
   },
   {
     id: 3,
-    quote: "A true sanctuary. The acoustic privacy allowed for complete relaxation, while the curated art and architectural mastery provided endless inspiration. Simply flawless.",
-    name: "Sophia Laurent",
-    title: "International Architect"
+    quote: "I travel frequently between Dubai and Islamabad, and Signature Art Hotel has become my permanent address in the city. Located right in prime F-8 Islamabad with scenic Margalla Hills views nearby. Easily the best hotel in Islamabad F-8 with genuine 5-star personalized hospitality.",
+    name: "Bilal & Zainab Farooq",
+    title: "Overseas Residents, Dubai (UAE)"
+  },
+  {
+    id: 4,
+    quote: "From the seamless online booking to the 24/7 attentive room service, our family stay at Signature Art Hotel was pure perfection. The security in F-8 is top notch, and the rooms feel like a luxury art gallery. The best hotel in Islamabad F-8 by a mile.",
+    name: "Omer Sheikh",
+    title: "Tech Entrepreneur, Lahore"
   }
 ];
 
@@ -91,7 +97,7 @@ export default function TestimonialSection() {
           </div>
 
           {/* Slider Container */}
-          <div className="relative min-h-[360px] sm:h-[320px] md:h-[300px] w-full perspective-[1000px]">
+          <div className="relative min-h-[420px] sm:min-h-[340px] md:min-h-[320px] w-full perspective-[1000px]">
             <AnimatePresence mode="wait">
               <motion.div
                 key={currentIndex}
@@ -99,7 +105,7 @@ export default function TestimonialSection() {
                 animate={{ opacity: 1, x: 0, rotateY: 0 }}
                 exit={{ opacity: 0, x: -50, rotateY: 10 }}
                 transition={{ duration: 0.6, ease: "easeOut" }}
-                className="absolute inset-0 bg-white/5 backdrop-blur-md border border-white/10 p-6 sm:p-8 md:p-14 flex flex-col items-center justify-center text-center shadow-[0_32px_64px_rgba(0,0,0,0.4)]"
+                className="absolute inset-0 bg-white/5 backdrop-blur-md border border-white/10 p-6 sm:p-8 md:p-12 flex flex-col items-center justify-center text-center shadow-[0_32px_64px_rgba(0,0,0,0.4)] rounded-xl"
               >
                 <div className="flex gap-1 text-[#d7b56d] mb-4 sm:mb-6">
                   {[...Array(5)].map((_, i) => <Star key={i} size={15} fill="currentColor" />)}
