@@ -74,8 +74,8 @@ export default function RestaurantClient({ initialSettings, initialItems }: Prop
           />
         </div>
 
-        {/* Subtle Black Fade on Hero Background Image */}
-        <div className="absolute inset-0 bg-black/40 z-10" />
+        {/* Full Black Overlay across the entire image */}
+        <div className="absolute inset-0 w-full h-full bg-black/65 z-10 pointer-events-none" />
 
         {/* Hero Content */}
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-20 text-center">
