@@ -27,11 +27,11 @@ export default function RestaurantClient({ initialSettings, initialItems }: Prop
     tagline: "Restaurant & Dining",
     heading: "Our Restaurant Menu",
     subheading: "Crafted with fresh seasonal Nordic ingredients and woodfire mastery.",
-    backgroundImage: "/restaurant/interior.jpg",
+    backgroundImage: "/images/resturantherobg.webp",
     buttonText: "Explore Full Menu & Book Table"
   };
 
-  const heroBgImage = settings.backgroundImage || "/restaurant/interior.jpg";
+  const heroBgImage = settings.backgroundImage || "/images/resturantherobg.webp";
 
   const filteredItems = activeCategory === "all"
     ? items
@@ -65,7 +65,7 @@ export default function RestaurantClient({ initialSettings, initialItems }: Prop
         <div className="absolute inset-0 z-0">
           <Image
             src={heroBgImage}
-            alt="Oslo Elite Restaurant & Cellar"
+            alt="Signature Art Hotel Restaurant & Dining"
             fill
             priority
             sizes="100vw"

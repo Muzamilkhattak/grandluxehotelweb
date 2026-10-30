@@ -32,7 +32,7 @@ const DEFAULT_RESTAURANT_DATA: RestaurantData = {
     tagline: "Restaurant & Dining",
     heading: "Our Restaurant",
     subheading: "Crafted with fresh seasonal Nordic ingredients and woodfire mastery.",
-    backgroundImage: "/restaurant/interior.jpg",
+    backgroundImage: "/images/resturantherobg.webp",
     buttonText: "Explore Full Menu & Book Table",
   },
   items: [
