@@ -1,5 +1,6 @@
 "use client";
 
+// Signature Hotel Amenities - Single-Line Smooth Infinite Marquee
 import { motion } from "framer-motion";
 import { 
   Car, 
