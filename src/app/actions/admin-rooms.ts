@@ -16,7 +16,8 @@ export async function createRoomAction(formData: FormData) {
 
   const title = formData.get("title") as string;
   const description = formData.get("description") as string;
-  const price_per_night = parseFloat(formData.get("price_per_night") as string);
+  const rawPrice = formData.get("price_per_night");
+  const price_per_night = rawPrice ? Number(String(rawPrice).replace(/[^0-9.]/g, "")) || 0 : 0;
   const capacity = parseInt(formData.get("capacity") as string, 10);
   const bed_type = (formData.get("bed_type") as string) || "Standard Bed";
   const size_sqft = parseInt(formData.get("size_sqft") as string, 10) || 0;
@@ -83,7 +84,8 @@ export async function updateRoomAction(id: string, formData: FormData) {
 
   const title = formData.get("title") as string;
   const description = formData.get("description") as string;
-  const price_per_night = parseFloat(formData.get("price_per_night") as string);
+  const rawPrice = formData.get("price_per_night");
+  const price_per_night = rawPrice ? Number(String(rawPrice).replace(/[^0-9.]/g, "")) || 0 : 0;
   const capacity = parseInt(formData.get("capacity") as string, 10);
   const bed_type = (formData.get("bed_type") as string) || "Standard Bed";
   const size_sqft = parseInt(formData.get("size_sqft") as string, 10) || 0;

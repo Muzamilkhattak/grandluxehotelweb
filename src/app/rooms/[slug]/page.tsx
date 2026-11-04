@@ -1,4 +1,4 @@
-﻿import { createClient } from "@/utils/supabase/server";
+import { createClient } from "@/utils/supabase/server";
 import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 import Image from "next/image";
@@ -13,7 +13,17 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const resolvedParams = await params;
   const cookieStore = await cookies();
   const supabase = await createClient(cookieStore);
-  const { data: room } = await supabase.from("rooms").select("*").eq("slug", resolvedParams.slug).single();
+
+  const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(resolvedParams.slug);
+  let room = null;
+  if (isUuid) {
+    const { data } = await supabase.from("rooms").select("*").eq("id", resolvedParams.slug).maybeSingle();
+    room = data;
+  }
+  if (!room) {
+    const { data } = await supabase.from("rooms").select("*").eq("slug", resolvedParams.slug).maybeSingle();
+    room = data;
+  }
 
   if (!room) return { title: "Suite Not Found | Signature Art Hotel" };
 
@@ -56,13 +66,18 @@ export default async function RoomDetailPage({ params }: { params: Promise<{ slu
   const cookieStore = await cookies();
   const supabase = await createClient(cookieStore);
 
-  const { data: room, error } = await supabase
-    .from("rooms")
-    .select("*")
-    .eq("slug", resolvedParams.slug)
-    .single();
+  const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(resolvedParams.slug);
+  let room = null;
+  if (isUuid) {
+    const { data } = await supabase.from("rooms").select("*").eq("id", resolvedParams.slug).maybeSingle();
+    room = data;
+  }
+  if (!room) {
+    const { data } = await supabase.from("rooms").select("*").eq("slug", resolvedParams.slug).maybeSingle();
+    room = data;
+  }
 
-  if (error || !room) {
+  if (!room) {
     notFound();
   }
 
@@ -72,9 +87,12 @@ export default async function RoomDetailPage({ params }: { params: Promise<{ slu
 
   const amenitiesList = rawAmenities.filter((a: string) => !a.startsWith('total_rooms:'));
 
-  const roomImages: string[] = Array.isArray(room.images) && room.images.length > 0 
-    ? room.images 
-    : (room.image_url ? [room.image_url] : []);
+  let roomImages: string[] = Array.isArray(room.images) && room.images.length > 0 
+    ? [...room.images.filter(Boolean)] 
+    : [];
+  if (room.image_url && !roomImages.includes(room.image_url)) {
+    roomImages.unshift(room.image_url);
+  }
 
   const roomJsonLd = {
     "@context": "https://schema.org",
@@ -99,7 +117,7 @@ export default async function RoomDetailPage({ params }: { params: Promise<{ slu
     offers: {
       "@type": "Offer",
       price: room.price_per_night,
-      priceCurrency: "NOK",
+      priceCurrency: "PKR",
       availability: "https://schema.org/InStock",
       url: `https://osloelitehotel.com/rooms/${room.slug}`,
     },

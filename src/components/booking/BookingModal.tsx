@@ -249,7 +249,7 @@ export default function BookingModal({
             Reserve {room.title}
           </h2>
           <p className="font-jost text-[#000000] font-semibold text-[15px] mb-6">
-            ${room.price_per_night} <span className="text-[13px] font-normal text-[#000000] uppercase">/ night</span>
+            PKR {Number(room.price_per_night || 0).toLocaleString()} <span className="text-[13px] font-normal text-[#000000] uppercase">/ night</span>
           </p>
 
           {message && (

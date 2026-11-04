@@ -3,7 +3,11 @@
 import { useRef, MouseEvent } from "react";
 import { motion, useScroll, useTransform, useSpring, useMotionValue } from "framer-motion";
 
-export default function HeroSection() {
+interface HeroSectionProps {
+  children?: React.ReactNode;
+}
+
+export default function HeroSection({ children }: HeroSectionProps) {
   const containerRef = useRef<HTMLElement>(null);
 
   // Window scroll (no target ref needed, 100% hydration-safe)
@@ -71,7 +75,7 @@ export default function HeroSection() {
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
       suppressHydrationWarning 
-      className="relative h-[85vh] sm:h-[90vh] min-h-[520px] w-full flex flex-col items-center justify-center overflow-hidden"
+      className="relative min-h-[58vh] sm:min-h-[65vh] md:min-h-[70vh] lg:min-h-screen w-full flex flex-col justify-between overflow-hidden"
       style={{ perspective: 1200 }}
     >
       {/* Background Video with Vertical Scroll Parallax */}
@@ -89,7 +93,7 @@ export default function HeroSection() {
           src="/for-website.webm"
         />
         {/* Cinematic dark luxury gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/45 to-black/75 z-10 pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/40 to-black/90 z-10 pointer-events-none" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.6)_100%)] z-10 pointer-events-none" />
       </motion.div>
 
@@ -102,7 +106,7 @@ export default function HeroSection() {
           rotateY,
           transformStyle: "preserve-3d"
         }}
-        className="relative z-10 flex flex-col items-center text-center px-4 mt-8 sm:mt-12 md:mt-16 max-w-5xl will-change-transform"
+        className="relative z-10 flex-1 flex flex-col items-center justify-center text-center px-4 pt-28 sm:pt-36 pb-12 max-w-5xl mx-auto will-change-transform"
         variants={containerVariants}
         initial="hidden"
         animate="visible"
@@ -116,6 +120,13 @@ export default function HeroSection() {
           A Signature OF <br className="hidden md:block" /> Luxury Living
         </motion.h1>
       </motion.div>
+
+      {/* Centered Hero Booking Form Bar (Desktop only: lg and up) */}
+      {children && (
+        <div className="hidden lg:flex relative z-20 w-full justify-center px-4 pb-8 sm:pb-12 md:pb-14 mt-auto">
+          {children}
+        </div>
+      )}
     </section>
   );
 }

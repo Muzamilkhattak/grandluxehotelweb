@@ -28,24 +28,20 @@ export default async function BookingPage({
   const cookieStore = await cookies();
   const supabase = await createClient(cookieStore);
 
-  // 1. Fetch Room Details
-  const { data: room, error: roomError } = await supabase
-    .from("rooms")
-    .select("*")
-    .eq("id", roomId)
-    .single();
+  // 1. Fetch Room Details (support UUID and slug safely)
+  const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(roomId);
+  let room = null;
+  if (isUuid) {
+    const { data } = await supabase.from("rooms").select("*").eq("id", roomId).maybeSingle();
+    room = data;
+  }
+  if (!room) {
+    const { data } = await supabase.from("rooms").select("*").eq("slug", roomId).maybeSingle();
+    room = data;
+  }
 
-  if (roomError || !room) {
-    // If not found by ID, try searching by slug
-    const { data: slugRoom } = await supabase
-      .from("rooms")
-      .select("*")
-      .eq("slug", roomId)
-      .single();
-
-    if (!slugRoom) {
-      notFound();
-    }
+  if (!room) {
+    notFound();
   }
 
   const targetRoom = room;

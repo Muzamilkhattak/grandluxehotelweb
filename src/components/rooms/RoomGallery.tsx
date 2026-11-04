@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState } from "react";
 import Image from "next/image";
@@ -37,6 +37,7 @@ export default function RoomGallery({ images, title }: RoomGalleryProps) {
           src={currentImage}
           alt={`${title} - Photo ${activeIndex + 1}`}
           fill
+          unoptimized
           className="object-cover transition-all duration-700 ease-out"
           priority
         />
@@ -86,6 +87,8 @@ export default function RoomGallery({ images, title }: RoomGalleryProps) {
                 src={img}
                 alt={`${title} thumbnail ${index + 1}`}
                 fill
+                unoptimized
+                loading="lazy"
                 className="object-cover"
               />
               {activeIndex === index && (

@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Sparkles, ArrowLeft, UtensilsCrossed, Phone, CalendarCheck } from "lucide-react";
 import { RestaurantSettings, MenuItemData } from "@/app/actions/admin-restaurant";
+import RestaurantDiningIntro from "@/components/restaurant/RestaurantDiningIntro";
 
 interface Props {
   initialSettings?: RestaurantSettings;
@@ -94,6 +95,9 @@ export default function RestaurantClient({ initialSettings, initialItems }: Prop
           </p>
         </div>
       </section>
+
+      {/* Intro Section: A Hotel Restaurant Serves Meals to Both Guests and Visitors */}
+      <RestaurantDiningIntro />
 
       {/* Main Content Area */}
       <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">

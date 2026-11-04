@@ -17,6 +17,7 @@ export type Room = {
   capacity?: number;
   amenities: any;
   image_url?: string;
+  images?: string[];
   description?: string;
 };
 
@@ -100,14 +101,18 @@ export default function AccommodationsClient({ initialRooms }: { initialRooms: R
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[24px]">
-          {filtered.map((room) => (
+          {filtered.map((room) => {
+            const coverImage = room.image_url || (Array.isArray(room.images) && room.images.length > 0 ? room.images[0] : null);
+            return (
             <div key={room.id} className="group flex flex-col bg-canvas border border-faint rounded-none overflow-hidden transition-colors">
               <div className="relative h-[300px] w-full overflow-hidden rounded-none">
-                {room.image_url ? (
+                {coverImage ? (
                   <Image 
-                    src={room.image_url} 
+                    src={coverImage} 
                     alt={room.title} 
                     fill 
+                    unoptimized
+                    loading="lazy"
                     className="object-cover rounded-none" 
                   />
                 ) : (
@@ -146,7 +151,8 @@ export default function AccommodationsClient({ initialRooms }: { initialRooms: R
                 </div>
               </div>
             </div>
-          ))}
+          );
+        })}
         </div>
       )}
 

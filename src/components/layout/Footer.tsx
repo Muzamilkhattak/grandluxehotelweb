@@ -108,24 +108,24 @@ export default function Footer() {
             <Link href="/privacy" className="hover:text-[#d7b56d] transition-colors">
               Privacy
             </Link>
-            <button
-              type="button"
+            <Link
+              href="#cookies"
               onClick={() => {
                 if (typeof window !== "undefined") {
                   window.dispatchEvent(new CustomEvent("open-cookie-settings"));
                 }
               }}
-              className="hover:text-[#d7b56d] transition-colors cursor-pointer text-left"
+              className="hover:text-[#d7b56d] transition-colors"
             >
               Cookies
-            </button>
+            </Link>
             <Link href="/admin" className="hover:text-[#d7b56d] transition-colors">
               Legal
             </Link>
           </div>
 
           {/* Center: Copyright */}
-          <p className="text-center font-normal text-white/50 order-3 sm:order-2">
+          <p className="text-center font-normal text-white/50 order-3 sm:order-2" suppressHydrationWarning>
             © {new Date().getFullYear()} Signature Art Hotel. All Rights Reserved.
           </p>
 

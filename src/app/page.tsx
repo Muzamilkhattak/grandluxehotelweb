@@ -82,19 +82,30 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ [
   const restaurantData = await getRestaurantData();
 
   return (
-    <main suppressHydrationWarning className="flex-1 flex flex-col relative w-full overflow-hidden">
+    <main suppressHydrationWarning className="flex-1 flex flex-col relative w-full overflow-x-clip">
       
-      {/* 1. Hero Section with Scroll Parallax & 3D Tilt */}
-      <HeroSection />
+      {/* 1. Hero Section (Booking Bar rendered inside on desktop md+) */}
+      <HeroSection>
+        <BookingEngineBar
+          checkin={checkin}
+          checkout={checkout}
+          adults={adults}
+          children={children}
+          todayStr={todayStr}
+        />
+      </HeroSection>
 
-      {/* 2. CRO Booking Engine with 3D Tilt & Float */}
-      <BookingEngineBar
-        checkin={checkin}
-        checkout={checkout}
-        adults={adults}
-        children={children}
-        todayStr={todayStr}
-      />
+      {/* 2. Mobile & Small Devices Booking Form (Rendered OUTSIDE Hero section on clean white background) */}
+      <section className="block lg:hidden relative z-30 w-full bg-[#FFFFFF] py-6 px-3.5 sm:px-4 border-b border-zinc-100">
+        <BookingEngineBar
+          checkin={checkin}
+          checkout={checkout}
+          adults={adults}
+          children={children}
+          todayStr={todayStr}
+          isMobileView={true}
+        />
+      </section>
 
       {/* 3. Animated About Section with Multi-Layer Scroll Parallax & 3D Imagery */}
       <AboutSection />

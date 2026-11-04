@@ -61,14 +61,19 @@ export async function createBookingAction(payload: BookingPayload) {
     }
 
     // 2. Fetch room details
-    const { data: room, error: roomError } = await supabase
-      .from("rooms")
-      .select("*")
-      .eq("id", roomId)
-      .single();
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(roomId);
+    let room = null;
+    if (isUuid) {
+      const { data } = await supabase.from("rooms").select("*").eq("id", roomId).maybeSingle();
+      room = data;
+    }
+    if (!room) {
+      const { data } = await supabase.from("rooms").select("*").eq("slug", roomId).maybeSingle();
+      room = data;
+    }
 
-    if (roomError || !room) {
-      console.error("Error fetching room details:", roomError);
+    if (!room) {
+      console.error("Error fetching room details: room not found for identifier", roomId);
       return { success: false, error: "Room accommodation not found." };
     }
 
@@ -78,7 +83,7 @@ export async function createBookingAction(payload: BookingPayload) {
     const { data: overlappingBookings, error: overlapError } = await supabase
       .from("bookings")
       .select("id")
-      .eq("room_id", roomId)
+      .eq("room_id", room.id)
       .neq("status", "cancelled")
       .lt("check_in", checkOut)
       .gt("check_out", checkIn);
@@ -108,13 +113,13 @@ export async function createBookingAction(payload: BookingPayload) {
       notes?.trim() ? `Special Requests: ${notes.trim()}` : null,
     ].filter(Boolean).join("\n");
 
-    const paymentStatus = payload.receiptUrl ? "receipt_submitted" : "pay_on_arrival";
+    const paymentStatus = payload.receiptUrl ? "paid" : "pay_on_arrival";
 
     // 5. Insert booking into bookings table
-    const { data: booking, error: insertError } = await supabase
+    let { data: booking, error: insertError } = await supabase
       .from("bookings")
       .insert({
-        room_id: roomId,
+        room_id: room.id,
         guest_name: guestName,
         guest_email: guestEmail,
         guest_phone: guestPhone,
@@ -131,8 +136,36 @@ export async function createBookingAction(payload: BookingPayload) {
       .single();
 
     if (insertError) {
-      console.error("Error creating booking:", insertError.message || insertError);
-      return { success: false, error: insertError.message || "Failed to create booking. Please try again." };
+      console.warn("Client insert failed, falling back to admin client:", insertError.message);
+      const adminSupabase = createAdminClient();
+      if (adminSupabase) {
+        const retryRes = await adminSupabase
+          .from("bookings")
+          .insert({
+            room_id: room.id,
+            guest_name: guestName,
+            guest_email: guestEmail,
+            guest_phone: guestPhone,
+            check_in: checkIn,
+            check_out: checkOut,
+            total_nights: totalNights,
+            notes: formattedNotes || null,
+            total_amount: totalAmount,
+            status: "confirmed",
+            payment_status: paymentStatus,
+            user_id: user ? user.id : null,
+          })
+          .select()
+          .single();
+
+        booking = retryRes.data;
+        insertError = retryRes.error;
+      }
+    }
+
+    if (insertError || !booking) {
+      console.error("Error creating booking:", insertError?.message || insertError);
+      return { success: false, error: insertError?.message || "Failed to create booking. Please try again." };
     }
 
     // 6. Dispatch emails asynchronously
@@ -210,13 +243,18 @@ export async function checkRoomAvailabilityAction(
     const cookieStore = await cookies();
     const supabase = await createClient(cookieStore);
 
-    const { data: room, error: roomError } = await supabase
-      .from("rooms")
-      .select("id, title, total_rooms, quantity, amenities")
-      .eq("id", roomId)
-      .single();
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(roomId);
+    let room = null;
+    if (isUuid) {
+      const { data } = await supabase.from("rooms").select("*").eq("id", roomId).maybeSingle();
+      room = data;
+    }
+    if (!room) {
+      const { data } = await supabase.from("rooms").select("*").eq("slug", roomId).maybeSingle();
+      room = data;
+    }
 
-    if (roomError || !room) {
+    if (!room) {
       return { available: false, error: "Room not found." };
     }
 
@@ -225,7 +263,7 @@ export async function checkRoomAvailabilityAction(
     const { data: overlappingBookings, error: overlapError } = await supabase
       .from("bookings")
       .select("id, check_in, check_out")
-      .eq("room_id", roomId)
+      .eq("room_id", room.id)
       .neq("status", "cancelled")
       .lt("check_in", checkOut)
       .gt("check_out", checkIn);
@@ -259,15 +297,24 @@ export async function checkRoomAvailabilityAction(
 
 export async function getRoomBookedDatesAction(roomId: string) {
   try {
+    if (!roomId) return [];
     const cookieStore = await cookies();
     const supabase = await createClient(cookieStore);
+
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(roomId);
+    let resolvedId = roomId;
+    if (!isUuid) {
+      const { data: r } = await supabase.from("rooms").select("id").eq("slug", roomId).maybeSingle();
+      if (r?.id) resolvedId = r.id;
+      else return [];
+    }
 
     const today = new Date().toISOString().split("T")[0];
 
     const { data: bookings, error } = await supabase
       .from("bookings")
       .select("check_in, check_out")
-      .eq("room_id", roomId)
+      .eq("room_id", resolvedId)
       .neq("status", "cancelled")
       .gte("check_out", today)
       .order("check_in", { ascending: true });

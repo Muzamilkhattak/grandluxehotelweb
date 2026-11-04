@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect, useTransition, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -68,33 +68,48 @@ function AdminLoginForm() {
   };
 
   return (
-    <div className="min-h-screen w-full bg-[#0a0d10] text-[#e1e4e8] flex flex-col justify-center items-center p-4 relative overflow-hidden font-sans">
-      {/* Ambient background glow effects */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-br from-[#d7b56d]/12 via-[#997a4d]/5 to-transparent rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute -bottom-20 right-10 w-96 h-96 bg-[#2271b1]/10 rounded-full blur-3xl pointer-events-none" />
+    <div className="min-h-screen w-full flex flex-col justify-center items-center p-4 relative overflow-hidden font-sans">
+      {/* Background Image Layer with Luxury Dark Overlay */}
+      <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
+        <Image
+          src="/images/about/about-hero.jpg"
+          alt="Signature Art Hotel Atmosphere"
+          fill
+          priority
+          quality={90}
+          sizes="100vw"
+          className="object-cover object-center scale-105"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#07090c]/92 via-[#0a0d12]/85 to-[#07090c]/95" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_25%,rgba(215,181,109,0.2)_0%,rgba(215,181,109,0.05)_45%,transparent_75%)]" />
+      </div>
 
       {/* Main container */}
-      <div className="w-full max-w-[440px] relative z-10">
+      <div className="w-full max-w-[450px] relative z-10">
         
         {/* Top Hotel Brand Badge */}
-        <div className="text-center mb-8 flex flex-col items-center">
+        <div className="text-center mb-6 flex flex-col items-center">
           <Link href="/" className="inline-block group mb-3">
             <Image
               src="/images/logo/signaturearthotellogo.webp"
               alt="Signature Art Hotel"
-              width={220}
+              width={240}
               height={130}
               priority
-              className="h-20 w-auto object-contain drop-shadow-[0_4px_20px_rgba(197,168,128,0.25)] transition-transform group-hover:scale-105 duration-200"
+              className="h-20 w-auto object-contain drop-shadow-[0_4px_24px_rgba(215,181,109,0.3)] transition-transform group-hover:scale-105 duration-300"
             />
           </Link>
-          <p className="text-[11px] tracking-[0.28em] uppercase text-[#d7b56d] font-semibold">
+          <p className="text-[11.5px] tracking-[0.28em] uppercase text-[#d7b56d] font-semibold bg-[#d7b56d]/10 border border-[#d7b56d]/30 px-3.5 py-1 rounded-full">
             Executive Admin Portal
           </p>
         </div>
 
         {/* Login Box */}
-        <div className="bg-[#12161b]/95 backdrop-blur-xl border border-white/10 rounded-2xl p-7 md:p-9 shadow-2xl shadow-black/80 relative">
+        <div className="bg-[#0f1319] border border-[#d7b56d]/35 rounded-2xl shadow-[0_25px_70px_-15px_rgba(0,0,0,0.95),0_0_40px_rgba(215,181,109,0.12)] overflow-hidden relative">
+          {/* Top Gold Accent Highlight */}
+          <div className="h-[3px] w-full bg-gradient-to-r from-transparent via-[#d7b56d] to-transparent shadow-[0_0_12px_rgba(215,181,109,0.8)]" />
+          
+          <div className="p-7 md:p-9">
           
           <div className="flex items-center justify-between pb-5 border-b border-white/5 mb-6">
             <div className="flex items-center gap-2">
@@ -211,14 +226,15 @@ function AdminLoginForm() {
             </Link>
           </div>
         </div>
-
-        {/* Security footer note */}
-        <p className="text-center text-[11px] text-white/30 mt-6 tracking-wide">
-          Signature Art Hotel Management System &bull; Authorized Personnel Only
-        </p>
       </div>
+
+      {/* Security footer note */}
+      <p className="text-center text-[11px] text-white/30 mt-6 tracking-wide">
+        Signature Art Hotel Management System &bull; Authorized Personnel Only
+      </p>
     </div>
-  );
+  </div>
+);
 }
 
 export default function AdminLoginPage() {

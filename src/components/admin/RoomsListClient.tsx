@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
@@ -131,7 +131,7 @@ export default function RoomsListClient({ initialRooms }: { initialRooms: RoomIt
               <div className="p-[24px] flex flex-col flex-1">
                 <h3 className="font-marcellus text-[24px] text-[#000000] mb-2 leading-snug">{room.title}</h3>
                 <div className="font-jost text-[14px] text-[#555E63] mb-4 space-y-1">
-                  <div className="font-semibold text-[#000000]">${room.price_per_night} / night</div>
+                  <div className="font-semibold text-[#000000]">PKR {Number(room.price_per_night || 0).toLocaleString()} / night</div>
                   <div>Up to {room.capacity || room.capacity_guests || 2} Guests • {room.bed_type || "King Bed"}</div>
                 </div>
 

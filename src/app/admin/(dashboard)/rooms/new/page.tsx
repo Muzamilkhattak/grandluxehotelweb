@@ -39,6 +39,60 @@ export default function NewRoomPage() {
     setGalleryPreviews(galleryPreviews.filter((_, i) => i !== index));
   };
 
+  const compressImageFile = async (file: File): Promise<File | Blob> => {
+    if (!file.type.startsWith("image/") || file.type === "image/svg+xml") return file;
+    return new Promise((resolve) => {
+      const img = new window.Image();
+      const url = URL.createObjectURL(file);
+      img.src = url;
+      img.onload = () => {
+        URL.revokeObjectURL(url);
+        const maxWidth = 1920;
+        const maxHeight = 1080;
+        let width = img.width;
+        let height = img.height;
+
+        if (width > maxWidth || height > maxHeight) {
+          if (width / height > maxWidth / maxHeight) {
+            height = Math.round((height * maxWidth) / width);
+            width = maxWidth;
+          } else {
+            width = Math.round((width * maxHeight) / height);
+            height = maxHeight;
+          }
+        }
+
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) {
+          resolve(file);
+          return;
+        }
+        ctx.drawImage(img, 0, 0, width, height);
+        canvas.toBlob(
+          (blob) => {
+            if (!blob || blob.size >= file.size) {
+              resolve(file);
+            } else {
+              const compressed = new File([blob], file.name.replace(/\.[^.]+$/, ".webp"), {
+                type: "image/webp",
+              });
+              resolve(compressed);
+            }
+          },
+          "image/webp",
+          0.82
+        );
+      };
+      img.onerror = () => {
+        URL.revokeObjectURL(url);
+        resolve(file);
+      };
+    });
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
@@ -62,9 +116,10 @@ export default function NewRoomPage() {
       // Upload Featured Image
       let featuredUrl = "";
       if (featuredFile) {
-        const fileExt = featuredFile.name.split('.').pop();
+        const fileToUpload = await compressImageFile(featuredFile);
+        const fileExt = fileToUpload instanceof File ? fileToUpload.name.split('.').pop() : "webp";
         const fileName = `${Date.now()}-feat-${Math.random().toString(36).substring(7)}.${fileExt}`;
-        const { data, error } = await supabase.storage.from('room-images').upload(fileName, featuredFile);
+        const { data, error } = await supabase.storage.from('room-images').upload(fileName, fileToUpload);
         if (error) throw new Error("Failed to upload featured image");
         if (data) {
           const { data: publicUrlData } = supabase.storage.from('room-images').getPublicUrl(data.path);
@@ -76,9 +131,10 @@ export default function NewRoomPage() {
       let galleryUrls: string[] = [];
       for (const file of galleryFiles) {
         if (file.size > 0) {
-          const fileExt = file.name.split('.').pop();
+          const fileToUpload = await compressImageFile(file);
+          const fileExt = fileToUpload instanceof File ? fileToUpload.name.split('.').pop() : "webp";
           const fileName = `${Date.now()}-gal-${Math.random().toString(36).substring(7)}.${fileExt}`;
-          const { data, error } = await supabase.storage.from('room-images').upload(fileName, file);
+          const { data, error } = await supabase.storage.from('room-images').upload(fileName, fileToUpload);
           
           if (error) throw new Error(`Failed to upload gallery image: ${file.name}`);
           

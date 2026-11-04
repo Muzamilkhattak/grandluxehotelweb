@@ -275,7 +275,7 @@ export default function BookingWidget({ room }: { room: any }) {
         </div>
         <div className="text-right">
           <div className="font-marcellus text-[26px] md:text-[28px] text-[#FFFFFF] leading-none">
-            ${room.price_per_night}
+            PKR {Number(room.price_per_night || 0).toLocaleString()}
           </div>
           <div className="text-[11px] font-jost uppercase tracking-wider text-[#FFFFFF]/60 mt-1">
             / night
@@ -284,7 +284,7 @@ export default function BookingWidget({ room }: { room: any }) {
       </div>
 
       {/* Error Message */}
-      {error && (
+      {error && !isUnavailable && (
         <div className="bg-[#5A231F] border border-[#EF4444]/60 text-[#FEE2E2] text-[13px] font-jost p-3.5 rounded-[12px] mb-5 flex items-start gap-2.5 shadow-sm">
           <AlertTriangle size={18} className="text-[#F87171] shrink-0 mt-0.5" />
           <span className="leading-snug">{error}</span>
@@ -313,7 +313,7 @@ export default function BookingWidget({ room }: { room: any }) {
             Not Available on Selected Dates
           </div>
           <p className="text-[#FEE2E2]/90 leading-relaxed text-[12.5px]">
-            This suite is already reserved from <strong>{checkIn}</strong> to <strong>{checkOut}</strong>. Please select different dates or explore other suites.
+            {availability?.message || `This suite is already reserved from ${checkIn} to ${checkOut}. Please select different dates or explore other suites.`}
           </p>
         </div>
       )}
@@ -426,8 +426,8 @@ export default function BookingWidget({ room }: { room: any }) {
         {nights > 0 && !isUnavailable && (
           <div className="bg-[#000000] border border-[#d7b56d]/30 rounded-[14px] p-4 my-1">
             <div className="flex justify-between items-center text-[13.5px] font-jost text-[#FFFFFF]/80 mb-1.5">
-              <span>${room.price_per_night} &times; {nights} {nights === 1 ? 'night' : 'nights'}</span>
-              <span className="font-semibold text-[#FFFFFF]">${totalAmount.toLocaleString()}</span>
+              <span>PKR {Number(room.price_per_night || 0).toLocaleString()} &times; {nights} {nights === 1 ? 'night' : 'nights'}</span>
+              <span className="font-semibold text-[#FFFFFF]">PKR {totalAmount.toLocaleString()}</span>
             </div>
             <div className="flex justify-between items-center text-[13px] font-jost text-[#FFFFFF]/70 mb-2 pb-2 border-b border-[#FFFFFF]/10">
               <span>Taxes & Fees</span>
