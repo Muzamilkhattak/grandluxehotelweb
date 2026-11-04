@@ -27,7 +27,7 @@ const DEFAULT_GALLERY_PHOTOS: GalleryPhoto[] = [
   {
     id: "g2",
     name: "Grand Architectural Colonnade Facade",
-    url: "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?q=80&w=1200&auto=format&fit=crop",
+    url: "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?q=75&w=800&auto=format&fit=crop",
     category: "Architecture",
     aspect: "aspect-[16/10]",
   },
@@ -55,7 +55,7 @@ const DEFAULT_GALLERY_PHOTOS: GalleryPhoto[] = [
   {
     id: "g6",
     name: "Atrium Reflection Pool & Skylight",
-    url: "https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?q=80&w=1200&auto=format&fit=crop",
+    url: "https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?q=75&w=800&auto=format&fit=crop",
     category: "Architecture",
     aspect: "aspect-[1/1]",
   },
@@ -83,7 +83,7 @@ const DEFAULT_GALLERY_PHOTOS: GalleryPhoto[] = [
   {
     id: "g10",
     name: "Veranda Sunset Terrace",
-    url: "https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=1200&auto=format&fit=crop",
+    url: "https://images.unsplash.com/photo-1566073771259-6a8506099945?q=75&w=800&auto=format&fit=crop",
     category: "Architecture",
     aspect: "aspect-[16/9]",
   },

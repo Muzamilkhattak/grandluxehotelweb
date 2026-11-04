@@ -178,7 +178,7 @@ export default function AboutSection() {
             <Tilt3D maxTilt={6} scale={1.02} glare={true} glareColor="rgba(215, 181, 109, 0.2)">
               <div className="relative w-full h-[380px] sm:h-[480px] lg:h-[550px] shadow-[0_32px_80px_rgba(54,38,24,0.18)] rounded-2xl overflow-hidden border border-black/5 group">
                 <Image 
-                  src="https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?q=80&w=1200&auto=format&fit=crop" 
+                  src="https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?q=75&w=800&auto=format&fit=crop" 
                   alt="Hotel Exterior" 
                   fill
                   sizes="(max-width: 768px) 85vw, 45vw"
@@ -215,7 +215,7 @@ export default function AboutSection() {
             <Tilt3D maxTilt={7} scale={1.03} glare={true}>
               <div className="relative w-full h-[200px] sm:h-[280px]">
                 <Image 
-                  src="https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=800&auto=format&fit=crop" 
+                  src="https://images.unsplash.com/photo-1566073771259-6a8506099945?q=75&w=600&auto=format&fit=crop" 
                   alt="Luxury Amenities" 
                   fill
                   sizes="(max-width: 768px) 40vw, 25vw"
@@ -250,7 +250,7 @@ export default function AboutSection() {
             <Tilt3D maxTilt={8} scale={1.03} glare={true}>
               <div className="relative w-full h-[260px] sm:h-[350px]">
                 <Image 
-                  src="https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?q=80&w=1200&auto=format&fit=crop" 
+                  src="https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?q=75&w=750&auto=format&fit=crop" 
                   alt="Lobby Details" 
                   fill
                   sizes="(max-width: 768px) 50vw, 30vw"

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import BookingModal from "@/components/booking/BookingModal";
@@ -26,10 +26,27 @@ export type RoomsSectionProps = {
   searchedDates?: { checkin: string; checkout: string };
 };
 
+function optimizeImageUrl(url: string, width = 680): string {
+  if (!url) return url;
+  try {
+    if (url.includes("images.unsplash.com")) {
+      const u = new URL(url);
+      u.searchParams.set("w", String(width));
+      u.searchParams.set("q", "75");
+      u.searchParams.set("auto", "format");
+      u.searchParams.set("fit", "crop");
+      return u.toString();
+    }
+  } catch {
+    return url;
+  }
+  return url;
+}
+
 const DEFAULT_PREVIEW_IMAGES = [
-  "https://images.unsplash.com/photo-1611892440504-42a792e24d32?q=80&w=1000&auto=format&fit=crop",
-  "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?q=80&w=1000&auto=format&fit=crop",
-  "https://images.unsplash.com/photo-1590490360182-c33d57733427?q=80&w=1000&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1611892440504-42a792e24d32?q=75&w=680&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?q=75&w=680&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1590490360182-c33d57733427?q=75&w=680&auto=format&fit=crop",
 ];
 
 function getRoomPreviewImages(room: Room): string[] {
@@ -42,9 +59,9 @@ function getRoomPreviewImages(room: Room): string[] {
   }
 
   if (list.length === 0) {
-    return DEFAULT_PREVIEW_IMAGES;
+    list = DEFAULT_PREVIEW_IMAGES;
   }
-  return list;
+  return list.map((src) => optimizeImageUrl(src, 680));
 }
 
 function getRoomPersons(room: Room): string {
@@ -77,7 +94,7 @@ interface RoomCardItemProps {
   onSelect: () => void;
 }
 
-function RoomCardItem({
+const RoomCardItem = React.memo(function RoomCardItem({
   room,
   index,
   active,
@@ -88,6 +105,7 @@ function RoomCardItem({
 }: RoomCardItemProps) {
   const diff = index - active;
   const isCenter = diff === 0;
+  const isVisible = Math.abs(diff) <= 2;
 
   // CodePen fanned carousel math with calibrated step per card:
   // Each step away shifts by 85% X, 22% Y, and 13° rotation
@@ -101,12 +119,10 @@ function RoomCardItem({
   // Hover slideshow for room photos
   const images = getRoomPreviewImages(room);
   const [currentIdx, setCurrentIdx] = useState(0);
-  const [isHovered, setIsHovered] = useState(false);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const startSlideshow = () => {
     if (!isCenter) return;
-    setIsHovered(true);
     if (images.length > 1 && !intervalRef.current) {
       intervalRef.current = setInterval(() => {
         setCurrentIdx((prev) => (prev + 1) % images.length);
@@ -115,7 +131,6 @@ function RoomCardItem({
   };
 
   const stopSlideshow = () => {
-    setIsHovered(false);
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
       intervalRef.current = null;
@@ -140,6 +155,9 @@ function RoomCardItem({
     };
   }, []);
 
+  // For non-center cards, only mount 1 image to eliminate image decoding overhead
+  const displayImages = isCenter ? images : images.slice(0, 1);
+
   return (
     <div
       onClick={!isCenter ? onSelect : undefined}
@@ -150,9 +168,11 @@ function RoomCardItem({
         transformOrigin: "0% 100%",
         zIndex: Math.max(1, zIndex),
         opacity: opacity,
+        visibility: isVisible ? "visible" : "hidden",
         pointerEvents: opacity <= 0.05 ? "none" : "auto",
-        transform: `translate(${xPercent}%, ${yPercent}%) rotate(${rotDeg}deg)`,
-        transition: "transform 0.8s cubic-bezier(0, 0.02, 0, 1), opacity 0.8s cubic-bezier(0, 0.02, 0, 1)",
+        transform: `translate3d(${xPercent}%, ${yPercent}%, 0) rotate(${rotDeg}deg)`,
+        willChange: isVisible ? "transform, opacity" : "auto",
+        transition: "transform 0.45s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease-out",
       }}
       className={`w-[280px] sm:w-[315px] md:w-[340px] h-[430px] sm:h-[455px] md:h-[475px] -ml-[140px] sm:-ml-[157px] md:-ml-[170px] -mt-[215px] sm:-mt-[227px] md:-mt-[237px] select-none ${
         !isCenter ? "cursor-pointer" : ""
@@ -161,7 +181,7 @@ function RoomCardItem({
       <article 
         onMouseEnter={startSlideshow}
         onMouseLeave={stopSlideshow}
-        className="group relative w-full h-full bg-[#0d0d0e] border border-neutral-800 hover:border-[#d7b56d]/40 rounded-[28px] sm:rounded-[32px] p-4 sm:p-5 pb-5 sm:pb-6 shadow-[0_20px_50px_rgba(0,0,0,0.85)] transition-all duration-300 flex flex-col justify-between overflow-hidden"
+        className="group relative w-full h-full bg-[#0d0d0e] border border-neutral-800 hover:border-[#d7b56d]/40 rounded-[28px] sm:rounded-[32px] p-4 sm:p-5 pb-5 sm:pb-6 shadow-[0_16px_36px_rgba(0,0,0,0.75)] transition-colors duration-300 flex flex-col justify-between overflow-hidden"
       >
         {/* Top Inset Image Box with Hover Rotation */}
         <Link 
@@ -175,8 +195,8 @@ function RoomCardItem({
           className="relative block w-full aspect-[16/10.2] rounded-[20px] overflow-hidden bg-neutral-900 border border-white/5 cursor-pointer"
           aria-label={`View ${room.title}`}
         >
-          {images.length > 0 ? (
-            images.map((imgSrc, idx) => {
+          {displayImages.length > 0 ? (
+            displayImages.map((imgSrc, idx) => {
               // Preload active, first, and adjacent slides for instant loading without heavy network bottleneck
               const isNear = idx === 0 || idx === currentIdx || Math.abs(idx - currentIdx) <= 1;
               if (!isNear) return null;
@@ -187,10 +207,9 @@ function RoomCardItem({
                   src={imgSrc} 
                   alt={`${room.title} photo ${idx + 1}`} 
                   fill 
-                  unoptimized
                   loading={idx === 0 && isCenter ? "eager" : "lazy"}
                   priority={idx === 0 && isCenter}
-                  className={`object-cover group-hover:scale-105 transition-all duration-700 ease-out rounded-[20px] ${
+                  className={`object-cover group-hover:scale-105 transition-transform duration-500 ease-out rounded-[20px] ${
                     isUnavailable ? "grayscale-[40%]" : ""
                   } ${
                     idx === currentIdx ? "opacity-100 z-1" : "opacity-0 z-0 pointer-events-none"
@@ -345,7 +364,7 @@ function RoomCardItem({
       </article>
     </div>
   );
-}
+});
 
 export default function RoomsSection({ 
   rooms, 
@@ -359,27 +378,46 @@ export default function RoomsSection({
 
   const sectionRef = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(0);
+  const activeRef = useRef(0);
+  activeRef.current = active;
+  const rafId = useRef<number | null>(null);
 
-  // Scroll listener: detects user scroll position inside section and maps to cards
+  // High-performance RAF scroll listener: maps user scroll smoothly without layout thrashing
   const handleScroll = useCallback(() => {
-    if (!sectionRef.current || totalCards <= 1) return;
-    const rect = sectionRef.current.getBoundingClientRect();
-    const scrollableHeight = sectionRef.current.offsetHeight - window.innerHeight;
-    if (scrollableHeight <= 0) return;
+    if (rafId.current !== null) return;
 
-    // How far has top of section scrolled past top of viewport?
-    const scrolled = -rect.top;
-    const progress = Math.max(0, Math.min(1, scrolled / scrollableHeight));
+    rafId.current = requestAnimationFrame(() => {
+      rafId.current = null;
+      if (!sectionRef.current || totalCards <= 1) return;
 
-    // Map progress smoothly into card indexes
-    const newActive = Math.min(totalCards - 1, Math.floor(progress * totalCards));
-    setActive(newActive);
+      const rect = sectionRef.current.getBoundingClientRect();
+      // Skip if section is completely outside the viewport
+      if (rect.bottom < 0 || rect.top > window.innerHeight) return;
+
+      const scrollableHeight = sectionRef.current.offsetHeight - window.innerHeight;
+      if (scrollableHeight <= 0) return;
+
+      // How far has top of section scrolled past top of viewport?
+      const scrolled = -rect.top;
+      const progress = Math.max(0, Math.min(1, scrolled / scrollableHeight));
+
+      // Map progress smoothly into card indexes
+      const newActive = Math.min(totalCards - 1, Math.floor(progress * totalCards));
+      if (newActive !== activeRef.current) {
+        setActive(newActive);
+      }
+    });
   }, [totalCards]);
 
   useEffect(() => {
     window.addEventListener("scroll", handleScroll, { passive: true });
     handleScroll();
-    return () => window.removeEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      if (rafId.current !== null) {
+        cancelAnimationFrame(rafId.current);
+      }
+    };
   }, [handleScroll]);
 
   // Smooth programmatic scroll when clicking a card or chevron

@@ -37,7 +37,7 @@ export default function RoomGallery({ images, title }: RoomGalleryProps) {
           src={currentImage}
           alt={`${title} - Photo ${activeIndex + 1}`}
           fill
-          unoptimized
+          sizes="(max-width: 768px) 100vw, 900px"
           className="object-cover transition-all duration-700 ease-out"
           priority
         />
@@ -87,7 +87,7 @@ export default function RoomGallery({ images, title }: RoomGalleryProps) {
                 src={img}
                 alt={`${title} thumbnail ${index + 1}`}
                 fill
-                unoptimized
+                sizes="(max-width: 768px) 96px, 128px"
                 loading="lazy"
                 className="object-cover"
               />

@@ -88,6 +88,7 @@ export default function HeroSection({ children }: HeroSectionProps) {
           loop
           muted
           playsInline
+          preload="metadata"
           suppressHydrationWarning
           className="w-full h-full object-cover"
           src="/for-website.webm"

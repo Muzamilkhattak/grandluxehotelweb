@@ -55,7 +55,7 @@ export default function RestaurantSection({ settings: propSettings, items: propI
       category: "starters" as const,
       price: "NOK 390",
       description: "Arctic king crab cluster steamed over seaweed broth with golden saffron & sea fennel.",
-      image: "https://images.unsplash.com/photo-1544148103-0773bf10d330?q=80&w=800&auto=format&fit=crop",
+      image: "https://images.unsplash.com/photo-1544148103-0773bf10d330?q=75&w=300&auto=format&fit=crop",
     },
     {
       id: "5",
@@ -172,6 +172,8 @@ export default function RestaurantSection({ settings: propSettings, items: propI
                         src={item.image}
                         alt={item.name}
                         fill
+                        sizes="(max-width: 640px) 64px, 80px"
+                        loading="lazy"
                         className="object-cover group-hover:scale-110 transition-transform duration-500 ease-out"
                       />
                     </div>
