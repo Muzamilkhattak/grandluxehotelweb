@@ -47,8 +47,8 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  // Protect /profile route: requires logged in user
-  if (pathname.startsWith("/profile")) {
+  // Protect /profile route: requires logged in user (only for page navigations, not server actions)
+  if (pathname.startsWith("/profile") && !request.headers.has("next-action")) {
     if (!user) {
       const loginUrl = new URL("/login", request.url);
       loginUrl.searchParams.set("redirect", pathname);

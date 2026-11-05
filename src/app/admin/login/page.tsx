@@ -93,145 +93,142 @@ function AdminLoginForm() {
             <Image
               src="/images/logo/signaturearthotellogo.webp"
               alt="Signature Art Hotel"
-              width={240}
-              height={130}
+              width={220}
+              height={120}
               priority
-              className="h-20 w-auto object-contain drop-shadow-[0_4px_24px_rgba(215,181,109,0.3)] transition-transform group-hover:scale-105 duration-300"
+              className="h-16 w-auto object-contain transition-opacity group-hover:opacity-90"
             />
           </Link>
-          <p className="text-[11.5px] tracking-[0.28em] uppercase text-[#d7b56d] font-semibold bg-[#d7b56d]/10 border border-[#d7b56d]/30 px-3.5 py-1 rounded-full">
+          <span className="text-[11px] tracking-wider uppercase text-[#d7b56d] font-medium bg-[#d7b56d]/10 border border-[#d7b56d]/25 px-3 py-0.5 rounded-full">
             Executive Admin Portal
-          </p>
+          </span>
         </div>
 
         {/* Login Box */}
-        <div className="bg-[#0f1319] border border-[#d7b56d]/35 rounded-2xl shadow-[0_25px_70px_-15px_rgba(0,0,0,0.95),0_0_40px_rgba(215,181,109,0.12)] overflow-hidden relative">
+        <div className="bg-[#0c0d0e] border border-zinc-800 rounded-xl shadow-2xl overflow-hidden relative">
           {/* Top Gold Accent Highlight */}
-          <div className="h-[3px] w-full bg-gradient-to-r from-transparent via-[#d7b56d] to-transparent shadow-[0_0_12px_rgba(215,181,109,0.8)]" />
+          <div className="h-[2px] w-full bg-[#d7b56d]" />
           
-          <div className="p-7 md:p-9">
-          
-          <div className="flex items-center justify-between pb-5 border-b border-white/5 mb-6">
-            <div className="flex items-center gap-2">
-              <ShieldCheck size={18} className="text-[#d7b56d]" />
-              <span className="text-xs font-semibold uppercase tracking-widest text-white/90">
-                Secure Authentication
+          <div className="p-7 md:p-8">
+            <div className="flex items-center justify-between pb-4 border-b border-zinc-800/80 mb-6">
+              <div className="flex items-center gap-2">
+                <ShieldCheck size={16} className="text-[#d7b56d]" />
+                <span className="text-xs font-medium uppercase tracking-wider text-zinc-300">
+                  Secure Authentication
+                </span>
+              </div>
+              <span className="inline-flex items-center gap-1.5 text-[11px] text-emerald-400 bg-emerald-950/40 border border-emerald-500/30 px-2.5 py-0.5 rounded-full font-medium">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                Protected
               </span>
             </div>
-            <span className="inline-flex items-center gap-1.5 text-[11px] text-emerald-400 bg-emerald-950/40 border border-emerald-500/30 px-2.5 py-0.5 rounded-full font-medium">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              Protected
-            </span>
-          </div>
 
-          {errorMessage && (
-            <div className="mb-6 p-3.5 bg-red-950/50 border border-red-500/40 rounded-xl text-red-300 text-xs flex items-start gap-2.5">
-              <div className="w-1.5 h-1.5 rounded-full bg-red-400 mt-1.5 shrink-0" />
-              <span>{errorMessage}</span>
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit} className="space-y-5">
-            {/* Username field */}
-            <div className="space-y-1.5">
-              <label className="block text-xs font-medium text-white/70 uppercase tracking-wider">
-                Username
-              </label>
-              <div className="relative flex items-center">
-                <div className="absolute left-3.5 text-white/40 pointer-events-none">
-                  <User size={17} />
-                </div>
-                <input
-                  type="text"
-                  required
-                  autoFocus
-                  autoComplete="username"
-                  placeholder="Enter admin username"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  className="w-full bg-[#181e25] border border-white/10 rounded-xl pl-10 pr-4 py-3 text-sm text-white placeholder-white/30 focus:outline-none focus:border-[#d7b56d] focus:ring-1 focus:ring-[#d7b56d] transition-all"
-                />
+            {errorMessage && (
+              <div className="mb-6 p-3 bg-red-950/40 border border-red-500/30 rounded-lg text-red-300 text-xs flex items-start gap-2.5">
+                <div className="w-1.5 h-1.5 rounded-full bg-red-400 mt-1.5 shrink-0" />
+                <span>{errorMessage}</span>
               </div>
-            </div>
+            )}
 
-            {/* Password field */}
-            <div className="space-y-1.5">
-              <div className="flex items-center justify-between">
-                <label className="block text-xs font-medium text-white/70 uppercase tracking-wider">
+            <form onSubmit={handleSubmit} className="space-y-4">
+              {/* Username field */}
+              <div className="space-y-1.5">
+                <label className="block text-xs font-medium text-zinc-400 uppercase tracking-wider">
+                  Username
+                </label>
+                <div className="relative flex items-center">
+                  <div className="absolute left-3.5 text-zinc-500 pointer-events-none">
+                    <User size={16} />
+                  </div>
+                  <input
+                    type="text"
+                    required
+                    autoFocus
+                    autoComplete="username"
+                    placeholder="Enter admin username"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    className="w-full bg-zinc-900/90 border border-zinc-800 rounded-lg pl-10 pr-4 py-2.5 text-sm text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-[#d7b56d] focus:ring-1 focus:ring-[#d7b56d] transition-colors"
+                  />
+                </div>
+              </div>
+
+              {/* Password field */}
+              <div className="space-y-1.5">
+                <label className="block text-xs font-medium text-zinc-400 uppercase tracking-wider">
                   Password
                 </label>
-              </div>
-              <div className="relative flex items-center">
-                <div className="absolute left-3.5 text-white/40 pointer-events-none">
-                  <Lock size={17} />
+                <div className="relative flex items-center">
+                  <div className="absolute left-3.5 text-zinc-500 pointer-events-none">
+                    <Lock size={16} />
+                  </div>
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    required
+                    autoComplete="current-password"
+                    placeholder="Enter admin password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="w-full bg-zinc-900/90 border border-zinc-800 rounded-lg pl-10 pr-11 py-2.5 text-sm text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-[#d7b56d] focus:ring-1 focus:ring-[#d7b56d] transition-colors"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    tabIndex={-1}
+                    className="absolute right-3 text-zinc-500 hover:text-zinc-300 p-1 transition-colors"
+                  >
+                    {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
+                  </button>
                 </div>
-                <input
-                  type={showPassword ? "text" : "password"}
-                  required
-                  autoComplete="current-password"
-                  placeholder="Enter admin password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full bg-[#181e25] border border-white/10 rounded-xl pl-10 pr-11 py-3 text-sm text-white placeholder-white/30 focus:outline-none focus:border-[#d7b56d] focus:ring-1 focus:ring-[#d7b56d] transition-all"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  tabIndex={-1}
-                  className="absolute right-3 text-white/40 hover:text-white/80 p-1 transition-colors"
-                >
-                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                </button>
               </div>
-            </div>
 
-            {/* Submit button */}
-            <button
-              type="submit"
-              disabled={isPending || isLocked}
-              className="w-full mt-2 py-3.5 px-4 bg-gradient-to-r from-[#d7b56d] to-[#997a4d] hover:from-[#d2b68e] hover:to-[#a88755] active:scale-[0.99] text-[#111] font-semibold text-sm rounded-xl transition-all shadow-lg shadow-[#d7b56d]/20 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed group"
-            >
-              {isPending ? (
-                <>
-                  <Loader2 size={17} className="animate-spin text-[#111]" />
-                  <span>Verifying Credentials...</span>
-                </>
-              ) : isLocked ? (
-                <>
-                  <Lock size={16} className="text-red-950" />
-                  <span>Temporarily Locked ({lockoutCountdown}s)</span>
-                </>
-              ) : (
-                <>
-                  <KeyRound size={16} />
-                  <span>Sign In to Admin Panel</span>
-                  <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
-                </>
-              )}
-            </button>
-          </form>
+              {/* Submit button */}
+              <button
+                type="submit"
+                disabled={isPending || isLocked}
+                className="w-full mt-2 py-2.5 px-4 bg-[#d7b56d] hover:bg-[#c9a65c] text-zinc-950 font-medium text-sm rounded-lg transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed group shadow-sm"
+              >
+                {isPending ? (
+                  <>
+                    <Loader2 size={16} className="animate-spin text-zinc-950" />
+                    <span>Verifying credentials...</span>
+                  </>
+                ) : isLocked ? (
+                  <>
+                    <Lock size={15} className="text-zinc-950" />
+                    <span>Temporarily locked ({lockoutCountdown}s)</span>
+                  </>
+                ) : (
+                  <>
+                    <KeyRound size={15} />
+                    <span>Sign in to admin panel</span>
+                    <ArrowRight size={15} className="group-hover:translate-x-0.5 transition-transform" />
+                  </>
+                )}
+              </button>
+            </form>
 
-          {/* Quick Info & Help */}
-          <div className="mt-7 pt-5 border-t border-white/5 flex items-center justify-between text-[11px] text-white/40">
-            <div className="flex items-center gap-1.5">
-              <Sparkles size={13} className="text-[#d7b56d]/70" />
-              <span>Encrypted Session</span>
+            {/* Quick Info & Help */}
+            <div className="mt-6 pt-4 border-t border-zinc-800/80 flex items-center justify-between text-[11px] text-zinc-500">
+              <div className="flex items-center gap-1.5">
+                <Sparkles size={12} className="text-[#d7b56d]" />
+                <span>Encrypted session</span>
+              </div>
+              <Link
+                href="/"
+                className="text-[#d7b56d] hover:underline transition-colors flex items-center gap-1"
+              >
+                <Building2 size={12} />
+                <span>Back to public site</span>
+              </Link>
             </div>
-            <Link
-              href="/"
-              className="text-[#d7b56d] hover:text-white transition-colors flex items-center gap-1"
-            >
-              <Building2 size={13} />
-              <span>Back to Public Site</span>
-            </Link>
           </div>
         </div>
-      </div>
 
-      {/* Security footer note */}
-      <p className="text-center text-[11px] text-white/30 mt-6 tracking-wide">
-        Signature Art Hotel Management System &bull; Authorized Personnel Only
-      </p>
+        {/* Security footer note */}
+        <p className="text-center text-[11px] text-zinc-500 mt-6 tracking-wide">
+          Signature Art Hotel management system &bull; Authorized personnel only
+        </p>
     </div>
   </div>
 );

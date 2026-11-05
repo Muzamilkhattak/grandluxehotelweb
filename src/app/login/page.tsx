@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { loginAction, signupAction } from "@/app/actions/auth";
+import { createClient } from "@/utils/supabase/client";
 import {
   Loader2,
   Mail,
@@ -85,10 +86,18 @@ function LoginFormContent() {
             ? "Signed in successfully! Redirecting..."
             : "Account created successfully! Redirecting..."
         );
+        // Instantly sync client-side Supabase and notify Navbar before navigation
+        try {
+          const supabase = createClient();
+          await supabase.auth.getUser();
+          window.dispatchEvent(new Event("supabase-auth-change"));
+        } catch {}
+
         setTimeout(() => {
+          window.dispatchEvent(new Event("supabase-auth-change"));
           router.push(redirectUrl);
           router.refresh();
-        }, 500);
+        }, 300);
       }
     } else {
       setError(res.error || "An unexpected error occurred. Please try again.");

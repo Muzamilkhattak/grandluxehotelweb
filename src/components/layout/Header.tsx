@@ -25,16 +25,52 @@ export default function Header() {
 
   useEffect(() => {
     const supabase = createClient();
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      setUser(user);
-    });
+    let isMounted = true;
 
+    const syncUser = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (isMounted) {
+          setUser(user ?? null);
+        }
+      } catch {
+        if (isMounted) setUser(null);
+      }
+    };
+
+    // Initial check
+    syncUser();
+
+    // Listen to real-time auth state events from Supabase client
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
+      if (isMounted) {
+        setUser(session?.user ?? null);
+      }
     });
 
-    return () => subscription.unsubscribe();
+    // Custom instant synchronization event across server action redirects
+    const handleAuthChange = () => {
+      syncUser();
+    };
+
+    window.addEventListener("supabase-auth-change", handleAuthChange);
+
+    return () => {
+      isMounted = false;
+      subscription.unsubscribe();
+      window.removeEventListener("supabase-auth-change", handleAuthChange);
+    };
   }, []);
+
+  // Re-sync user immediately whenever pathname changes (e.g. right after login, signup, or logout navigation)
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      setUser(user ?? null);
+    }).catch(() => {
+      setUser(null);
+    });
+  }, [pathname]);
 
   // Compute display name for authenticated user
   const displayName = user
@@ -141,6 +177,7 @@ export default function Header() {
             {/* User Account / Profile Button */}
             <Link 
               href={user ? "/profile" : "/login"} 
+              prefetch={true}
               className={`relative z-30 flex items-center gap-1.5 font-jost text-[12px] sm:text-[13px] uppercase tracking-[0.12em] py-1 sm:py-1.5 px-1.5 sm:px-2 rounded-full transition-all group whitespace-nowrap cursor-pointer touch-manipulation ${
                 (pathname === "/profile" || pathname === "/login")
                   ? "text-[#d7b56d] bg-white/10"
@@ -273,6 +310,7 @@ export default function Header() {
               </span>
               <Link 
                 href={user ? "/profile" : "/login"} 
+                prefetch={true}
                 onClick={handleLinkClick} 
                 className={`flex items-center gap-2 text-[#FFFFFF]/90 hover:text-[#d7b56d] transition-colors ${
                   (pathname === "/profile" || pathname === "/login") ? "text-[#d7b56d]" : ""

@@ -1,6 +1,6 @@
 import { createClient } from "@/utils/supabase/server";
 import { cookies } from "next/headers";
-import { DollarSign, Percent, CalendarCheck, Clock } from "lucide-react";
+import { Percent, CalendarCheck, Clock, TrendingUp } from "lucide-react";
 import RecentBookingsTable from "@/components/admin/RecentBookingsTable";
 
 export default async function AdminDashboardPage() {
@@ -21,69 +21,90 @@ export default async function AdminDashboardPage() {
   const activeReservations = bookings?.filter(b => b.status === 'confirmed').length || 0;
   
   return (
-    <div className="max-w-6xl mx-auto space-y-6">
-      <div className="flex flex-col gap-1 mb-2">
-        <h1 className="text-[23px] font-normal text-[#1d2327]">Dashboard</h1>
+    <div className="max-w-7xl mx-auto space-y-6">
+      {/* Page Title Header */}
+      <div>
+        <h1 className="text-xl md:text-2xl font-semibold text-zinc-900 tracking-tight">Overview</h1>
+        <p className="text-xs md:text-sm text-zinc-500 mt-0.5">
+          Real-time operations, occupancy tracking, and recent guest reservations.
+        </p>
       </div>
 
-      {/* KPI Analytics Grid - WP Style Widgets */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <WPWidgetCard 
-          title="Total Revenue" 
+      {/* KPI Analytics Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <MetricCard 
+          label="Total revenue" 
           value={`PKR ${totalRevenue.toLocaleString()}`} 
-          trend="+14% vs last month" 
-          icon={<span className="text-[12px] font-bold text-[#2271b1] px-1 py-0.5 border border-[#2271b1]/40 rounded">PKR</span>} 
-          positive 
+          comparison="+14% vs last month"
+          icon={<TrendingUp size={16} className="text-emerald-600" />}
+          positive
         />
-        <WPWidgetCard 
-          title="Live Occupancy Rate" 
+        <MetricCard 
+          label="Live occupancy" 
           value="84%" 
-          trend="Optimal capacity" 
-          icon={<Percent size={20} className="text-[#2271b1]" />} 
-          positive={false} 
+          comparison="Target 80% achieved"
+          icon={<Percent size={16} className="text-zinc-500" />}
         />
-        <WPWidgetCard 
-          title="Active Reservations" 
+        <MetricCard 
+          label="Active reservations" 
           value={activeReservations.toString()} 
-          trend="Next 7 days" 
-          icon={<CalendarCheck size={20} className="text-[#2271b1]" />} 
-          positive={false} 
+          comparison="Upcoming 7 days"
+          icon={<CalendarCheck size={16} className="text-zinc-500" />}
         />
-        <WPWidgetCard 
-          title="Pending Check-ins" 
+        <MetricCard 
+          label="Pending check-ins" 
           value="3" 
-          trend="Requires attention" 
-          icon={<Clock size={20} className="text-[#d63638]" />} 
-          positive={false}
+          comparison="Requires front-desk confirmation"
+          icon={<Clock size={16} className="text-amber-600" />}
           alert
         />
       </div>
 
-      <div className="pt-2">
-        <div className="bg-white border border-[#c3c4c7] shadow-sm">
-          <div className="px-4 py-3 border-b border-[#c3c4c7]">
-            <h2 className="text-[14px] font-semibold text-[#1d2327]">Recent Reservations</h2>
+      {/* Recent Reservations Table Container */}
+      <div className="bg-white border border-zinc-200/80 rounded-xl overflow-hidden shadow-xs">
+        <div className="px-5 py-4 border-b border-zinc-200/80 flex items-center justify-between">
+          <div>
+            <h2 className="text-sm font-semibold text-zinc-900">Recent reservations</h2>
+            <p className="text-xs text-zinc-500 mt-0.5">Live booking transactions and guest arrival status.</p>
           </div>
-          <div className="p-4">
-            <RecentBookingsTable initialBookings={bookings || []} />
-          </div>
+        </div>
+        <div className="p-5">
+          <RecentBookingsTable initialBookings={bookings || []} />
         </div>
       </div>
     </div>
   );
 }
 
-function WPWidgetCard({ title, value, trend, icon, positive, alert }: any) {
+function MetricCard({ 
+  label, 
+  value, 
+  comparison, 
+  icon, 
+  positive, 
+  alert 
+}: { 
+  label: string; 
+  value: string; 
+  comparison: string; 
+  icon: React.ReactNode; 
+  positive?: boolean; 
+  alert?: boolean; 
+}) {
   return (
-    <div className="bg-white border border-[#c3c4c7] shadow-sm">
-      <div className="px-4 py-3 border-b border-[#c3c4c7] flex justify-between items-center bg-[#f6f7f7]">
-        <h3 className="text-[14px] font-semibold text-[#1d2327]">{title}</h3>
-        <div>{icon}</div>
+    <div className="bg-white border border-zinc-200/80 rounded-xl p-5 shadow-xs flex flex-col justify-between">
+      <div className="flex items-center justify-between">
+        <span className="text-xs font-medium text-zinc-500">{label}</span>
+        <div className="w-7 h-7 rounded-lg bg-zinc-50 border border-zinc-200/60 flex items-center justify-center shrink-0">
+          {icon}
+        </div>
       </div>
-      <div className="p-4">
-        <div className="text-[28px] font-normal text-[#1d2327] mb-2 leading-none">{value}</div>
-        <div className={`text-[13px] ${alert ? 'text-[#d63638]' : positive ? 'text-[#00a32a]' : 'text-[#50575e]'}`}>
-          {trend}
+      <div className="mt-3">
+        <div className="text-2xl font-semibold text-zinc-900 tracking-tight tabular-nums">{value}</div>
+        <div className={`text-xs mt-1 font-medium ${
+          alert ? 'text-amber-600' : positive ? 'text-emerald-600' : 'text-zinc-500'
+        }`}>
+          {comparison}
         </div>
       </div>
     </div>

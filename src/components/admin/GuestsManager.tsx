@@ -1,10 +1,9 @@
-﻿"use client";
+"use client";
 
 import { useState, useMemo } from "react";
 import { 
   Users, 
   Crown, 
-  DollarSign, 
   Repeat, 
   Search, 
   Download, 
@@ -14,8 +13,6 @@ import {
   X, 
   Eye, 
   BedDouble, 
-  Clock, 
-  ChevronRight,
   FileText
 } from "lucide-react";
 
@@ -80,7 +77,7 @@ export default function GuestsManager({ guests }: { guests: GuestProfile[] }) {
   }, [guests, statusFilter, searchQuery, sortBy]);
 
   const handleExportCSV = () => {
-    const headers = ["Name", "Email", "Phone", "Status", "Total Stays", "Total Spent ($)", "First Stay", "Last Stay"];
+    const headers = ["Name", "Email", "Phone", "Status", "Total Stays", "Total Spent (PKR)", "First Stay", "Last Stay"];
     const rows = filteredGuests.map((g) => [
       `"${g.name.replace(/"/g, '""')}"`,
       `"${g.email.replace(/"/g, '""')}"`,
@@ -113,110 +110,119 @@ export default function GuestsManager({ guests }: { guests: GuestProfile[] }) {
   };
 
   return (
-    <div className="max-w-6xl mx-auto space-y-6">
+    <div className="max-w-7xl mx-auto space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-[23px] font-normal text-[#1d2327]">Guests Directory</h1>
-          <p className="text-[13px] text-[#50575e] mt-0.5">
-            Manage guest profiles, loyalty status, preferences, and booking history.
+          <h1 className="text-xl md:text-2xl font-semibold text-zinc-900 tracking-tight">Guest directory</h1>
+          <p className="text-xs md:text-sm text-zinc-500 mt-0.5">
+            Registered guest profiles, VIP recognition, and stay history.
           </p>
         </div>
         <button
           onClick={handleExportCSV}
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#2271b1] hover:bg-[#135e96] text-white text-[13px] font-medium rounded-[3px] shadow-sm transition-colors self-start sm:self-auto"
+          className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-medium rounded-lg shadow-xs transition-colors self-start sm:self-auto cursor-pointer"
         >
-          <Download size={15} />
-          <span>Export Guests (CSV)</span>
+          <Download size={14} />
+          <span>Export CSV</span>
         </button>
       </div>
 
       {/* Analytics KPI Widgets */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white border border-[#c3c4c7] shadow-sm">
-          <div className="px-4 py-2.5 border-b border-[#c3c4c7] flex justify-between items-center bg-[#f6f7f7]">
-            <h3 className="text-[13px] font-semibold text-[#1d2327]">Total Guests</h3>
-            <Users size={18} className="text-[#2271b1]" />
+        <div className="bg-white border border-zinc-200/80 rounded-xl p-5 shadow-xs flex flex-col justify-between">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-medium text-zinc-500">Total profiles</span>
+            <div className="w-7 h-7 rounded-lg bg-zinc-50 border border-zinc-200/60 flex items-center justify-center shrink-0">
+              <Users size={15} className="text-zinc-500" />
+            </div>
           </div>
-          <div className="p-4">
-            <div className="text-[26px] font-normal text-[#1d2327] mb-1">{totalGuestsCount}</div>
-            <div className="text-[12px] text-[#50575e]">Registered hotel profiles</div>
-          </div>
-        </div>
-
-        <div className="bg-white border border-[#c3c4c7] shadow-sm">
-          <div className="px-4 py-2.5 border-b border-[#c3c4c7] flex justify-between items-center bg-[#f6f7f7]">
-            <h3 className="text-[13px] font-semibold text-[#1d2327]">VIP Guests</h3>
-            <Crown size={18} className="text-[#dba617]" />
-          </div>
-          <div className="p-4">
-            <div className="text-[26px] font-normal text-[#1d2327] mb-1">{vipCount}</div>
-            <div className="text-[12px] text-[#dba617] font-medium">Top tier frequent travelers</div>
+          <div className="mt-3">
+            <div className="text-2xl font-semibold text-zinc-900 tracking-tight tabular-nums">{totalGuestsCount}</div>
+            <div className="text-xs mt-1 text-zinc-500 font-medium">Verified hotel guests</div>
           </div>
         </div>
 
-        <div className="bg-white border border-[#c3c4c7] shadow-sm">
-          <div className="px-4 py-2.5 border-b border-[#c3c4c7] flex justify-between items-center bg-[#f6f7f7]">
-            <h3 className="text-[13px] font-semibold text-[#1d2327]">Repeat Guest Rate</h3>
-            <Repeat size={18} className="text-[#00a32a]" />
+        <div className="bg-white border border-zinc-200/80 rounded-xl p-5 shadow-xs flex flex-col justify-between">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-medium text-zinc-500">VIP guests</span>
+            <div className="w-7 h-7 rounded-lg bg-amber-50 border border-amber-200/60 flex items-center justify-center shrink-0">
+              <Crown size={15} className="text-amber-600" />
+            </div>
           </div>
-          <div className="p-4">
-            <div className="text-[26px] font-normal text-[#1d2327] mb-1">{repeatRate}%</div>
-            <div className="text-[12px] text-[#00a32a] font-medium">{returningCount} returning guests</div>
+          <div className="mt-3">
+            <div className="text-2xl font-semibold text-zinc-900 tracking-tight tabular-nums">{vipCount}</div>
+            <div className="text-xs mt-1 text-amber-600 font-medium">Top-tier loyalty tier</div>
           </div>
         </div>
 
-        <div className="bg-white border border-[#c3c4c7] shadow-sm">
-          <div className="px-4 py-2.5 border-b border-[#c3c4c7] flex justify-between items-center bg-[#f6f7f7]">
-            <h3 className="text-[13px] font-semibold text-[#1d2327]">Avg. Lifetime Value</h3>
-            <span className="text-[11px] font-bold text-[#2271b1] px-1 border border-[#2271b1]/40 rounded">PKR</span>
+        <div className="bg-white border border-zinc-200/80 rounded-xl p-5 shadow-xs flex flex-col justify-between">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-medium text-zinc-500">Repeat guest rate</span>
+            <div className="w-7 h-7 rounded-lg bg-emerald-50 border border-emerald-200/60 flex items-center justify-center shrink-0">
+              <Repeat size={15} className="text-emerald-600" />
+            </div>
           </div>
-          <div className="p-4">
-            <div className="text-[26px] font-normal text-[#1d2327] mb-1">PKR {avgLtv.toLocaleString()}</div>
-            <div className="text-[12px] text-[#50575e]">Total PKR {totalRevenue.toLocaleString()} volume</div>
+          <div className="mt-3">
+            <div className="text-2xl font-semibold text-zinc-900 tracking-tight tabular-nums">{repeatRate}%</div>
+            <div className="text-xs mt-1 text-emerald-600 font-medium">{returningCount} returning guests</div>
+          </div>
+        </div>
+
+        <div className="bg-white border border-zinc-200/80 rounded-xl p-5 shadow-xs flex flex-col justify-between">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-medium text-zinc-500">Average spend</span>
+            <div className="w-7 h-7 rounded-lg bg-zinc-50 border border-zinc-200/60 flex items-center justify-center shrink-0">
+              <span className="text-[10px] font-bold text-zinc-600">PKR</span>
+            </div>
+          </div>
+          <div className="mt-3">
+            <div className="text-2xl font-semibold text-zinc-900 tracking-tight tabular-nums">PKR {avgLtv.toLocaleString()}</div>
+            <div className="text-xs mt-1 text-zinc-500 font-medium">Per guest profile</div>
           </div>
         </div>
       </div>
 
       {/* Main Table Container */}
-      <div className="bg-white border border-[#c3c4c7] shadow-sm">
+      <div className="bg-white border border-zinc-200/80 rounded-xl overflow-hidden shadow-xs">
         {/* Toolbar & Filter Bar */}
-        <div className="p-3 border-b border-[#c3c4c7] flex flex-col md:flex-row justify-between items-stretch md:items-center gap-3 bg-[#f6f7f7]">
+        <div className="p-4 border-b border-zinc-200/80 flex flex-col md:flex-row justify-between items-stretch md:items-center gap-3">
           {/* Status Tabs */}
-          <div className="flex items-center gap-3 text-[13px] overflow-x-auto pb-1 md:pb-0">
-            {(["All", "VIP", "Returning", "New"] as const).map((tab, idx) => (
+          <div className="inline-flex p-1 bg-zinc-100 rounded-lg self-start">
+            {(["All", "VIP", "Returning", "New"] as const).map((tab) => (
               <button
                 key={tab}
+                type="button"
                 onClick={() => setStatusFilter(tab)}
-                className={`transition-colors whitespace-nowrap ${
+                className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
                   statusFilter === tab
-                    ? "text-[#1d2327] font-semibold"
-                    : "text-[#2271b1] hover:text-[#135e96]"
+                    ? "bg-white text-zinc-900 shadow-xs"
+                    : "text-zinc-600 hover:text-zinc-900"
                 }`}
               >
-                {tab} {tab === "All" ? `(${guests.length})` : `(${guests.filter((g) => g.status === tab).length})`}
-                {idx < 3 && <span className="text-[#a7aaad] ml-3">|</span>}
+                {tab}
               </button>
             ))}
           </div>
 
           {/* Search & Sort Controls */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2.5">
             <div className="relative flex-1 md:w-64">
-              <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[#8c8f94]" />
+              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" />
               <input
                 type="text"
-                placeholder="Search guest by name, email, phone..."
+                placeholder="Search by name, email, phone..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-white border border-[#8c8f94] rounded-[3px] pl-8 pr-3 py-1.5 text-[13px] text-[#3c434a] focus:outline-none focus:border-[#2271b1] focus:ring-1 focus:ring-[#2271b1]"
+                className="w-full h-9 bg-white border border-zinc-200 rounded-lg pl-9 pr-7 text-xs text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:border-zinc-400 focus:ring-1 focus:ring-zinc-400"
               />
               {searchQuery && (
                 <button
+                  type="button"
                   onClick={() => setSearchQuery("")}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 text-[#8c8f94] hover:text-[#1d2327]"
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600"
                 >
-                  <X size={14} />
+                  <X size={13} />
                 </button>
               )}
             </div>
@@ -224,51 +230,58 @@ export default function GuestsManager({ guests }: { guests: GuestProfile[] }) {
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as any)}
-              className="bg-white border border-[#8c8f94] rounded-[3px] px-2 py-1.5 text-[13px] text-[#3c434a] focus:outline-none focus:border-[#2271b1]"
+              className="h-9 bg-white border border-zinc-200 rounded-lg px-2.5 text-xs text-zinc-700 focus:outline-none focus:border-zinc-400 cursor-pointer"
             >
-              <option value="recent">Sort: Most Recent</option>
-              <option value="spent">Sort: Highest Spend</option>
-              <option value="bookings">Sort: Most Stays</option>
-              <option value="name">Sort: Name (A-Z)</option>
+              <option value="recent">Sort: Most recent</option>
+              <option value="spent">Sort: Highest spend</option>
+              <option value="bookings">Sort: Most stays</option>
+              <option value="name">Sort: Name (A–Z)</option>
             </select>
           </div>
         </div>
 
         {/* Guests Table */}
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-[13px] text-[#3c434a]">
-            <thead className="bg-[#f6f7f7] border-b border-[#c3c4c7]">
+          <table className="w-full text-left text-xs">
+            <thead className="bg-zinc-50/80 border-b border-zinc-200/80 text-zinc-500 font-medium">
               <tr>
-                <th className="px-4 py-2.5 font-semibold text-[#1d2327]">Guest</th>
-                <th className="px-4 py-2.5 font-semibold text-[#1d2327]">Contact Details</th>
-                <th className="px-4 py-2.5 font-semibold text-[#1d2327]">Tier Status</th>
-                <th className="px-4 py-2.5 font-semibold text-[#1d2327]">Total Stays</th>
-                <th className="px-4 py-2.5 font-semibold text-[#1d2327]">Total Spend</th>
-                <th className="px-4 py-2.5 font-semibold text-[#1d2327]">Last Check-in</th>
-                <th className="px-4 py-2.5 font-semibold text-right text-[#1d2327]">Actions</th>
+                <th className="px-4 py-3">Guest profile</th>
+                <th className="px-4 py-3">Contact details</th>
+                <th className="px-4 py-3">Tier</th>
+                <th className="px-4 py-3">Total stays</th>
+                <th className="px-4 py-3 text-right">Lifetime spend</th>
+                <th className="px-4 py-3">Last stay</th>
+                <th className="px-4 py-3 text-right">Action</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#c3c4c7]">
-              {filteredGuests.map((guest, idx) => {
+            <tbody className="divide-y divide-zinc-200/80 bg-white">
+              {filteredGuests.map((guest) => {
+                const tierStyle = 
+                  guest.status === "VIP" 
+                    ? "bg-amber-50 text-amber-800 border-amber-200/70"
+                    : guest.status === "Returning"
+                    ? "bg-emerald-50 text-emerald-800 border-emerald-200/70"
+                    : "bg-zinc-100 text-zinc-700 border-zinc-200/70";
+
                 return (
                   <tr
                     key={guest.id}
-                    className={`${idx % 2 === 0 ? "bg-white" : "bg-[#f6f7f7]"} hover:bg-[#f0f0f1] transition-colors group cursor-pointer`}
+                    className="hover:bg-zinc-50/60 transition-colors cursor-pointer group"
                     onClick={() => setSelectedGuest(guest)}
                   >
                     {/* Guest Name & Avatar */}
-                    <td className="px-4 py-3 align-top">
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-[#1d2327] text-white flex items-center justify-center font-semibold text-[12px] shrink-0 shadow-sm">
+                    <td className="px-4 py-3.5 align-middle">
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-7 h-7 rounded-full bg-zinc-800 text-white flex items-center justify-center font-medium text-[11px] shrink-0">
                           {getInitials(guest.name)}
                         </div>
-                        <div>
-                          <strong className="text-[#1d2327] hover:text-[#2271b1] transition-colors block text-[13.5px]">
+                        <div className="min-w-0">
+                          <span className="font-medium text-zinc-900 group-hover:text-zinc-950 transition-colors block truncate">
                             {guest.name}
-                          </strong>
+                          </span>
                           {guest.notes.length > 0 && (
-                            <span className="inline-flex items-center gap-1 text-[11px] text-[#dba617] font-medium mt-0.5">
-                              <FileText size={11} /> {guest.notes.length} note{guest.notes.length > 1 ? "s" : ""}
+                            <span className="inline-flex items-center gap-1 text-[11px] text-amber-700 font-medium mt-0.5">
+                              <FileText size={11} /> {guest.notes.length} {guest.notes.length > 1 ? "notes" : "note"}
                             </span>
                           )}
                         </div>
@@ -276,17 +289,15 @@ export default function GuestsManager({ guests }: { guests: GuestProfile[] }) {
                     </td>
 
                     {/* Contact info */}
-                    <td className="px-4 py-3 align-top">
-                      <div className="space-y-0.5 text-[12.5px]">
-                        <div className="flex items-center gap-1.5 text-[#50575e]">
-                          <Mail size={12} className="text-[#8c8f94] shrink-0" />
-                          <span className="text-[#2271b1] hover:underline" onClick={(e) => { e.stopPropagation(); window.location.href = `mailto:${guest.email}`; }}>
-                            {guest.email || "No email"}
-                          </span>
+                    <td className="px-4 py-3.5 align-middle text-zinc-600">
+                      <div className="space-y-0.5 text-[11.5px]">
+                        <div className="flex items-center gap-1.5">
+                          <Mail size={12} className="text-zinc-400 shrink-0" />
+                          <span className="truncate">{guest.email || "No email"}</span>
                         </div>
                         {guest.phone && (
-                          <div className="flex items-center gap-1.5 text-[#50575e]">
-                            <Phone size={12} className="text-[#8c8f94] shrink-0" />
+                          <div className="flex items-center gap-1.5 text-zinc-500 tabular-nums">
+                            <Phone size={12} className="text-zinc-400 shrink-0" />
                             <span>{guest.phone}</span>
                           </div>
                         )}
@@ -294,47 +305,40 @@ export default function GuestsManager({ guests }: { guests: GuestProfile[] }) {
                     </td>
 
                     {/* Status Badge */}
-                    <td className="px-4 py-3 align-top">
-                      <span
-                        className={`inline-flex items-center gap-1 px-2.5 py-0.5 text-[11.5px] rounded-[3px] font-medium border ${
-                          guest.status === "VIP"
-                            ? "bg-[#fcf8e3] text-[#000000] border-[#faebcc]"
-                            : guest.status === "Returning"
-                            ? "bg-[#e5f5fa] text-[#006ba1] border-[#bce8f1]"
-                            : "bg-[#f0f0f1] text-[#50575e] border-[#c3c4c7]"
-                        }`}
-                      >
-                        {guest.status === "VIP" && <Crown size={11} className="text-[#dba617]" />}
+                    <td className="px-4 py-3.5 align-middle">
+                      <span className={`inline-flex items-center gap-1 px-2 py-0.5 text-[11px] rounded-md font-medium border ${tierStyle}`}>
+                        {guest.status === "VIP" && <Crown size={11} className="text-amber-600" />}
                         {guest.status}
                       </span>
                     </td>
 
                     {/* Total Stays */}
-                    <td className="px-4 py-3 align-top font-medium text-[#1d2327]">
-                      {guest.totalBookings} {guest.totalBookings === 1 ? "booking" : "bookings"}
+                    <td className="px-4 py-3.5 align-middle font-medium text-zinc-900 tabular-nums">
+                      {guest.totalBookings} {guest.totalBookings === 1 ? "stay" : "stays"}
                     </td>
 
                     {/* Total Spend */}
-                    <td className="px-4 py-3 align-top font-semibold text-[#1d2327]">
+                    <td className="px-4 py-3.5 align-middle text-right font-medium text-zinc-900 tabular-nums">
                       PKR {guest.totalSpent.toLocaleString()}
                     </td>
 
                     {/* Last Stay */}
-                    <td className="px-4 py-3 align-top text-[#50575e]">
-                      {guest.lastStay ? new Date(guest.lastStay).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "N/A"}
+                    <td className="px-4 py-3.5 align-middle text-zinc-500 tabular-nums">
+                      {guest.lastStay ? new Date(guest.lastStay).toLocaleDateString("en-GB", { month: "short", day: "numeric", year: "numeric" }) : "N/A"}
                     </td>
 
                     {/* Action Button */}
-                    <td className="px-4 py-3 align-top text-right">
+                    <td className="px-4 py-3.5 align-middle text-right">
                       <button
+                        type="button"
                         onClick={(e) => {
                           e.stopPropagation();
                           setSelectedGuest(guest);
                         }}
-                        className="inline-flex items-center gap-1 text-[12px] text-[#2271b1] hover:text-[#135e96] hover:underline font-medium"
+                        className="inline-flex items-center gap-1 text-xs text-zinc-600 hover:text-zinc-900 font-medium px-2 py-1 rounded-md hover:bg-zinc-100 transition-colors cursor-pointer"
                       >
                         <Eye size={13} />
-                        <span>View Details</span>
+                        <span>View</span>
                       </button>
                     </td>
                   </tr>
@@ -343,105 +347,81 @@ export default function GuestsManager({ guests }: { guests: GuestProfile[] }) {
 
               {filteredGuests.length === 0 && (
                 <tr>
-                  <td colSpan={7} className="px-4 py-10 text-center text-[#50575e]">
-                    <Users size={32} className="mx-auto mb-2 text-[#c3c4c7]" />
-                    <p className="text-[14px] font-medium text-[#1d2327]">No guests matching your criteria</p>
-                    <p className="text-[12px] text-[#8c8f94] mt-0.5">Try clearing the search query or changing filters.</p>
+                  <td colSpan={7} className="px-4 py-12 text-center text-zinc-400">
+                    No guest profiles match the current filter or search criteria.
                   </td>
                 </tr>
               )}
             </tbody>
-            <tfoot className="bg-[#f6f7f7] border-t border-[#c3c4c7]">
-              <tr>
-                <td colSpan={7} className="px-4 py-2 text-[12px] text-[#50575e]">
-                  Showing {filteredGuests.length} of {guests.length} guest records
-                </td>
-              </tr>
-            </tfoot>
           </table>
         </div>
       </div>
 
-      {/* Guest Details Modal / Drawer */}
+      {/* Guest Details Modal */}
       {selectedGuest && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white w-full max-w-2xl max-h-[90vh] flex flex-col shadow-2xl border border-[#c3c4c7] rounded-none overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+        <div 
+          className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-150"
+          onClick={() => setSelectedGuest(null)}
+        >
+          <div 
+            className="bg-white w-full max-w-xl max-h-[85vh] flex flex-col shadow-2xl border border-zinc-200 rounded-xl overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
             {/* Modal Header */}
-            <div className="bg-[#1d2327] text-white px-6 py-4 flex items-center justify-between">
+            <div className="px-6 py-4 border-b border-zinc-200/80 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-[#2271b1] text-white flex items-center justify-center font-bold text-base shadow">
+                <div className="w-9 h-9 rounded-full bg-zinc-900 text-white flex items-center justify-center font-medium text-xs">
                   {getInitials(selectedGuest.name)}
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <h2 className="text-lg font-semibold text-white">{selectedGuest.name}</h2>
-                    <span
-                      className={`inline-flex items-center gap-1 px-2 py-0.5 text-[11px] rounded-[3px] font-medium ${
-                        selectedGuest.status === "VIP"
-                          ? "bg-[#dba617] text-black"
-                          : selectedGuest.status === "Returning"
-                          ? "bg-[#72aee6] text-[#1d2327]"
-                          : "bg-white/20 text-white"
-                      }`}
-                    >
-                      {selectedGuest.status === "VIP" && <Crown size={11} />}
+                    <h2 className="text-sm font-semibold text-zinc-900">{selectedGuest.name}</h2>
+                    <span className="text-[11px] font-medium px-2 py-0.5 rounded-md bg-zinc-100 border border-zinc-200 text-zinc-700">
                       {selectedGuest.status}
                     </span>
                   </div>
-                  <p className="text-[12px] text-white/70">Guest Profile & Stay Timeline</p>
+                  <p className="text-xs text-zinc-500">Guest profile & history</p>
                 </div>
               </div>
               <button
+                type="button"
                 onClick={() => setSelectedGuest(null)}
-                className="text-white/70 hover:text-white p-1 hover:bg-white/10 rounded transition-colors"
+                className="text-zinc-400 hover:text-zinc-600 p-1 rounded-lg hover:bg-zinc-100 transition-colors cursor-pointer"
               >
-                <X size={20} />
+                <X size={16} />
               </button>
             </div>
 
             {/* Modal Body */}
-            <div className="flex-1 overflow-y-auto p-6 space-y-6">
-              {/* Contact & Lifetime Highlights */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="bg-[#f6f7f7] border border-[#c3c4c7] p-3.5 space-y-2">
-                  <h4 className="text-[12px] font-semibold uppercase text-[#50575e] tracking-wider">Contact Information</h4>
-                  <div className="space-y-1.5 text-[13px]">
-                    <div className="flex items-center gap-2 text-[#3c434a]">
-                      <Mail size={14} className="text-[#8c8f94]" />
-                      <a href={`mailto:${selectedGuest.email}`} className="text-[#2271b1] hover:underline">
-                        {selectedGuest.email || "N/A"}
-                      </a>
-                    </div>
-                    <div className="flex items-center gap-2 text-[#3c434a]">
-                      <Phone size={14} className="text-[#8c8f94]" />
-                      <span>{selectedGuest.phone || "N/A"}</span>
-                    </div>
-                  </div>
+            <div className="flex-1 overflow-y-auto p-6 space-y-5">
+              {/* Contact info grid */}
+              <div className="grid grid-cols-2 gap-3 text-xs">
+                <div className="p-3 bg-zinc-50 border border-zinc-200/70 rounded-lg">
+                  <div className="text-zinc-400 text-[11px]">Email</div>
+                  <div className="font-medium text-zinc-900 mt-0.5 truncate">{selectedGuest.email || "N/A"}</div>
                 </div>
-
-                <div className="bg-[#f6f7f7] border border-[#c3c4c7] p-3.5 space-y-2">
-                  <h4 className="text-[12px] font-semibold uppercase text-[#50575e] tracking-wider">Lifetime Statistics</h4>
-                  <div className="grid grid-cols-2 gap-2 text-[13px]">
-                    <div>
-                      <span className="text-[#8c8f94] block text-[11px]">Total Revenue</span>
-                      <strong className="text-[#00a32a] text-[15px]">PKR {selectedGuest.totalSpent.toLocaleString()}</strong>
-                    </div>
-                    <div>
-                      <span className="text-[#8c8f94] block text-[11px]">Total Stays</span>
-                      <strong className="text-[#1d2327] text-[15px]">{selectedGuest.totalBookings}</strong>
-                    </div>
-                  </div>
+                <div className="p-3 bg-zinc-50 border border-zinc-200/70 rounded-lg">
+                  <div className="text-zinc-400 text-[11px]">Phone</div>
+                  <div className="font-medium text-zinc-900 mt-0.5 tabular-nums">{selectedGuest.phone || "N/A"}</div>
+                </div>
+                <div className="p-3 bg-zinc-50 border border-zinc-200/70 rounded-lg">
+                  <div className="text-zinc-400 text-[11px]">Lifetime revenue</div>
+                  <div className="font-medium text-zinc-900 mt-0.5 tabular-nums">PKR {selectedGuest.totalSpent.toLocaleString()}</div>
+                </div>
+                <div className="p-3 bg-zinc-50 border border-zinc-200/70 rounded-lg">
+                  <div className="text-zinc-400 text-[11px]">Total stays</div>
+                  <div className="font-medium text-zinc-900 mt-0.5 tabular-nums">{selectedGuest.totalBookings}</div>
                 </div>
               </div>
 
-              {/* Special Guest Notes & Preferences */}
+              {/* Guest Notes */}
               {selectedGuest.notes.length > 0 && (
-                <div className="bg-[#fff8e5] border-l-4 border-[#dba617] p-4 space-y-1.5">
-                  <div className="flex items-center gap-1.5 text-[#000000] font-semibold text-[13px]">
-                    <FileText size={15} />
-                    <span>Special Requests & Guest Notes</span>
+                <div className="p-3.5 bg-amber-50/70 border border-amber-200/70 rounded-lg text-xs space-y-1">
+                  <div className="font-semibold text-amber-900 flex items-center gap-1.5">
+                    <FileText size={13} />
+                    <span>Special requests & guest notes</span>
                   </div>
-                  <ul className="list-disc list-inside text-[13px] text-[#000000] space-y-1 pl-1">
+                  <ul className="list-disc list-inside text-amber-800 space-y-0.5 pl-1">
                     {selectedGuest.notes.map((note, idx) => (
                       <li key={idx}>{note}</li>
                     ))}
@@ -449,52 +429,24 @@ export default function GuestsManager({ guests }: { guests: GuestProfile[] }) {
                 </div>
               )}
 
-              {/* Booking History */}
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-[14px] font-semibold text-[#1d2327] flex items-center gap-2">
-                    <Calendar size={16} className="text-[#2271b1]" />
-                    <span>Complete Reservation History ({selectedGuest.bookings.length})</span>
-                  </h3>
-                </div>
-
-                <div className="border border-[#c3c4c7] divide-y divide-[#c3c4c7]">
+              {/* Reservation History */}
+              <div className="space-y-2">
+                <h3 className="text-xs font-semibold text-zinc-900">
+                  Reservation history ({selectedGuest.bookings.length})
+                </h3>
+                <div className="border border-zinc-200/80 rounded-lg divide-y divide-zinc-200/80 overflow-hidden text-xs">
                   {selectedGuest.bookings.map((booking) => (
-                    <div key={booking.id} className="p-3.5 bg-white hover:bg-[#f9f9f9] transition-colors space-y-1.5">
-                      <div className="flex items-start justify-between">
-                        <div>
-                          <div className="font-semibold text-[13.5px] text-[#1d2327] flex items-center gap-2">
-                            <BedDouble size={14} className="text-[#2271b1]" />
-                            <span>{booking.roomTitle}</span>
-                          </div>
-                          <div className="text-[12px] text-[#50575e] mt-0.5">
-                            {booking.checkIn} &rarr; {booking.checkOut} ({booking.totalNights} {booking.totalNights === 1 ? "night" : "nights"})
-                          </div>
-                        </div>
-
-                        <div className="text-right">
-                          <span className="font-semibold text-[14px] text-[#1d2327] block">
-                            PKR {booking.totalAmount?.toLocaleString() || 0}
-                          </span>
-                          <span
-                            className={`inline-block px-2 py-0.2 text-[10.5px] rounded-[2px] font-medium uppercase border ${
-                              booking.status === "confirmed"
-                                ? "bg-[#edfaef] text-[#00a32a] border-[#00a32a]/20"
-                                : booking.status === "cancelled"
-                                ? "bg-[#fcf0f1] text-[#d63638] border-[#d63638]/20"
-                                : "bg-[#fcf0e0] text-[#d16400] border-[#d16400]/20"
-                            }`}
-                          >
-                            {booking.status}
-                          </span>
+                    <div key={booking.id} className="p-3 bg-white hover:bg-zinc-50 transition-colors flex items-center justify-between">
+                      <div>
+                        <div className="font-medium text-zinc-900">{booking.roomTitle}</div>
+                        <div className="text-[11px] text-zinc-500 tabular-nums">
+                          {booking.checkIn} &rarr; {booking.checkOut} ({booking.totalNights} {booking.totalNights === 1 ? "night" : "nights"})
                         </div>
                       </div>
-
-                      {booking.notes && (
-                        <p className="text-[12px] text-[#646970] italic bg-[#f0f0f1] px-2.5 py-1 rounded-[2px]">
-                          Note: &ldquo;{booking.notes}&rdquo;
-                        </p>
-                      )}
+                      <div className="text-right">
+                        <div className="font-medium text-zinc-900 tabular-nums">PKR {Number(booking.totalAmount || 0).toLocaleString()}</div>
+                        <span className="text-[10px] text-zinc-500 capitalize">{booking.status}</span>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -502,15 +454,13 @@ export default function GuestsManager({ guests }: { guests: GuestProfile[] }) {
             </div>
 
             {/* Modal Footer */}
-            <div className="bg-[#f6f7f7] border-t border-[#c3c4c7] px-6 py-3 flex items-center justify-between">
-              <span className="text-[12px] text-[#50575e]">
-                Guest ID: <code className="bg-white px-1.5 py-0.5 border border-[#c3c4c7] text-[#1d2327]">{selectedGuest.id.slice(0, 8)}</code>
-              </span>
+            <div className="px-6 py-3 bg-zinc-50 border-t border-zinc-200/80 flex items-center justify-end">
               <button
+                type="button"
                 onClick={() => setSelectedGuest(null)}
-                className="px-4 py-1.5 bg-[#2271b1] hover:bg-[#135e96] text-white text-[13px] font-medium rounded-[3px] transition-colors"
+                className="px-3.5 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-medium rounded-lg transition-colors cursor-pointer"
               >
-                Close Profile
+                Close
               </button>
             </div>
           </div>

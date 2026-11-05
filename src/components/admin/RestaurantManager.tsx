@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useTransition } from "react";
 import Image from "next/image";
@@ -13,7 +13,6 @@ import {
   AlertCircle,
   ExternalLink,
   Search,
-  Sparkles,
   Save,
   X,
   Image as ImageIcon
@@ -62,27 +61,27 @@ export default function RestaurantManager({ initialData }: Props) {
 
     startTransition(async () => {
       const res = await saveRestaurantSettingsAction(settings);
-      if (res.success && res.settings) {
-        setSettings(res.settings);
-        setStatusMessage({ type: "success", text: "Restaurant settings saved successfully!" });
+      if (res.success) {
+        setStatusMessage({ type: "success", text: "Restaurant settings saved successfully." });
+        setTimeout(() => setStatusMessage(null), 4000);
       } else {
-        setStatusMessage({ type: "error", text: res.error || "Failed to save settings." });
+        setStatusMessage({ type: "error", text: res.error || "Failed to update settings." });
       }
     });
   };
 
-  // Open Modal for Add
+  // Open modal to add item
   const handleOpenAdd = () => {
     setEditingItem(null);
     setFormName("");
     setFormCategory("mains");
-    setFormPrice("NOK ");
+    setFormPrice("");
     setFormDescription("");
-    setFormImage("/restaurant/salmon.jpg");
+    setFormImage("");
     setIsModalOpen(true);
   };
 
-  // Open Modal for Edit
+  // Open modal to edit item
   const handleOpenEdit = (item: MenuItemData) => {
     setEditingItem(item);
     setFormName(item.name);
@@ -93,7 +92,7 @@ export default function RestaurantManager({ initialData }: Props) {
     setIsModalOpen(true);
   };
 
-  // Image Upload handler
+  // Handle File upload
   const handleImageFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -108,15 +107,15 @@ export default function RestaurantManager({ initialData }: Props) {
     if (res.success && res.url) {
       setFormImage(res.url);
     } else {
-      alert(res.error || "Image upload failed");
+      alert(res.error || "Image upload failed.");
     }
   };
 
-  // Handle Item Save (Add or Update)
+  // Handle Save (Add or Update) item
   const handleSaveItem = (e: React.FormEvent) => {
     e.preventDefault();
     if (!formName.trim() || !formPrice.trim()) {
-      alert("Please provide dish name and price.");
+      alert("Dish name and price are required.");
       return;
     }
 
@@ -182,35 +181,34 @@ export default function RestaurantManager({ initialData }: Props) {
   });
 
   return (
-    <div className="space-y-8 max-w-6xl mx-auto pb-16">
+    <div className="space-y-6 max-w-7xl mx-auto pb-16">
       
       {/* Top Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#c3c4c7]">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold text-[#1d2327] flex items-center gap-2">
-            <UtensilsCrossed className="text-[#2271b1]" size={24} />
-            Restaurant & Menu Management
+          <h1 className="text-xl md:text-2xl font-semibold text-zinc-900 tracking-tight">
+            Restaurant & dining
           </h1>
-          <p className="text-[13px] text-[#646970] mt-1">
-            Edit restaurant page headings, background images, and manage menu items with prices, descriptions, and circular photos.
+          <p className="text-xs md:text-sm text-zinc-500 mt-0.5">
+            Dining settings, background artwork, and culinary menu items.
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2.5">
           <Link
             href="/restaurant"
             target="_blank"
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-[#2271b1] text-[#2271b1] hover:bg-[#f0f6fc] text-[13px] font-medium rounded-sm transition-colors"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-zinc-200 text-zinc-700 hover:text-zinc-900 hover:bg-zinc-50 text-xs font-medium rounded-lg transition-colors"
           >
-            <span>View Public Menu</span>
-            <ExternalLink size={14} />
+            <span>Live menu</span>
+            <ExternalLink size={13} className="text-zinc-400" />
           </Link>
           <button
             onClick={handleOpenAdd}
-            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-[#2271b1] hover:bg-[#135e96] text-white text-[13px] font-semibold rounded-sm shadow-sm transition-colors"
+            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-medium rounded-lg shadow-xs transition-colors cursor-pointer"
           >
-            <Plus size={15} />
-            <span>Add New Dish</span>
+            <Plus size={14} className="text-[#d7b56d]" />
+            <span>Add dish</span>
           </button>
         </div>
       </div>
@@ -218,23 +216,23 @@ export default function RestaurantManager({ initialData }: Props) {
       {/* Status Alert Banner */}
       {statusMessage && (
         <div
-          className={`p-3.5 rounded-sm flex items-center justify-between text-[13.5px] border ${
+          className={`p-3 rounded-lg flex items-center justify-between text-xs border ${
             statusMessage.type === "success"
-              ? "bg-[#ecf7ed] border-[#46b450] text-[#1e4620]"
-              : "bg-[#fcf0f1] border-[#dc3232] text-[#801313]"
+              ? "bg-emerald-50 border-emerald-200 text-emerald-800"
+              : "bg-rose-50 border-rose-200 text-rose-800"
           }`}
         >
           <div className="flex items-center gap-2">
             {statusMessage.type === "success" ? (
-              <CheckCircle2 size={16} className="text-[#46b450]" />
+              <CheckCircle2 size={15} className="text-emerald-600" />
             ) : (
-              <AlertCircle size={16} className="text-[#dc3232]" />
+              <AlertCircle size={15} className="text-rose-600" />
             )}
             <span>{statusMessage.text}</span>
           </div>
           <button
             onClick={() => setStatusMessage(null)}
-            className="text-gray-500 hover:text-black text-[12px]"
+            className="text-zinc-500 hover:text-zinc-800 text-xs font-semibold"
           >
             Dismiss
           </button>
@@ -242,81 +240,82 @@ export default function RestaurantManager({ initialData }: Props) {
       )}
 
       {/* SECTION 1: Page Headings & Banner Settings */}
-      <div className="bg-white border border-[#c3c4c7] shadow-sm">
-        <div className="px-5 py-4 border-b border-[#f0f0f1] bg-[#f6f7f7] flex items-center justify-between">
-          <h2 className="text-[15px] font-semibold text-[#1d2327] flex items-center gap-2">
-            <Sparkles size={16} className="text-[#d7b56d]" />
-            Restaurant Page Headings & Display Settings
-          </h2>
-          <span className="text-[12px] text-[#646970]">Applies to both /restaurant page and Home Menu section</span>
+      <div className="bg-white border border-zinc-200/80 rounded-xl overflow-hidden shadow-xs">
+        <div className="px-5 py-4 border-b border-zinc-200/80 flex items-center justify-between">
+          <div>
+            <h2 className="text-sm font-semibold text-zinc-900">
+              Restaurant display settings
+            </h2>
+            <p className="text-xs text-zinc-500 mt-0.5">Applies to the /restaurant page and homepage dining showcase.</p>
+          </div>
         </div>
 
-        <form onSubmit={handleSaveSettings} className="p-6 space-y-5">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <form onSubmit={handleSaveSettings} className="p-5 space-y-4 text-xs">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-[13px] font-semibold text-[#1d2327] mb-1">
-                Top Tagline / Kicker
+              <label className="block font-medium text-zinc-700 mb-1">
+                Top tagline
               </label>
               <input
                 type="text"
                 value={settings.tagline}
                 onChange={(e) => setSettings({ ...settings, tagline: e.target.value })}
                 placeholder="Restaurant & Dining"
-                className="w-full px-3 py-2 border border-[#8c8f94] rounded-sm text-[13.5px] focus:outline-none focus:border-[#2271b1] focus:ring-1 focus:ring-[#2271b1]"
+                className="w-full h-9 px-3 border border-zinc-200 rounded-lg text-xs text-zinc-900 focus:outline-none focus:border-zinc-400 focus:ring-1 focus:ring-zinc-400"
               />
             </div>
 
             <div>
-              <label className="block text-[13px] font-semibold text-[#1d2327] mb-1">
-                Main Heading
+              <label className="block font-medium text-zinc-700 mb-1">
+                Main heading
               </label>
               <input
                 type="text"
                 value={settings.heading}
                 onChange={(e) => setSettings({ ...settings, heading: e.target.value })}
                 placeholder="Our Restaurant Menu"
-                className="w-full px-3 py-2 border border-[#8c8f94] rounded-sm text-[13.5px] focus:outline-none focus:border-[#2271b1] focus:ring-1 focus:ring-[#2271b1]"
+                className="w-full h-9 px-3 border border-zinc-200 rounded-lg text-xs text-zinc-900 focus:outline-none focus:border-zinc-400 focus:ring-1 focus:ring-zinc-400"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-[13px] font-semibold text-[#1d2327] mb-1">
-              Subheading / Description
+            <label className="block font-medium text-zinc-700 mb-1">
+              Subheading / description
             </label>
             <textarea
               rows={2}
               value={settings.subheading}
               onChange={(e) => setSettings({ ...settings, subheading: e.target.value })}
-              placeholder="Crafted with fresh seasonal Nordic ingredients and woodfire mastery."
-              className="w-full px-3 py-2 border border-[#8c8f94] rounded-sm text-[13.5px] focus:outline-none focus:border-[#2271b1] focus:ring-1 focus:ring-[#2271b1]"
+              placeholder="Crafted with fresh seasonal ingredients and woodfire mastery."
+              className="w-full p-3 border border-zinc-200 rounded-lg text-xs text-zinc-900 focus:outline-none focus:border-zinc-400 focus:ring-1 focus:ring-zinc-400"
             />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-[13px] font-semibold text-[#1d2327] mb-1">
-                Background Image URL (Home Section)
+              <label className="block font-medium text-zinc-700 mb-1">
+                Background image path
               </label>
               <input
                 type="text"
                 value={settings.backgroundImage}
                 onChange={(e) => setSettings({ ...settings, backgroundImage: e.target.value })}
                 placeholder="/restaurant/interior.jpg"
-                className="w-full px-3 py-2 border border-[#8c8f94] rounded-sm text-[13.5px] focus:outline-none focus:border-[#2271b1] focus:ring-1 focus:ring-[#2271b1]"
+                className="w-full h-9 px-3 border border-zinc-200 rounded-lg text-xs text-zinc-900 focus:outline-none focus:border-zinc-400 focus:ring-1 focus:ring-zinc-400"
               />
             </div>
 
             <div>
-              <label className="block text-[13px] font-semibold text-[#1d2327] mb-1">
-                Home CTA Button Text
+              <label className="block font-medium text-zinc-700 mb-1">
+                Call to action label
               </label>
               <input
                 type="text"
                 value={settings.buttonText}
                 onChange={(e) => setSettings({ ...settings, buttonText: e.target.value })}
-                placeholder="Explore Full Menu & Book Table"
-                className="w-full px-3 py-2 border border-[#8c8f94] rounded-sm text-[13.5px] focus:outline-none focus:border-[#2271b1] focus:ring-1 focus:ring-[#2271b1]"
+                placeholder="Explore Full Menu"
+                className="w-full h-9 px-3 border border-zinc-200 rounded-lg text-xs text-zinc-900 focus:outline-none focus:border-zinc-400 focus:ring-1 focus:ring-zinc-400"
               />
             </div>
           </div>
@@ -325,39 +324,39 @@ export default function RestaurantManager({ initialData }: Props) {
             <button
               type="submit"
               disabled={isPending}
-              className="inline-flex items-center gap-2 px-5 py-2 bg-[#2271b1] hover:bg-[#135e96] disabled:opacity-50 text-white text-[13px] font-semibold rounded-sm shadow-sm transition-colors"
+              className="inline-flex items-center gap-1.5 px-4 py-2 bg-zinc-900 hover:bg-zinc-800 disabled:opacity-50 text-white text-xs font-medium rounded-lg shadow-xs transition-colors cursor-pointer"
             >
-              <Save size={15} />
-              <span>{isPending ? "Saving..." : "Save Settings"}</span>
+              <Save size={13} />
+              <span>{isPending ? "Saving..." : "Save settings"}</span>
             </button>
           </div>
         </form>
       </div>
 
       {/* SECTION 2: Menu Items List & Management */}
-      <div className="bg-white border border-[#c3c4c7] shadow-sm">
+      <div className="bg-white border border-zinc-200/80 rounded-xl overflow-hidden shadow-xs">
         
         {/* Header & Filter Bar */}
-        <div className="px-5 py-4 border-b border-[#f0f0f1] bg-[#f6f7f7] flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="p-4 border-b border-zinc-200/80 flex flex-col md:flex-row md:items-center justify-between gap-3">
           <div>
-            <h2 className="text-[15px] font-semibold text-[#1d2327]">
-              Menu Items ({items.length})
+            <h2 className="text-sm font-semibold text-zinc-900">
+              Menu dishes ({items.length})
             </h2>
-            <p className="text-[12px] text-[#646970]">
-              Dishes displayed on the restaurant page and home menu with prices and circular photos.
+            <p className="text-xs text-zinc-500 mt-0.5">
+              Individual offerings categorized by starters, mains, desserts, and beverages.
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-3">
+          <div className="flex flex-wrap items-center gap-2.5">
             {/* Search */}
             <div className="relative">
-              <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400" />
+              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search dishes..."
-                className="pl-8 pr-3 py-1.5 border border-[#8c8f94] text-[13px] rounded-sm focus:outline-none focus:border-[#2271b1]"
+                className="h-9 pl-9 pr-3 border border-zinc-200 text-xs rounded-lg text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:border-zinc-400 focus:ring-1 focus:ring-zinc-400"
               />
             </div>
 
@@ -365,43 +364,43 @@ export default function RestaurantManager({ initialData }: Props) {
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
-              className="px-2.5 py-1.5 border border-[#8c8f94] text-[13px] rounded-sm bg-white focus:outline-none focus:border-[#2271b1]"
+              className="h-9 px-3 border border-zinc-200 text-xs rounded-lg bg-white text-zinc-700 focus:outline-none focus:border-zinc-400 cursor-pointer"
             >
-              <option value="all">All Categories</option>
+              <option value="all">All categories</option>
               <option value="starters">Starters</option>
               <option value="mains">Mains</option>
               <option value="desserts">Desserts</option>
-              <option value="drinks">Drinks & Cocktails</option>
+              <option value="drinks">Drinks & cocktails</option>
             </select>
           </div>
         </div>
 
         {/* Table of Menu Items */}
         <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse text-[13.5px]">
-            <thead>
-              <tr className="bg-[#f0f0f1] text-[#2c3338] font-semibold border-b border-[#c3c4c7]">
-                <th className="py-2.5 px-4 w-16 text-center">Image</th>
-                <th className="py-2.5 px-4">Dish Name</th>
-                <th className="py-2.5 px-4 w-28">Category</th>
-                <th className="py-2.5 px-4 w-28">Price</th>
-                <th className="py-2.5 px-4">Description</th>
-                <th className="py-2.5 px-4 w-28 text-right">Actions</th>
+          <table className="w-full text-left text-xs">
+            <thead className="bg-zinc-50/80 border-b border-zinc-200/80 text-zinc-500 font-medium">
+              <tr>
+                <th className="py-3 px-4 w-16 text-center">Photo</th>
+                <th className="py-3 px-4">Dish name</th>
+                <th className="py-3 px-4 w-28">Category</th>
+                <th className="py-3 px-4 w-28">Price</th>
+                <th className="py-3 px-4">Description</th>
+                <th className="py-3 px-4 w-24 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#f0f0f1]">
+            <tbody className="divide-y divide-zinc-200/80 bg-white">
               {filteredItems.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="py-8 text-center text-gray-500">
+                  <td colSpan={6} className="py-12 text-center text-zinc-400">
                     No menu items found matching your filters.
                   </td>
                 </tr>
               ) : (
                 filteredItems.map((item) => (
-                  <tr key={item.id} className="hover:bg-[#f9f9f9] transition-colors">
+                  <tr key={item.id} className="hover:bg-zinc-50/60 transition-colors">
                     {/* Circular Image */}
                     <td className="py-3 px-4 text-center">
-                      <div className="relative w-12 h-12 mx-auto rounded-full overflow-hidden border-2 border-[#d7b56d] shadow-sm">
+                      <div className="relative w-10 h-10 mx-auto rounded-full overflow-hidden border border-zinc-200 shrink-0">
                         <Image
                           src={item.image}
                           alt={item.name}
@@ -412,24 +411,24 @@ export default function RestaurantManager({ initialData }: Props) {
                     </td>
 
                     {/* Name */}
-                    <td className="py-3 px-4 font-semibold text-[#1d2327]">
+                    <td className="py-3 px-4 font-medium text-zinc-900">
                       {item.name}
                     </td>
 
                     {/* Category Badge */}
                     <td className="py-3 px-4">
-                      <span className="px-2 py-0.5 text-[11.5px] uppercase tracking-wider font-semibold rounded-sm bg-gray-100 text-gray-700 border border-gray-200">
+                      <span className="px-2 py-0.5 text-[11px] capitalize font-medium rounded-md bg-zinc-100 text-zinc-700 border border-zinc-200">
                         {item.category}
                       </span>
                     </td>
 
                     {/* Price */}
-                    <td className="py-3 px-4 font-semibold text-[#d7b56d]">
+                    <td className="py-3 px-4 font-medium text-zinc-900 tabular-nums">
                       {item.price}
                     </td>
 
                     {/* Description */}
-                    <td className="py-3 px-4 text-[#50575e] text-[13px] max-w-xs truncate">
+                    <td className="py-3 px-4 text-zinc-500 max-w-xs truncate">
                       {item.description}
                     </td>
 
@@ -437,18 +436,20 @@ export default function RestaurantManager({ initialData }: Props) {
                     <td className="py-3 px-4 text-right whitespace-nowrap">
                       <div className="flex items-center justify-end gap-1.5">
                         <button
+                          type="button"
                           onClick={() => handleOpenEdit(item)}
                           title="Edit Dish"
-                          className="p-1.5 text-[#2271b1] hover:bg-[#f0f6fc] rounded-sm transition-colors"
+                          className="p-1.5 text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100 rounded-md transition-colors cursor-pointer"
                         >
-                          <Pencil size={15} />
+                          <Pencil size={13} />
                         </button>
                         <button
+                          type="button"
                           onClick={() => handleDeleteItem(item.id, item.name)}
                           title="Delete Dish"
-                          className="p-1.5 text-[#b32d2e] hover:bg-[#fcf0f1] rounded-sm transition-colors"
+                          className="p-1.5 text-rose-600 hover:text-rose-700 hover:bg-rose-50 rounded-md transition-colors cursor-pointer"
                         >
-                          <Trash2 size={15} />
+                          <Trash2 size={13} />
                         </button>
                       </div>
                     </td>
@@ -463,30 +464,37 @@ export default function RestaurantManager({ initialData }: Props) {
 
       {/* MODAL: ADD / EDIT MENU ITEM */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
-          <div className="bg-white border border-[#c3c4c7] shadow-2xl max-w-lg w-full overflow-hidden rounded-sm animate-in fade-in zoom-in-95 duration-150">
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-150"
+          onClick={() => setIsModalOpen(false)}
+        >
+          <div 
+            className="bg-white border border-zinc-200 shadow-2xl max-w-lg w-full overflow-hidden rounded-xl"
+            onClick={(e) => e.stopPropagation()}
+          >
             
             {/* Modal Header */}
-            <div className="px-5 py-3.5 bg-[#1d2327] text-white flex items-center justify-between">
-              <h3 className="text-[15px] font-semibold flex items-center gap-2">
+            <div className="px-5 py-4 border-b border-zinc-200/80 flex items-center justify-between">
+              <h3 className="text-sm font-semibold text-zinc-900 flex items-center gap-2">
                 <UtensilsCrossed size={16} className="text-[#d7b56d]" />
-                {editingItem ? "Edit Menu Dish" : "Add New Menu Dish"}
+                <span>{editingItem ? "Edit menu dish" : "Add menu dish"}</span>
               </h3>
               <button
+                type="button"
                 onClick={() => setIsModalOpen(false)}
-                className="text-gray-400 hover:text-white"
+                className="text-zinc-400 hover:text-zinc-600 p-1 rounded-lg hover:bg-zinc-100 transition-colors cursor-pointer"
               >
-                <X size={18} />
+                <X size={16} />
               </button>
             </div>
 
             {/* Modal Form */}
-            <form onSubmit={handleSaveItem} className="p-6 space-y-4 text-[13.5px]">
+            <form onSubmit={handleSaveItem} className="p-5 space-y-4 text-xs">
               
               {/* Dish Name */}
               <div>
-                <label className="block font-semibold text-[#1d2327] mb-1">
-                  Dish Name *
+                <label className="block font-medium text-zinc-700 mb-1">
+                  Dish name *
                 </label>
                 <input
                   type="text"
@@ -494,66 +502,65 @@ export default function RestaurantManager({ initialData }: Props) {
                   value={formName}
                   onChange={(e) => setFormName(e.target.value)}
                   placeholder="e.g. Hardangerfjord Wild King Salmon"
-                  className="w-full px-3 py-2 border border-[#8c8f94] rounded-sm focus:outline-none focus:border-[#2271b1]"
+                  className="w-full h-9 px-3 border border-zinc-200 rounded-lg text-xs text-zinc-900 focus:outline-none focus:border-zinc-400 focus:ring-1 focus:ring-zinc-400"
                 />
               </div>
 
               {/* Category & Price */}
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block font-semibold text-[#1d2327] mb-1">
+                  <label className="block font-medium text-zinc-700 mb-1">
                     Category *
                   </label>
                   <select
                     value={formCategory}
                     onChange={(e) => setFormCategory(e.target.value as any)}
-                    className="w-full px-3 py-2 border border-[#8c8f94] rounded-sm bg-white focus:outline-none focus:border-[#2271b1]"
+                    className="w-full h-9 px-3 border border-zinc-200 rounded-lg text-xs bg-white text-zinc-700 focus:outline-none focus:border-zinc-400 cursor-pointer"
                   >
                     <option value="starters">Starters</option>
                     <option value="mains">Mains</option>
                     <option value="desserts">Desserts</option>
-                    <option value="drinks">Drinks & Cocktails</option>
+                    <option value="drinks">Drinks & cocktails</option>
                   </select>
                 </div>
 
                 <div>
-                  <label className="block font-semibold text-[#1d2327] mb-1">
-                    Price (with currency) *
+                  <label className="block font-medium text-zinc-700 mb-1">
+                    Price *
                   </label>
                   <input
                     type="text"
                     required
                     value={formPrice}
                     onChange={(e) => setFormPrice(e.target.value)}
-                    placeholder="e.g. NOK 460"
-                    className="w-full px-3 py-2 border border-[#8c8f94] rounded-sm focus:outline-none focus:border-[#2271b1]"
+                    placeholder="e.g. PKR 3,800"
+                    className="w-full h-9 px-3 border border-zinc-200 rounded-lg text-xs text-zinc-900 focus:outline-none focus:border-zinc-400 focus:ring-1 focus:ring-zinc-400"
                   />
                 </div>
               </div>
 
               {/* Description */}
               <div>
-                <label className="block font-semibold text-[#1d2327] mb-1">
+                <label className="block font-medium text-zinc-700 mb-1">
                   Description
                 </label>
                 <textarea
                   rows={2}
                   value={formDescription}
                   onChange={(e) => setFormDescription(e.target.value)}
-                  placeholder="Crispy-skin wild salmon, dill oil emulsion, smoked parsnip puree & gold leaf."
-                  className="w-full px-3 py-2 border border-[#8c8f94] rounded-sm focus:outline-none focus:border-[#2271b1]"
+                  placeholder="Crispy-skin wild salmon, dill oil emulsion, smoked parsnip puree."
+                  className="w-full p-3 border border-zinc-200 rounded-lg text-xs text-zinc-900 focus:outline-none focus:border-zinc-400 focus:ring-1 focus:ring-zinc-400"
                 />
               </div>
 
-              {/* Image with Circular Preview */}
+              {/* Image Preview & Upload */}
               <div>
-                <label className="block font-semibold text-[#1d2327] mb-1">
-                  Dish Circular Photo *
+                <label className="block font-medium text-zinc-700 mb-1">
+                  Dish circular photo *
                 </label>
                 
-                <div className="flex items-center gap-4 p-3 bg-gray-50 border border-gray-200 rounded-sm">
-                  {/* Circular preview */}
-                  <div className="relative w-16 h-16 rounded-full overflow-hidden border-2 border-[#d7b56d] shrink-0 bg-gray-200 shadow-sm">
+                <div className="flex items-center gap-3 p-3 bg-zinc-50 border border-zinc-200 rounded-lg">
+                  <div className="relative w-12 h-12 rounded-full overflow-hidden border border-zinc-200 shrink-0 bg-zinc-100">
                     {formImage ? (
                       <Image
                         src={formImage}
@@ -562,8 +569,8 @@ export default function RestaurantManager({ initialData }: Props) {
                         className="object-cover"
                       />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center text-gray-400">
-                        <ImageIcon size={20} />
+                      <div className="w-full h-full flex items-center justify-center text-zinc-400">
+                        <ImageIcon size={18} />
                       </div>
                     )}
                   </div>
@@ -574,13 +581,13 @@ export default function RestaurantManager({ initialData }: Props) {
                       value={formImage}
                       onChange={(e) => setFormImage(e.target.value)}
                       placeholder="/restaurant/salmon.jpg or image URL"
-                      className="w-full px-2.5 py-1.5 border border-[#8c8f94] rounded-sm text-[12.5px] focus:outline-none focus:border-[#2271b1]"
+                      className="w-full h-8 px-2.5 border border-zinc-200 rounded-md text-xs text-zinc-900 focus:outline-none focus:border-zinc-400"
                     />
 
                     <div className="flex items-center gap-2">
-                      <label className="cursor-pointer inline-flex items-center gap-1.5 px-3 py-1 bg-white border border-[#2271b1] text-[#2271b1] hover:bg-[#f0f6fc] text-[12px] font-medium rounded-sm transition-colors">
-                        <Upload size={13} />
-                        <span>{uploadingImage ? "Uploading..." : "Upload New File"}</span>
+                      <label className="cursor-pointer inline-flex items-center gap-1.5 px-2.5 py-1 bg-white border border-zinc-200 hover:bg-zinc-50 text-zinc-700 text-xs font-medium rounded-md transition-colors">
+                        <Upload size={12} />
+                        <span>{uploadingImage ? "Uploading..." : "Upload photo"}</span>
                         <input
                           type="file"
                           accept="image/*"
@@ -589,7 +596,7 @@ export default function RestaurantManager({ initialData }: Props) {
                           className="hidden"
                         />
                       </label>
-                      <span className="text-[11.5px] text-gray-500">
+                      <span className="text-[11px] text-zinc-400">
                         PNG, JPG, WEBP
                       </span>
                     </div>
@@ -598,32 +605,32 @@ export default function RestaurantManager({ initialData }: Props) {
               </div>
 
               {/* Modal Actions */}
-              <div className="pt-3 border-t border-gray-200 flex items-center justify-between gap-3">
+              <div className="pt-3 border-t border-zinc-100 flex items-center justify-between gap-3">
                 {editingItem ? (
                   <button
                     type="button"
                     onClick={() => setItemToDelete({ id: editingItem.id, name: editingItem.name })}
-                    className="inline-flex items-center gap-1.5 px-3 py-2 bg-red-50 hover:bg-red-100 text-[#b32d2e] border border-red-200 rounded-sm font-semibold text-[13px] transition-colors"
+                    className="inline-flex items-center gap-1 px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-lg font-medium text-xs transition-colors cursor-pointer"
                   >
-                    <Trash2 size={14} />
-                    <span>Delete Dish</span>
+                    <Trash2 size={13} />
+                    <span>Delete</span>
                   </button>
                 ) : <div />}
 
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2">
                   <button
                     type="button"
                     onClick={() => setIsModalOpen(false)}
-                    className="px-4 py-2 border border-gray-300 text-gray-700 hover:bg-gray-100 rounded-sm font-medium transition-colors"
+                    className="px-3 py-1.5 text-zinc-700 hover:bg-zinc-100 rounded-lg font-medium text-xs transition-colors cursor-pointer"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
                     disabled={isPending}
-                    className="px-5 py-2 bg-[#2271b1] hover:bg-[#135e96] text-white rounded-sm font-semibold shadow-sm transition-colors disabled:opacity-50"
+                    className="px-4 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-white rounded-lg font-medium text-xs shadow-xs transition-colors disabled:opacity-50 cursor-pointer"
                   >
-                    {isPending ? "Saving..." : editingItem ? "Update Dish" : "Add Dish to Menu"}
+                    {isPending ? "Saving..." : editingItem ? "Update dish" : "Add dish"}
                   </button>
                 </div>
               </div>
@@ -634,29 +641,35 @@ export default function RestaurantManager({ initialData }: Props) {
         </div>
       )}
 
-      {/* DEDICATED IN-APP CONFIRMATION MODAL FOR DELETION */}
+      {/* CONFIRMATION MODAL FOR DELETION */}
       {itemToDelete && (
-        <div className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
-          <div className="bg-white border border-[#c3c4c7] shadow-2xl max-w-md w-full p-6 rounded-sm space-y-4 animate-in fade-in zoom-in-95 duration-150">
-            <div className="flex items-center gap-3 text-[#b32d2e]">
-              <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center shrink-0">
-                <Trash2 size={20} />
+        <div 
+          className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-150"
+          onClick={() => setItemToDelete(null)}
+        >
+          <div 
+            className="bg-white border border-zinc-200 shadow-xl max-w-sm w-full p-5 rounded-xl space-y-3"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center gap-2.5 text-rose-600">
+              <div className="w-8 h-8 rounded-lg bg-rose-50 border border-rose-200 flex items-center justify-center shrink-0">
+                <Trash2 size={16} />
               </div>
               <div>
-                <h3 className="text-[16px] font-semibold text-[#1d2327]">Delete Menu Item</h3>
-                <p className="text-[12px] text-gray-500">Permanent removal</p>
+                <h3 className="text-sm font-semibold text-zinc-900">Delete menu item</h3>
+                <p className="text-xs text-zinc-500">Permanent removal</p>
               </div>
             </div>
             
-            <p className="text-[13.5px] text-[#2c3338] leading-relaxed">
-              Are you sure you want to permanently delete <strong className="text-[#1d2327]">"{itemToDelete.name}"</strong>? It will be removed immediately from both the restaurant page and the homepage menu section.
+            <p className="text-xs text-zinc-600 leading-relaxed">
+              Are you sure you want to delete <strong className="text-zinc-900 font-semibold">&quot;{itemToDelete.name}&quot;</strong>? It will be removed immediately from public listings.
             </p>
 
-            <div className="pt-2 border-t border-gray-100 flex items-center justify-end gap-3">
+            <div className="pt-2 border-t border-zinc-100 flex items-center justify-end gap-2">
               <button
                 type="button"
                 onClick={() => setItemToDelete(null)}
-                className="px-4 py-2 border border-gray-300 text-gray-700 hover:bg-gray-100 rounded-sm font-medium text-[13px] transition-colors"
+                className="px-3 py-1.5 text-zinc-700 hover:bg-zinc-100 rounded-lg font-medium text-xs transition-colors cursor-pointer"
               >
                 Cancel
               </button>
@@ -664,10 +677,10 @@ export default function RestaurantManager({ initialData }: Props) {
                 type="button"
                 disabled={isPending}
                 onClick={handleConfirmDelete}
-                className="px-4 py-2 bg-[#b32d2e] hover:bg-[#8f2424] text-white rounded-sm font-semibold text-[13px] shadow-sm transition-colors disabled:opacity-50 inline-flex items-center gap-1.5"
+                className="px-3.5 py-1.5 bg-rose-600 hover:bg-rose-700 text-white rounded-lg font-medium text-xs shadow-xs transition-colors disabled:opacity-50 cursor-pointer inline-flex items-center gap-1.5"
               >
-                <Trash2 size={14} />
-                <span>{isPending ? "Deleting..." : "Yes, Delete Dish"}</span>
+                <Trash2 size={13} />
+                <span>{isPending ? "Deleting..." : "Delete dish"}</span>
               </button>
             </div>
           </div>

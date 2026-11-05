@@ -166,7 +166,7 @@ const RoomCardItem = React.memo(function RoomCardItem({
         top: "50%",
         left: "50%",
         transformOrigin: "0% 100%",
-        zIndex: Math.max(1, zIndex),
+        zIndex: Math.max(1, Math.round(zIndex * 10)),
         opacity: opacity,
         visibility: isVisible ? "visible" : "hidden",
         pointerEvents: opacity <= 0.05 ? "none" : "auto",
@@ -174,14 +174,14 @@ const RoomCardItem = React.memo(function RoomCardItem({
         willChange: isVisible ? "transform, opacity" : "auto",
         transition: "transform 0.45s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease-out",
       }}
-      className={`w-[280px] sm:w-[315px] md:w-[340px] h-[430px] sm:h-[455px] md:h-[475px] -ml-[140px] sm:-ml-[157px] md:-ml-[170px] -mt-[215px] sm:-mt-[227px] md:-mt-[237px] select-none ${
+      className={`w-[285px] sm:w-[320px] md:w-[345px] h-[415px] sm:h-[435px] md:h-[455px] -ml-[142px] sm:-ml-[160px] md:-ml-[172px] -mt-[207px] sm:-mt-[217px] md:-mt-[227px] select-none ${
         !isCenter ? "cursor-pointer" : ""
       }`}
     >
       <article 
         onMouseEnter={startSlideshow}
         onMouseLeave={stopSlideshow}
-        className="group relative w-full h-full bg-[#0d0d0e] border border-neutral-800 hover:border-[#d7b56d]/40 rounded-[28px] sm:rounded-[32px] p-4 sm:p-5 pb-5 sm:pb-6 shadow-[0_16px_36px_rgba(0,0,0,0.75)] transition-colors duration-300 flex flex-col justify-between overflow-hidden"
+        className="group relative w-full h-full bg-[#0d0d0e] border border-neutral-800 hover:border-[#d7b56d]/40 rounded-[24px] sm:rounded-[28px] p-3 sm:p-3.5 pb-3.5 sm:pb-4 shadow-[0_16px_36px_rgba(0,0,0,0.75)] transition-colors duration-300 flex flex-col justify-between overflow-hidden"
       >
         {/* Top Inset Image Box with Hover Rotation */}
         <Link 
@@ -192,12 +192,11 @@ const RoomCardItem = React.memo(function RoomCardItem({
               onSelect();
             }
           }}
-          className="relative block w-full aspect-[16/10.2] rounded-[20px] overflow-hidden bg-neutral-900 border border-white/5 cursor-pointer"
+          className="relative block w-full aspect-[16/10.5] rounded-[18px] overflow-hidden bg-neutral-900 border border-white/5 cursor-pointer shrink-0"
           aria-label={`View ${room.title}`}
         >
           {displayImages.length > 0 ? (
             displayImages.map((imgSrc, idx) => {
-              // Preload active, first, and adjacent slides for instant loading without heavy network bottleneck
               const isNear = idx === 0 || idx === currentIdx || Math.abs(idx - currentIdx) <= 1;
               if (!isNear) return null;
 
@@ -281,52 +280,59 @@ const RoomCardItem = React.memo(function RoomCardItem({
         </Link>
 
         {/* Card Content */}
-        <div className="flex flex-col flex-1 pt-3.5 sm:pt-4 text-left">
-          {/* Room Title in Luxury Gold */}
-          <h3 className="font-marcellus text-[#d7b56d] text-lg sm:text-xl md:text-[22px] font-normal leading-snug tracking-wide group-hover:text-[#e8be74] transition-colors truncate">
-            {isCenter ? (
-              <Link href={`/rooms/${room.slug || room.id}`}>
-                {room.title}
-              </Link>
-            ) : (
-              <span>{room.title}</span>
-            )}
-          </h3>
+        <div className="flex flex-col flex-1 justify-between pt-2.5 sm:pt-3 text-left">
+          <div>
+            {/* Room Title in Luxury Gold */}
+            <h3 className="font-marcellus text-[#d7b56d] text-base sm:text-lg md:text-[21px] font-normal leading-snug tracking-wide group-hover:text-[#e8be74] transition-colors truncate">
+              {isCenter ? (
+                <Link href={`/rooms/${room.slug || room.id}`}>
+                  {room.title}
+                </Link>
+              ) : (
+                <span>{room.title}</span>
+              )}
+            </h3>
 
-          {/* Capacity / Persons Pill Badge */}
-          <div className="my-2.5 sm:my-3">
-            <div className="inline-flex items-center gap-1.5 px-3 py-0.5 sm:py-1 rounded-full bg-[#1b1c20] border border-white/5 text-white">
-              <User size={12} className="text-white/80 shrink-0" />
-              <span className="font-jost text-xs sm:text-[12.5px] font-medium tracking-wide">
-                {getRoomPersons(room)}
+            {/* Capacity & Bed Type Pill Row */}
+            <div className="flex items-center gap-2 my-1.5 sm:my-2">
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#1b1c20] border border-white/5 text-white">
+                <User size={11} className="text-white/80 shrink-0" />
+                <span className="font-jost text-[11px] sm:text-xs font-medium tracking-wide">
+                  {getRoomPersons(room)}
+                </span>
+              </div>
+              {room.bed_type && (
+                <span className="font-jost text-white/50 text-[11px] sm:text-xs tracking-wide truncate">
+                  • {room.bed_type}
+                </span>
+              )}
+            </div>
+
+            {/* Price per night */}
+            <div className="flex items-baseline mt-0.5 mb-1.5">
+              <span className="font-jost font-bold text-white text-xl sm:text-2xl md:text-[26px] tracking-tight leading-none">
+                {formatRoomPrice(room.price_per_night)}
+              </span>
+              <span className="font-jost text-white/60 text-xs sm:text-[13px] font-normal ml-1.5">
+                / night
               </span>
             </div>
           </div>
 
-          {/* Price per night */}
-          <div className="flex items-baseline mb-4 sm:mb-5 mt-0.5">
-            <span className="font-jost font-bold text-white text-2xl sm:text-[28px] md:text-[30px] tracking-tight leading-none">
-              {formatRoomPrice(room.price_per_night)}
-            </span>
-            <span className="font-jost text-white/60 text-xs sm:text-sm font-normal ml-1.5">
-              / night
-            </span>
-          </div>
-
           {/* Bottom Row Action Buttons */}
-          <div className="flex items-center gap-2.5 sm:gap-3 w-full mt-auto pt-0.5">
+          <div className="flex items-center gap-2 sm:gap-2.5 w-full pt-1">
             {/* Explore Now Button (Outline Gold) */}
             {isCenter ? (
               <Link
                 href={`/rooms/${room.slug || room.id}`}
-                className="flex-1 border border-[#d7b56d] hover:bg-[#d7b56d] text-[#d7b56d] hover:text-black font-jost font-semibold text-xs sm:text-sm h-[42px] sm:h-[44px] rounded-xl transition-all duration-300 flex items-center justify-center text-center shadow-xs cursor-pointer active:scale-[0.98]"
+                className="flex-1 border border-[#d7b56d] hover:bg-[#d7b56d] text-[#d7b56d] hover:text-black font-jost font-semibold text-xs sm:text-[13px] h-[38px] sm:h-[40px] rounded-xl transition-all duration-300 flex items-center justify-center text-center shadow-xs cursor-pointer active:scale-[0.98]"
               >
                 Explore Now
               </Link>
             ) : (
               <button
                 onClick={onSelect}
-                className="flex-1 border border-[#d7b56d]/60 text-[#d7b56d] font-jost font-semibold text-xs sm:text-sm h-[42px] sm:h-[44px] rounded-xl flex items-center justify-center text-center cursor-pointer"
+                className="flex-1 border border-[#d7b56d]/60 text-[#d7b56d] font-jost font-semibold text-xs sm:text-[13px] h-[38px] sm:h-[40px] rounded-xl flex items-center justify-center text-center cursor-pointer"
               >
                 Explore Now
               </button>
@@ -337,20 +343,20 @@ const RoomCardItem = React.memo(function RoomCardItem({
               isCenter ? (
                 <Link
                   href={`/booking?roomId=${room.id}${searchedDates?.checkin ? `&checkin=${searchedDates.checkin}&checkout=${searchedDates.checkout}` : ""}`}
-                  className="flex-1 bg-[#d7b56d] hover:bg-[#c9a65d] text-black font-jost font-semibold text-xs sm:text-sm h-[42px] sm:h-[44px] rounded-xl transition-all duration-300 flex items-center justify-center text-center shadow-md cursor-pointer active:scale-[0.98]"
+                  className="flex-1 bg-[#d7b56d] hover:bg-[#c9a65d] text-black font-jost font-semibold text-xs sm:text-[13px] h-[38px] sm:h-[40px] rounded-xl transition-all duration-300 flex items-center justify-center text-center shadow-md cursor-pointer active:scale-[0.98]"
                 >
                   Book Now
                 </Link>
               ) : (
                 <button
                   onClick={onSelect}
-                  className="flex-1 bg-[#d7b56d] text-black font-jost font-semibold text-xs sm:text-sm h-[42px] sm:h-[44px] rounded-xl flex items-center justify-center text-center cursor-pointer"
+                  className="flex-1 bg-[#d7b56d] text-black font-jost font-semibold text-xs sm:text-[13px] h-[38px] sm:h-[40px] rounded-xl flex items-center justify-center text-center cursor-pointer"
                 >
                   Book Now
                 </button>
               )
             ) : (
-              <span className="flex-1 bg-red-950/80 border border-red-700/50 text-red-300 font-jost font-semibold text-xs sm:text-sm h-[42px] sm:h-[44px] rounded-xl flex items-center justify-center text-center">
+              <span className="flex-1 bg-red-950/80 border border-red-700/50 text-red-300 font-jost font-semibold text-xs sm:text-[13px] h-[38px] sm:h-[40px] rounded-xl flex items-center justify-center text-center">
                 Booked
               </span>
             )}
@@ -377,209 +383,299 @@ export default function RoomsSection({
   const totalCards = displayRooms.length;
 
   const sectionRef = useRef<HTMLDivElement>(null);
-  const [active, setActive] = useState(0);
-  const activeRef = useRef(0);
-  activeRef.current = active;
-  const rafId = useRef<number | null>(null);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const activeIndexRef = useRef(0);
+  activeIndexRef.current = activeIndex;
 
-  // High-performance RAF scroll listener: maps user scroll smoothly without layout thrashing
-  const handleScroll = useCallback(() => {
-    if (rafId.current !== null) return;
+  const wheelAccumulator = useRef(0);
+  const isThrottled = useRef(false);
 
-    rafId.current = requestAnimationFrame(() => {
-      rafId.current = null;
-      if (!sectionRef.current || totalCards <= 1) return;
+  // Navigate to specific card index
+  const goToCard = useCallback((targetIndex: number) => {
+    const clampedIndex = Math.max(0, Math.min(totalCards - 1, targetIndex));
+    setActiveIndex(clampedIndex);
+  }, [totalCards]);
+
+  const handlePrev = useCallback((e?: React.MouseEvent) => {
+    e?.preventDefault();
+    e?.stopPropagation();
+    if (activeIndexRef.current > 0) {
+      goToCard(activeIndexRef.current - 1);
+    }
+  }, [goToCard]);
+
+  const handleNext = useCallback((e?: React.MouseEvent) => {
+    e?.preventDefault();
+    e?.stopPropagation();
+    if (activeIndexRef.current < totalCards - 1) {
+      goToCard(activeIndexRef.current + 1);
+    }
+  }, [totalCards, goToCard]);
+
+  // Mouse Wheel scroll listener:
+  // Pins the section and smoothly moves card-by-card on scroll wheel.
+  // Until all cards have slid through, it prevents scrolling down to the next section!
+  useEffect(() => {
+    if (totalCards <= 1) return;
+
+    const onWheel = (e: WheelEvent) => {
+      if (!sectionRef.current) return;
 
       const rect = sectionRef.current.getBoundingClientRect();
-      // Skip if section is completely outside the viewport
-      if (rect.bottom < 0 || rect.top > window.innerHeight) return;
+      const inView = rect.top <= 80 && rect.bottom >= window.innerHeight * 0.45;
 
-      const scrollableHeight = sectionRef.current.offsetHeight - window.innerHeight;
-      if (scrollableHeight <= 0) return;
-
-      // How far has top of section scrolled past top of viewport?
-      const scrolled = -rect.top;
-      const progress = Math.max(0, Math.min(1, scrolled / scrollableHeight));
-
-      // Map progress smoothly into card indexes
-      const newActive = Math.min(totalCards - 1, Math.floor(progress * totalCards));
-      if (newActive !== activeRef.current) {
-        setActive(newActive);
+      // If the section is not actively framed in the viewport, let normal page scroll happen
+      if (!inView) {
+        return;
       }
-    });
-  }, [totalCards]);
 
-  useEffect(() => {
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    handleScroll();
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-      if (rafId.current !== null) {
-        cancelAnimationFrame(rafId.current);
+      // Horizontal gestures (e.g. horizontal trackpad scroll) should not be captured
+      if (Math.abs(e.deltaY) <= Math.abs(e.deltaX) || Math.abs(e.deltaY) < 10) {
+        return;
+      }
+
+      const isScrollingDown = e.deltaY > 0;
+      const currentIdx = activeIndexRef.current;
+
+      if (isScrollingDown) {
+        // Scrolling down:
+        // If we haven't reached the last card yet, PREVENT page scroll to next section and slide to next card!
+        if (currentIdx < totalCards - 1) {
+          e.preventDefault();
+
+          if (!isThrottled.current) {
+            wheelAccumulator.current += e.deltaY;
+            if (wheelAccumulator.current >= 25) {
+              isThrottled.current = true;
+              wheelAccumulator.current = 0;
+              if (Math.abs(rect.top) > 15) {
+                sectionRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+              }
+              goToCard(currentIdx + 1);
+
+              setTimeout(() => {
+                isThrottled.current = false;
+              }, 420);
+            }
+          }
+        } else {
+          // We ARE on the last card! All rooms have slid through.
+          // Allow normal scroll so user can scroll down to the next section!
+        }
+      } else {
+        // Scrolling up:
+        // If we haven't reached the first card yet, PREVENT page scroll up and slide to previous card!
+        if (currentIdx > 0) {
+          e.preventDefault();
+
+          if (!isThrottled.current) {
+            wheelAccumulator.current += e.deltaY;
+            if (wheelAccumulator.current <= -25) {
+              isThrottled.current = true;
+              wheelAccumulator.current = 0;
+              if (Math.abs(rect.top) > 15) {
+                sectionRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+              }
+              goToCard(currentIdx - 1);
+
+              setTimeout(() => {
+                isThrottled.current = false;
+              }, 420);
+            }
+          }
+        } else {
+          // We ARE on the first card!
+          // Allow normal scroll so user can scroll up to previous section!
+        }
       }
     };
-  }, [handleScroll]);
 
-  // Smooth programmatic scroll when clicking a card or chevron
-  const scrollToCard = useCallback((targetIndex: number) => {
-    if (!sectionRef.current || totalCards <= 1) {
-      setActive(targetIndex);
-      return;
+    window.addEventListener("wheel", onWheel, { passive: false });
+    return () => {
+      window.removeEventListener("wheel", onWheel);
+    };
+  }, [totalCards, goToCard]);
+
+  // Keyboard navigation when section is in view
+  useEffect(() => {
+    if (totalCards <= 1) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!sectionRef.current) return;
+      const rect = sectionRef.current.getBoundingClientRect();
+      const inView = rect.top <= 80 && rect.bottom >= window.innerHeight * 0.45;
+      if (!inView) return;
+
+      if (e.key === "ArrowRight" || e.key === "ArrowDown") {
+        if (activeIndexRef.current < totalCards - 1) {
+          e.preventDefault();
+          goToCard(activeIndexRef.current + 1);
+        }
+      } else if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
+        if (activeIndexRef.current > 0) {
+          e.preventDefault();
+          goToCard(activeIndexRef.current - 1);
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [totalCards, goToCard]);
+
+  // Touch Swipe for mobile devices
+  const touchStartX = useRef<number | null>(null);
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+  };
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX.current === null) return;
+    const diffX = touchStartX.current - e.changedTouches[0].clientX;
+    touchStartX.current = null;
+    if (Math.abs(diffX) > 40) {
+      if (diffX > 0) {
+        handleNext();
+      } else {
+        handlePrev();
+      }
     }
-    const rect = sectionRef.current.getBoundingClientRect();
-    const scrollableHeight = sectionRef.current.offsetHeight - window.innerHeight;
-    const containerTopDoc = window.scrollY + rect.top;
-    
-    // Position comfortably inside target card's scroll segment
-    const targetProgress = (targetIndex + 0.45) / totalCards;
-    const targetScrollY = containerTopDoc + Math.min(scrollableHeight, targetProgress * scrollableHeight);
-
-    window.scrollTo({
-      top: targetScrollY,
-      behavior: "smooth"
-    });
-  }, [totalCards]);
-
-  const handlePrev = () => {
-    scrollToCard(Math.max(0, active - 1));
   };
-
-  const handleNext = () => {
-    scrollToCard(Math.min(totalCards - 1, active + 1));
-  };
-
-  // Outer scroll track height: gives enough scroll space for each card before releasing to next section
-  // e.g. 4 cards = 320vh (each card gets ~70-80vh of scroll before advancing)
-  const trackHeightVh = totalCards > 1 ? Math.max(240, totalCards * 80) : 100;
 
   return (
     <section 
       ref={sectionRef}
-      style={{ height: `${trackHeightVh}vh` }}
-      className="relative bg-black w-full"
+      className="relative bg-black w-full h-screen min-h-[640px] max-h-[960px] py-3 sm:py-4 md:py-6 flex flex-col justify-between items-center overflow-hidden px-3 sm:px-4 select-none"
     >
-      {/* Pinned Sticky Viewport Container */}
-      <div className="sticky top-0 h-screen w-full flex flex-col justify-between items-center overflow-hidden bg-black px-3 sm:px-4 py-6 sm:py-8">
-        
-        {/* Section Heading */}
-        <div className="text-center max-w-2xl z-20 pt-2 sm:pt-4">
-          <div className="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-[#d7b56d]/10 border border-[#d7b56d]/25 mb-2 shadow-xs">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#d7b56d]" />
-            <span className="font-jost text-[#d7b56d] tracking-[0.22em] uppercase text-[11px] sm:text-[12px] font-bold">
-              Accommodations
-            </span>
-            <span className="w-1.5 h-1.5 rounded-full bg-[#d7b56d]" />
-          </div>
-          <h2 className="font-marcellus text-2xl sm:text-3xl md:text-[44px] lg:text-[48px] text-white leading-tight font-normal">
-            Curated Suites
-          </h2>
-          <div className="w-12 sm:w-16 h-[2px] bg-[#d7b56d] mx-auto mt-2" />
+      {/* Section Heading */}
+      <div className="text-center max-w-2xl z-20 pt-1 sm:pt-2">
+        <div className="inline-flex items-center gap-2 px-3.5 py-0.5 rounded-full bg-[#d7b56d]/10 border border-[#d7b56d]/25 mb-1.5 shadow-xs">
+          <span className="w-1.5 h-1.5 rounded-full bg-[#d7b56d]" />
+          <span className="font-jost text-[#d7b56d] tracking-[0.22em] uppercase text-[10.5px] sm:text-[11.5px] font-bold">
+            Accommodations
+          </span>
+          <span className="w-1.5 h-1.5 rounded-full bg-[#d7b56d]" />
         </div>
-        
-        {/* Search Dates Banner */}
-        {searchedDates?.checkin && searchedDates?.checkout && (
-          <div className="bg-neutral-900/90 border border-[#d7b56d]/30 px-4 sm:px-6 py-2 sm:py-2.5 rounded-full text-center font-jost text-[12px] sm:text-[13.5px] text-white/90 shadow-sm z-20 -mt-2">
-            <span>Availability checked for: </span>
-            <strong className="text-[#d7b56d] font-semibold">{searchedDates.checkin}</strong> to <strong className="text-[#d7b56d] font-semibold">{searchedDates.checkout}</strong>
-            {unavailableRoomIds.length > 0 && (
-              <span className="block sm:inline sm:ml-2.5 text-red-400 font-medium text-[11px] sm:text-[12.5px]">
-                ({unavailableRoomIds.length} booked)
-              </span>
-            )}
-          </div>
-        )}
-
-        {totalCards === 0 ? (
-          <div className="text-center text-zinc-400 font-jost text-xl py-12">
-            No suites are currently available matching your criteria.
-          </div>
-        ) : (
-          <div className="relative w-full flex-1 flex items-center justify-center max-w-[1400px]">
-            
-            {/* Left Chevron Button */}
-            <button
-              onClick={handlePrev}
-              disabled={active === 0}
-              aria-label="Previous suite"
-              className={`absolute left-2 sm:left-6 md:left-12 top-1/2 -translate-y-1/2 z-30 w-10 h-10 sm:w-12 sm:h-12 rounded-full border border-[#d7b56d] flex items-center justify-center shadow-2xl transition-all duration-300 ${
-                active === 0 
-                  ? "opacity-30 cursor-not-allowed bg-black/60 text-[#d7b56d]" 
-                  : "bg-[#d7b56d] hover:bg-white text-black cursor-pointer active:scale-95"
-              }`}
-            >
-              <ChevronLeft size={20} className="sm:w-6 sm:h-6" />
-            </button>
-
-            {/* Right Chevron Button */}
-            <button
-              onClick={handleNext}
-              disabled={active === totalCards - 1}
-              aria-label="Next suite"
-              className={`absolute right-2 sm:right-6 md:right-12 top-1/2 -translate-y-1/2 z-30 w-10 h-10 sm:w-12 sm:h-12 rounded-full border border-[#d7b56d] flex items-center justify-center shadow-2xl transition-all duration-300 ${
-                active === totalCards - 1 
-                  ? "opacity-30 cursor-not-allowed bg-black/60 text-[#d7b56d]" 
-                  : "bg-[#d7b56d] hover:bg-white text-black cursor-pointer active:scale-95"
-              }`}
-            >
-              <ChevronRight size={20} className="sm:w-6 sm:h-6" />
-            </button>
-
-            {/* 3D Curved Fanned Carousel Stage */}
-            <div className="relative w-full h-[470px] sm:h-[500px] md:h-[530px] flex items-center justify-center overflow-visible select-none">
-              {displayRooms.map((room, idx) => {
-                const isUnavailable = unavailableRoomIds.includes(room.id);
-                return (
-                  <RoomCardItem
-                    key={room.id}
-                    room={room}
-                    index={idx}
-                    active={active}
-                    totalItems={totalCards}
-                    isUnavailable={isUnavailable}
-                    searchedDates={searchedDates}
-                    onSelect={() => scrollToCard(idx)}
-                  />
-                );
-              })}
-            </div>
-
-          </div>
-        )}
-
-        {/* Bottom Interactive Progress & Scroll Guidance */}
-        {totalCards > 1 && (
-          <div className="flex flex-col items-center gap-2 pb-2 sm:pb-3 z-20">
-            {/* Dots */}
-            <div className="flex items-center gap-2">
-              {displayRooms.map((_, i) => (
-                <button
-                  key={i}
-                  onClick={() => scrollToCard(i)}
-                  aria-label={`Jump to suite ${i + 1}`}
-                  className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${
-                    active === i 
-                      ? "w-8 bg-[#d7b56d] shadow-sm" 
-                      : "w-2 bg-neutral-700 hover:bg-neutral-500"
-                  }`}
-                />
-              ))}
-            </div>
-
-            {/* Active Counter & Scroll Hint */}
-            <div className="flex items-center gap-3 text-xs font-jost text-neutral-400">
-              <span className="text-[#d7b56d] font-semibold tracking-wider">
-                Suite 0{active + 1} of 0{totalCards}
-              </span>
-              <span className="opacity-30">•</span>
-              <span className="inline-flex items-center gap-1 text-neutral-400 tracking-wide">
-                <span>{active === totalCards - 1 ? "Scroll down to continue" : "Scroll to explore"}</span>
-                <ArrowDown size={12} className={active === totalCards - 1 ? "animate-bounce text-[#d7b56d]" : "animate-pulse"} />
-              </span>
-            </div>
-          </div>
-        )}
-
+        <h2 className="font-marcellus text-2xl sm:text-3xl md:text-[38px] lg:text-[42px] text-white leading-tight font-normal">
+          Curated Suites
+        </h2>
+        <div className="w-12 sm:w-16 h-[2px] bg-[#d7b56d] mx-auto mt-1.5" />
       </div>
+      
+      {/* Search Dates Banner */}
+      {searchedDates?.checkin && searchedDates?.checkout && (
+        <div className="bg-neutral-900/90 border border-[#d7b56d]/30 px-4 sm:px-6 py-1.5 sm:py-2 rounded-full text-center font-jost text-[12px] sm:text-[13px] text-white/90 shadow-sm z-20 -mt-1">
+          <span>Availability checked for: </span>
+          <strong className="text-[#d7b56d] font-semibold">{searchedDates.checkin}</strong> to <strong className="text-[#d7b56d] font-semibold">{searchedDates.checkout}</strong>
+          {unavailableRoomIds.length > 0 && (
+            <span className="block sm:inline sm:ml-2.5 text-red-400 font-medium text-[11px] sm:text-[12px]">
+              ({unavailableRoomIds.length} booked)
+            </span>
+          )}
+        </div>
+      )}
+
+      {totalCards === 0 ? (
+        <div className="text-center text-zinc-400 font-jost text-xl py-12">
+          No suites are currently available matching your criteria.
+        </div>
+      ) : (
+        <div className="relative w-full flex-1 flex items-center justify-center max-w-[1400px] my-2 sm:my-3">
+          
+          {/* Left Chevron Button: High Z-Index, Guaranteed Clickable */}
+          <button
+            type="button"
+            onClick={handlePrev}
+            disabled={activeIndex === 0}
+            aria-label="Previous suite"
+            className={`absolute left-2 sm:left-6 md:left-12 top-1/2 -translate-y-1/2 z-[100] w-11 h-11 sm:w-13 sm:h-13 rounded-full border border-[#d7b56d] flex items-center justify-center shadow-2xl transition-all duration-300 pointer-events-auto ${
+              activeIndex === 0
+                ? "opacity-35 cursor-not-allowed bg-black/70 text-[#d7b56d]"
+                : "bg-[#d7b56d] hover:bg-white text-black cursor-pointer active:scale-95"
+            }`}
+          >
+            <ChevronLeft size={22} className="sm:w-6 sm:h-6" />
+          </button>
+
+          {/* Right Chevron Button: High Z-Index, Guaranteed Clickable */}
+          <button
+            type="button"
+            onClick={handleNext}
+            disabled={activeIndex === totalCards - 1}
+            aria-label="Next suite"
+            className={`absolute right-2 sm:right-6 md:right-12 top-1/2 -translate-y-1/2 z-[100] w-11 h-11 sm:w-13 sm:h-13 rounded-full border border-[#d7b56d] flex items-center justify-center shadow-2xl transition-all duration-300 pointer-events-auto ${
+              activeIndex === totalCards - 1
+                ? "opacity-35 cursor-not-allowed bg-black/70 text-[#d7b56d]"
+                : "bg-[#d7b56d] hover:bg-white text-black cursor-pointer active:scale-95"
+            }`}
+          >
+            <ChevronRight size={22} className="sm:w-6 sm:h-6" />
+          </button>
+
+          {/* 3D Curved Fanned Carousel Stage with touch swipe */}
+          <div 
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
+            className="relative w-full h-[450px] sm:h-[480px] md:h-[510px] flex items-center justify-center overflow-visible select-none"
+          >
+            {displayRooms.map((room, idx) => {
+              const isUnavailable = unavailableRoomIds.includes(room.id);
+              return (
+                <RoomCardItem
+                  key={room.id}
+                  room={room}
+                  index={idx}
+                  active={activeIndex}
+                  totalItems={totalCards}
+                  isUnavailable={isUnavailable}
+                  searchedDates={searchedDates}
+                  onSelect={() => goToCard(idx)}
+                />
+              );
+            })}
+          </div>
+
+        </div>
+      )}
+
+      {/* Bottom Interactive Progress & Scroll Guidance */}
+      {totalCards > 1 && (
+        <div className="flex flex-col items-center gap-2.5 pb-2 sm:pb-3 z-20">
+          {/* Dots */}
+          <div className="flex items-center gap-2">
+            {displayRooms.map((_, i) => (
+              <button
+                type="button"
+                key={i}
+                onClick={() => goToCard(i)}
+                aria-label={`Jump to suite ${i + 1}`}
+                className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${
+                  activeIndex === i 
+                    ? "w-8 bg-[#d7b56d] shadow-sm" 
+                    : "w-2 bg-neutral-700 hover:bg-neutral-500"
+                }`}
+              />
+            ))}
+          </div>
+
+          {/* Active Counter & Scroll Guidance */}
+          <div className="flex items-center gap-3 text-xs font-jost text-neutral-400">
+            <span className="text-[#d7b56d] font-semibold tracking-wider">
+              Suite {String(activeIndex + 1).padStart(2, "0")} of {String(totalCards).padStart(2, "0")}
+            </span>
+            <span className="opacity-30">•</span>
+            <span className="inline-flex items-center gap-1.5 text-neutral-400 tracking-wide">
+              <span>
+                {activeIndex === totalCards - 1 
+                  ? "Scroll down to continue" 
+                  : "Scroll down to explore all suites"}
+              </span>
+              <ArrowDown size={12} className={activeIndex === totalCards - 1 ? "animate-bounce text-[#d7b56d]" : "animate-pulse"} />
+            </span>
+          </div>
+        </div>
+      )}
 
       {selectedRoom && (
         <BookingModal 

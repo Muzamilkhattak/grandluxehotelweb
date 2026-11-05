@@ -1,8 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Search, ChevronDown } from "lucide-react";
+import { Search, ChevronDown, CheckCircle2, Clock, CalendarX, User } from "lucide-react";
 import Image from "next/image";
 import { updateBookingStatus } from "@/app/actions/admin-bookings";
 
@@ -32,172 +31,151 @@ export default function RecentBookingsTable({ initialBookings }: { initialBookin
     const result = await updateBookingStatus(id, newStatus);
     if (result.success) {
       setBookings(prev => prev.map(b => b.id === id ? { ...b, status: newStatus } : b));
-      setToast(`Booking status updated to ${newStatus}.`);
+      setToast(`Booking status updated to ${newStatus}`);
       setTimeout(() => setToast(null), 3000);
     }
     setProcessingId(null);
   };
 
   return (
-    <div className="relative">
-      <AnimatePresence>
-        {toast && (
-          <motion.div 
-            initial={{ opacity: 0, y: -20 }} 
-            animate={{ opacity: 1, y: 0 }} 
-            exit={{ opacity: 0, y: -20 }}
-            className="fixed top-12 left-1/2 -translate-x-1/2 z-50 bg-white border-l-4 border-[#00a32a] text-[#1d2327] px-4 py-3 shadow-md text-sm"
-          >
-            {toast}
-          </motion.div>
-        )}
-      </AnimatePresence>
+    <div className="space-y-4">
+      {/* Toast Alert */}
+      {toast && (
+        <div className="fixed top-16 right-6 z-50 bg-white border border-emerald-200 text-emerald-800 px-4 py-2.5 rounded-lg shadow-lg text-xs font-medium flex items-center gap-2">
+          <CheckCircle2 size={15} className="text-emerald-600" />
+          <span>{toast}</span>
+        </div>
+      )}
 
-      <div className="bg-white flex flex-col">
-        {/* Toolbar */}
-        <div className="p-3 flex flex-col md:flex-row justify-between items-center gap-3">
-          <div className="flex gap-4 text-[13px]">
-            {tabs.map(tab => (
-              <button
-                key={tab}
-                onClick={() => setFilter(tab)}
-                className={`relative transition-colors ${filter === tab ? 'text-[#1d2327] font-semibold' : 'text-[#2271b1] hover:text-[#0a4b78]'}`}
-              >
-                {tab}
-                {filter !== tab && <span className="text-[#a7aaad] ml-4">|</span>}
-              </button>
-            ))}
-          </div>
-
-          <div className="relative w-full md:w-64">
-            <input 
-              type="text" 
-              placeholder="Search..." 
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-white border border-[#8c8f94] rounded-[3px] px-3 py-1.5 text-[13px] focus:outline-none focus:border-[#2271b1] focus:ring-1 focus:ring-[#2271b1] focus:shadow-[0_0_0_1px_#2271b1] transition-all text-[#3c434a]"
-            />
-          </div>
+      {/* Toolbar: Segmented Controls & Search */}
+      <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3">
+        {/* Segmented Filter Pills */}
+        <div className="inline-flex p-1 bg-zinc-100 rounded-lg self-start">
+          {tabs.map((tab) => (
+            <button
+              key={tab}
+              type="button"
+              onClick={() => setFilter(tab)}
+              className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
+                filter === tab
+                  ? "bg-white text-zinc-900 shadow-xs"
+                  : "text-zinc-600 hover:text-zinc-900"
+              }`}
+            >
+              {tab}
+            </button>
+          ))}
         </div>
 
-        {/* Table */}
-        <div className="overflow-x-auto border border-[#c3c4c7]">
-          <table className="w-full text-left text-[13px] text-[#3c434a]">
-            <thead className="bg-[#f6f7f7] border-b border-[#c3c4c7]">
+        {/* Search Bar */}
+        <div className="relative w-full sm:w-64">
+          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" />
+          <input 
+            type="text" 
+            placeholder="Search guests or suites..." 
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full h-9 bg-white border border-zinc-200 rounded-lg pl-9 pr-3 text-xs text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:border-zinc-400 focus:ring-1 focus:ring-zinc-400 transition-all"
+          />
+        </div>
+      </div>
+
+      {/* Table Container */}
+      <div className="border border-zinc-200/80 rounded-lg overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-xs">
+            <thead className="bg-zinc-50/80 border-b border-zinc-200/80 text-zinc-500 font-medium">
               <tr>
-                <th className="px-3 py-2 font-semibold">Guest Name</th>
-                <th className="px-3 py-2 font-semibold">Suite Booked</th>
-                <th className="px-3 py-2 font-semibold">Check In/Out</th>
-                <th className="px-3 py-2 font-semibold">Revenue</th>
-                <th className="px-3 py-2 font-semibold">Status</th>
+                <th className="px-4 py-3">Guest details</th>
+                <th className="px-4 py-3">Accommodation</th>
+                <th className="px-4 py-3">Dates</th>
+                <th className="px-4 py-3 text-right">Total</th>
+                <th className="px-4 py-3">Status</th>
+                <th className="px-4 py-3 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#c3c4c7] bg-white">
-              <AnimatePresence mode="popLayout">
-                {filteredBookings.map((booking, idx) => {
-                  const checkIn = new Date(booking.check_in);
-                  const checkOut = new Date(booking.check_out);
-                  const nights = Math.ceil((checkOut.getTime() - checkIn.getTime()) / (1000 * 3600 * 24));
-                  
-                  const receiptMatch = booking.notes?.match(/Payment Receipt:\s*(https?:\/\/[^\s]+)/i);
-                  const receiptUrl = receiptMatch ? receiptMatch[1] : null;
+            <tbody className="divide-y divide-zinc-200/80 bg-white">
+              {filteredBookings.map((booking) => {
+                const checkIn = new Date(booking.check_in);
+                const checkOut = new Date(booking.check_out);
+                const nights = Math.max(1, Math.ceil((checkOut.getTime() - checkIn.getTime()) / (1000 * 3600 * 24)));
+                
+                const statusStyle = 
+                  booking.status === 'confirmed' 
+                    ? 'bg-emerald-50 text-emerald-700 border-emerald-200/60' 
+                    : booking.status === 'pending'
+                    ? 'bg-amber-50 text-amber-700 border-amber-200/60'
+                    : 'bg-zinc-100 text-zinc-600 border-zinc-200/60';
 
-                  return (
-                    <motion.tr 
-                      layout
-                      key={booking.id}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, scale: 0.95 }}
-                      transition={{ duration: 0.2 }}
-                      className={`${idx % 2 === 0 ? 'bg-white' : 'bg-[#f6f7f7]'} hover:bg-[#f0f0f1] transition-colors group`}
-                    >
-                      <td className="px-3 py-3 align-top">
-                        <strong className="text-[#1d2327] block mb-0.5">{booking.guest_name}</strong>
-                        <div className="text-[11.5px] text-[#50575e] space-y-0.5">
-                          {booking.guest_email && <div>{booking.guest_email}</div>}
-                          {booking.guest_phone && <div>{booking.guest_phone}</div>}
-                          {booking.notes && (
-                            <div className="text-[11px] text-gray-500 line-clamp-1 italic mt-0.5">
-                              {booking.notes.split('\n')[0]}
-                            </div>
-                          )}
+                return (
+                  <tr key={booking.id} className="hover:bg-zinc-50/50 transition-colors">
+                    {/* Guest Name & Phone */}
+                    <td className="px-4 py-3.5">
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-7 h-7 rounded-full bg-zinc-100 border border-zinc-200 flex items-center justify-center text-zinc-600 text-[11px] font-semibold shrink-0">
+                          {booking.guest_name ? booking.guest_name.charAt(0).toUpperCase() : "G"}
                         </div>
-                        <div className="flex gap-2 text-[12px] opacity-0 group-hover:opacity-100 transition-opacity mt-1.5">
-                          {booking.status === 'confirmed' ? (
-                            <button
-                              onClick={() => handleStatusChange(booking.id, 'cancelled')}
-                              disabled={processingId === booking.id}
-                              className="text-[#d63638] hover:underline disabled:opacity-50"
-                            >
-                              {processingId === booking.id ? "Wait..." : "Cancel"}
-                            </button>
-                          ) : (
-                            <button
-                              onClick={() => handleStatusChange(booking.id, 'confirmed')}
-                              disabled={processingId === booking.id}
-                              className="text-[#2271b1] hover:underline disabled:opacity-50"
-                            >
-                              {processingId === booking.id ? "Wait..." : "Confirm"}
-                            </button>
-                          )}
-                          <span className="text-[#a7aaad]">|</span>
-                          <span className="text-[#2271b1] hover:underline cursor-pointer">View</span>
+                        <div className="min-w-0">
+                          <div className="font-medium text-zinc-900 truncate">{booking.guest_name}</div>
+                          <div className="text-[11px] text-zinc-500 tabular-nums">{booking.guest_phone || booking.guest_email || "Direct Booking"}</div>
                         </div>
-                      </td>
-                      <td className="px-3 py-3 align-top">
-                        <span className="text-[#2271b1] font-medium block">{booking.rooms?.title || "N/A"}</span>
-                        {receiptUrl && (
-                          <a 
-                            href={receiptUrl} 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1 mt-1.5 px-2 py-0.5 bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-300 rounded text-[11px] font-medium"
-                          >
-                            <span>📎 View Payment Receipt</span>
-                          </a>
-                        )}
-                      </td>
-                      <td className="px-3 py-3 align-top">
-                        {booking.check_in} <br/> 
-                        <span className="text-[#50575e]">{nights} nights</span>
-                      </td>
-                      <td className="px-3 py-3 align-top font-medium">
-                        PKR {booking.total_amount?.toLocaleString() || 0}
-                      </td>
-                      <td className="px-3 py-3 align-top">
-                        <span className={`inline-block px-2 py-0.5 text-[12px] rounded-[3px] font-medium border ${
-                          booking.status === 'confirmed'
-                            ? 'bg-[#edfaef] text-[#00a32a] border-[#00a32a]/20'
-                            : booking.status === 'pending'
-                            ? 'bg-[#fcf0e0] text-[#d16400] border-[#d16400]/20'
-                            : 'bg-[#f6f7f7] text-[#50575e] border-[#c3c4c7]'
-                        }`}>
-                          {booking.status}
-                        </span>
-                      </td>
-                    </motion.tr>
-                  );
-                })}
-              </AnimatePresence>
-              
+                      </div>
+                    </td>
+
+                    {/* Suite Booked */}
+                    <td className="px-4 py-3.5 text-zinc-700">
+                      <div className="font-medium text-zinc-900">{booking.rooms?.title || "Luxury Suite"}</div>
+                      <div className="text-[11px] text-zinc-500">{booking.guests_count || 2} Guests</div>
+                    </td>
+
+                    {/* Dates */}
+                    <td className="px-4 py-3.5 text-zinc-600">
+                      <div className="font-medium text-zinc-900 tabular-nums">
+                        {checkIn.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })} – {checkOut.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
+                      </div>
+                      <div className="text-[11px] text-zinc-500 tabular-nums">{nights} {nights === 1 ? 'night' : 'nights'}</div>
+                    </td>
+
+                    {/* Revenue Total */}
+                    <td className="px-4 py-3.5 text-right font-medium text-zinc-900 tabular-nums">
+                      PKR {Number(booking.total_amount || 0).toLocaleString()}
+                    </td>
+
+                    {/* Status Badge */}
+                    <td className="px-4 py-3.5">
+                      <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-[11px] font-medium border capitalize ${statusStyle}`}>
+                        <span className={`w-1.5 h-1.5 rounded-full ${
+                          booking.status === 'confirmed' ? 'bg-emerald-500' : booking.status === 'pending' ? 'bg-amber-500' : 'bg-zinc-400'
+                        }`} />
+                        {booking.status}
+                      </span>
+                    </td>
+
+                    {/* Quick Status Action */}
+                    <td className="px-4 py-3.5 text-right">
+                      <select
+                        value={booking.status}
+                        disabled={processingId === booking.id}
+                        onChange={(e) => handleStatusChange(booking.id, e.target.value)}
+                        className="h-7 text-xs bg-white border border-zinc-200 rounded-md px-2 text-zinc-700 focus:outline-none focus:border-zinc-400 cursor-pointer disabled:opacity-50"
+                      >
+                        <option value="confirmed">Confirmed</option>
+                        <option value="pending">Pending</option>
+                        <option value="cancelled">Cancelled</option>
+                      </select>
+                    </td>
+                  </tr>
+                );
+              })}
+
               {filteredBookings.length === 0 && (
-                <motion.tr initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-                  <td colSpan={5} className="px-3 py-6 text-[#50575e]">
-                    No reservations found.
+                <tr>
+                  <td colSpan={6} className="px-4 py-12 text-center text-zinc-400 text-xs">
+                    No reservations found matching the current filters.
                   </td>
-                </motion.tr>
+                </tr>
               )}
             </tbody>
-            <tfoot className="bg-[#f6f7f7] border-t border-[#c3c4c7]">
-              <tr>
-                <th className="px-3 py-2 font-semibold">Guest Name</th>
-                <th className="px-3 py-2 font-semibold">Suite Booked</th>
-                <th className="px-3 py-2 font-semibold">Check In/Out</th>
-                <th className="px-3 py-2 font-semibold">Revenue</th>
-                <th className="px-3 py-2 font-semibold">Status</th>
-              </tr>
-            </tfoot>
           </table>
         </div>
       </div>

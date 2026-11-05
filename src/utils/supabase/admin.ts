@@ -8,10 +8,20 @@ export function createAdminClient() {
     return null;
   }
 
-  return createClient(supabaseUrl, serviceRoleKey, {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false,
-    },
-  });
+  try {
+    // Polyfill WebSocket in Node.js runtime if missing (required by @supabase/supabase-js realtime client)
+    if (typeof globalThis !== "undefined" && !globalThis.WebSocket) {
+      globalThis.WebSocket = class {} as any;
+    }
+
+    return createClient(supabaseUrl, serviceRoleKey, {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false,
+      },
+    });
+  } catch (error) {
+    console.error("Failed to initialize Supabase admin client:", error);
+    return null;
+  }
 }

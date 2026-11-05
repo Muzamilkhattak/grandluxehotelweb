@@ -167,14 +167,17 @@ export default function NewRoomPage() {
   };
 
   return (
-    <div className="max-w-5xl mx-auto pb-12 font-sans">
+    <div className="max-w-5xl mx-auto pb-12 font-jost">
       {/* Top Action Header */}
-      <div className="flex justify-between items-center mb-6 pb-4 border-b border-[#c3c4c7]">
+      <div className="flex justify-between items-center mb-6 pb-4 border-b border-zinc-200/80">
         <div className="flex items-center gap-3">
-          <Link href="/admin/rooms" className="text-[#2271b1] hover:text-[#135e96] transition-colors p-1">
-            <ArrowLeft size={20} />
+          <Link href="/admin/rooms" className="text-zinc-600 hover:text-zinc-900 transition-colors p-1 rounded-lg hover:bg-zinc-100">
+            <ArrowLeft size={18} />
           </Link>
-          <h1 className="text-2xl font-[#1d2327] font-semibold tracking-tight">Add New Accommodation</h1>
+          <div>
+            <h1 className="text-xl md:text-2xl font-semibold text-zinc-900 tracking-tight">Add accommodation</h1>
+            <p className="text-xs text-zinc-500 mt-0.5">Create a new suite with inventory, pricing, and photography.</p>
+          </div>
         </div>
       </div>
 
@@ -191,19 +194,19 @@ export default function NewRoomPage() {
         <div className="flex-1 flex flex-col gap-5">
           
           {/* Title Input */}
-          <div className="bg-white border border-[#c3c4c7] p-4 shadow-sm rounded-sm">
+          <div className="bg-white border border-zinc-200/80 p-4 shadow-sm rounded-sm">
             <input 
               name="title" 
               type="text" 
               required 
               placeholder="Add Accommodation Title (e.g., Deluxe Oceanfront Suite)" 
-              className="w-full text-xl font-medium text-[#1d2327] border border-[#8c8f94] rounded-[3px] px-3.5 py-2.5 focus:outline-none focus:border-[#2271b1] focus:ring-1 focus:ring-[#2271b1] placeholder:text-[#646970]"
+              className="w-full text-xl font-medium text-zinc-900 border border-zinc-200 rounded-lg px-3.5 py-2.5 focus:outline-none focus:border-zinc-400 focus:ring-1 focus:ring-zinc-400 placeholder:text-[#646970]"
             />
           </div>
 
           {/* Description Editor Box */}
-          <div className="bg-white border border-[#c3c4c7] shadow-sm rounded-sm overflow-hidden">
-            <div className="bg-[#f6f7f7] border-b border-[#c3c4c7] px-3 py-2 text-[14px] font-semibold text-[#1d2327]">
+          <div className="bg-white border border-zinc-200/80 shadow-sm rounded-sm overflow-hidden">
+            <div className="bg-zinc-50 border-b border-zinc-200/80 px-3 py-2 text-[14px] font-semibold text-zinc-900">
               Accommodation Description
             </div>
             <div className="p-3">
@@ -212,44 +215,44 @@ export default function NewRoomPage() {
                 rows={7} 
                 required 
                 placeholder="Enter detailed room description, architectural features, and luxury specifications..."
-                className="w-full bg-white border border-[#8c8f94] rounded-[3px] p-3 text-[14px] text-[#3c434a] focus:outline-none focus:border-[#2271b1] focus:ring-1 focus:ring-[#2271b1] leading-relaxed resize-y"
+                className="w-full bg-white border border-zinc-200 rounded-lg p-3 text-[14px] text-zinc-700 focus:outline-none focus:border-zinc-400 focus:ring-1 focus:ring-zinc-400 leading-relaxed resize-y"
               ></textarea>
             </div>
           </div>
 
           {/* Room Data / Specifications Box */}
-          <div className="bg-white border border-[#c3c4c7] shadow-sm rounded-sm">
-            <div className="bg-[#f6f7f7] border-b border-[#c3c4c7] px-3 py-2 text-[14px] font-semibold text-[#1d2327]">
+          <div className="bg-white border border-zinc-200/80 shadow-sm rounded-sm">
+            <div className="bg-zinc-50 border-b border-zinc-200/80 px-3 py-2 text-[14px] font-semibold text-zinc-900">
               Room Data & Pricing
             </div>
             <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="flex flex-col gap-1.5">
-                <label className="text-[13px] font-semibold text-[#1d2327]">Nightly Rate (PKR)</label>
+                <label className="text-[13px] font-semibold text-zinc-900">Nightly Rate (PKR)</label>
                 <input 
                   name="price_per_night" 
                   type="number" 
                   required 
                   min={0}
                   placeholder="e.g. 15000"
-                  className="w-full bg-white border border-[#8c8f94] rounded-[3px] px-3 py-1.5 text-[13px] text-[#3c434a] focus:outline-none focus:border-[#2271b1] focus:ring-1 focus:ring-[#2271b1]"
+                  className="w-full bg-white border border-zinc-200 rounded-lg px-3 py-1.5 text-[13px] text-zinc-700 focus:outline-none focus:border-zinc-400 focus:ring-1 focus:ring-zinc-400"
                 />
               </div>
 
               <div className="flex flex-col gap-1.5">
-                <label className="text-[13px] font-semibold text-[#1d2327]">Guest Capacity (Max Persons)</label>
+                <label className="text-[13px] font-semibold text-zinc-900">Guest Capacity (Max Persons)</label>
                 <input 
                   name="capacity" 
                   type="number" 
                   required 
                   min={1}
                   defaultValue={2}
-                  className="w-full bg-white border border-[#8c8f94] rounded-[3px] px-3 py-1.5 text-[13px] text-[#3c434a] focus:outline-none focus:border-[#2271b1] focus:ring-1 focus:ring-[#2271b1]"
+                  className="w-full bg-white border border-zinc-200 rounded-lg px-3 py-1.5 text-[13px] text-zinc-700 focus:outline-none focus:border-zinc-400 focus:ring-1 focus:ring-zinc-400"
                 />
               </div>
 
               {/* NEW FIELD: Total Available Quantity in Hotel */}
-              <div className="flex flex-col gap-1.5 col-span-full border-t border-[#c3c4c7] pt-4 mt-2">
-                <label className="text-[13px] font-semibold text-[#2271b1] flex items-center gap-1.5">
+              <div className="flex flex-col gap-1.5 col-span-full border-t border-zinc-200/80 pt-4 mt-2">
+                <label className="text-[13px] font-semibold text-zinc-700 flex items-center gap-1.5">
                   Total Physical Rooms of this Type in Hotel (Inventory Quantity)
                 </label>
                 <input 
@@ -259,7 +262,7 @@ export default function NewRoomPage() {
                   min={1}
                   defaultValue={1}
                   placeholder="e.g. 5 (Number of rooms of this category in hotel)"
-                  className="w-full bg-white border border-[#8c8f94] rounded-[3px] px-3 py-2 text-[14px] text-[#1d2327] font-semibold focus:outline-none focus:border-[#2271b1] focus:ring-1 focus:ring-[#2271b1]"
+                  className="w-full bg-white border border-zinc-200 rounded-lg px-3 py-2 text-[14px] text-zinc-900 font-semibold focus:outline-none focus:border-zinc-400 focus:ring-1 focus:ring-zinc-400"
                 />
                 <p className="text-[12px] text-[#646970] leading-normal">
                   Specify how many physical rooms of this accommodation category exist in the hotel (e.g., 5 Deluxe Suites). The booking engine will allow up to this quantity of overlapping bookings for the same dates.
@@ -274,23 +277,23 @@ export default function NewRoomPage() {
         <div className="w-full lg:w-[320px] flex flex-col gap-5">
           
           {/* Publish Metabox */}
-          <div className="bg-white border border-[#c3c4c7] shadow-sm rounded-sm">
-            <div className="bg-[#f6f7f7] border-b border-[#c3c4c7] px-3 py-2 text-[14px] font-semibold text-[#1d2327]">
+          <div className="bg-white border border-zinc-200/80 shadow-sm rounded-sm">
+            <div className="bg-zinc-50 border-b border-zinc-200/80 px-3 py-2 text-[14px] font-semibold text-zinc-900">
               Publish Settings
             </div>
             <div className="p-3 bg-white">
               <div className="flex items-center gap-2 mb-3 text-[13px] text-[#50575e]">
-                <span className="font-semibold text-[#1d2327]">Status:</span> Draft
+                <span className="font-semibold text-zinc-900">Status:</span> Draft
               </div>
               <div className="flex items-center gap-2 mb-4 text-[13px] text-[#50575e]">
-                <span className="font-semibold text-[#1d2327]">Visibility:</span> Public
+                <span className="font-semibold text-zinc-900">Visibility:</span> Public
               </div>
             </div>
-            <div className="p-3 bg-[#f6f7f7] border-t border-[#c3c4c7] flex items-center justify-end">
+            <div className="p-3 bg-zinc-50 border-t border-zinc-200/80 flex items-center justify-end">
               <button 
                 type="submit" 
                 disabled={loading}
-                className="bg-[#2271b1] hover:bg-[#135e96] border border-[#2271b1] text-white text-[13px] px-5 py-2 rounded-[3px] font-medium transition-colors disabled:opacity-70 disabled:cursor-not-allowed shadow-sm"
+                className="bg-zinc-900 hover:bg-zinc-800 border border-[#2271b1] text-white text-[13px] px-5 py-2 rounded-lg font-medium transition-colors disabled:opacity-70 disabled:cursor-not-allowed shadow-sm"
               >
                 {loading ? "Publishing..." : "Publish Accommodation"}
               </button>
@@ -298,8 +301,8 @@ export default function NewRoomPage() {
           </div>
 
           {/* Amenities Metabox */}
-          <div className="bg-white border border-[#c3c4c7] shadow-sm rounded-sm">
-            <div className="bg-[#f6f7f7] border-b border-[#c3c4c7] px-3 py-2 text-[14px] font-semibold text-[#1d2327]">
+          <div className="bg-white border border-zinc-200/80 shadow-sm rounded-sm">
+            <div className="bg-zinc-50 border-b border-zinc-200/80 px-3 py-2 text-[14px] font-semibold text-zinc-900">
               Amenities & Tags
             </div>
             <div className="p-3">
@@ -307,20 +310,20 @@ export default function NewRoomPage() {
                 name="amenities" 
                 rows={3}
                 placeholder="Oceanfront, Jacuzzi, Private Balcony, Mini Bar (comma separated)"
-                className="w-full bg-white border border-[#8c8f94] rounded-[3px] px-3 py-2 text-[13px] text-[#3c434a] focus:outline-none focus:border-[#2271b1] focus:ring-1 focus:ring-[#2271b1] resize-none"
+                className="w-full bg-white border border-zinc-200 rounded-lg px-3 py-2 text-[13px] text-zinc-700 focus:outline-none focus:border-zinc-400 focus:ring-1 focus:ring-zinc-400 resize-none"
               ></textarea>
               <p className="text-[12px] text-[#646970] mt-1 italic">Separate amenities with commas.</p>
             </div>
           </div>
 
           {/* Featured Image Metabox */}
-          <div className="bg-white border border-[#c3c4c7] shadow-sm rounded-sm overflow-hidden">
-            <div className="bg-[#f6f7f7] border-b border-[#c3c4c7] px-3 py-2 text-[14px] font-semibold text-[#1d2327]">
+          <div className="bg-white border border-zinc-200/80 shadow-sm rounded-sm overflow-hidden">
+            <div className="bg-zinc-50 border-b border-zinc-200/80 px-3 py-2 text-[14px] font-semibold text-zinc-900">
               Featured Image
             </div>
             <div className="p-3 space-y-3">
               {featuredPreview && (
-                <div className="relative aspect-video rounded-[3px] overflow-hidden border border-gray-300 bg-white">
+                <div className="relative aspect-video rounded-lg overflow-hidden border border-gray-300 bg-white">
                   <img src={featuredPreview} alt="Featured Preview" className="w-full h-full object-cover" />
                   <span className="absolute top-2 left-2 bg-[#2271b1] text-white text-[10px] px-2 py-0.5 rounded font-medium flex items-center gap-1 shadow-sm">
                     <Star size={12} className="fill-white" /> Featured
@@ -337,7 +340,7 @@ export default function NewRoomPage() {
               )}
               
               {!featuredPreview && (
-                <div className="border-2 border-dashed border-[#8c8f94] bg-[#f6f7f7] p-4 text-center rounded-[3px] relative overflow-hidden group hover:bg-[#f0f0f1] hover:border-[#2271b1] transition-colors cursor-pointer">
+                <div className="border-2 border-dashed border-zinc-200 bg-zinc-50 p-4 text-center rounded-lg relative overflow-hidden group hover:bg-[#f0f0f1] hover:border-[#2271b1] transition-colors cursor-pointer">
                   <input 
                     name="featured"
                     type="file" 
@@ -347,8 +350,8 @@ export default function NewRoomPage() {
                     required
                   />
                   <div className="flex flex-col items-center justify-center gap-1.5">
-                    <ImagePlus size={24} className="text-[#2271b1]" />
-                    <span className="text-[13px] text-[#2271b1] font-medium underline">
+                    <ImagePlus size={24} className="text-zinc-700" />
+                    <span className="text-[13px] text-zinc-700 font-medium underline">
                       Set Featured Image
                     </span>
                   </div>
@@ -358,8 +361,8 @@ export default function NewRoomPage() {
           </div>
 
           {/* Room Gallery / Images Metabox */}
-          <div className="bg-white border border-[#c3c4c7] shadow-sm rounded-sm overflow-hidden">
-            <div className="bg-[#f6f7f7] border-b border-[#c3c4c7] px-3 py-2 text-[14px] font-semibold text-[#1d2327] flex justify-between items-center">
+          <div className="bg-white border border-zinc-200/80 shadow-sm rounded-sm overflow-hidden">
+            <div className="bg-zinc-50 border-b border-zinc-200/80 px-3 py-2 text-[14px] font-semibold text-zinc-900 flex justify-between items-center">
               <span>Room Gallery</span>
               <span className="text-[11px] font-normal bg-[#2271b1] text-white px-2 py-0.5 rounded-full">
                 {galleryFiles.length} {galleryFiles.length === 1 ? 'image' : 'images'}
@@ -369,9 +372,9 @@ export default function NewRoomPage() {
             <div className="p-3 space-y-3">
               {/* Image Preview Grid */}
               {galleryPreviews.length > 0 && (
-                <div className="grid grid-cols-2 gap-2 max-h-[320px] overflow-y-auto p-1 border border-[#c3c4c7] rounded-[3px] bg-gray-50">
+                <div className="grid grid-cols-2 gap-2 max-h-[320px] overflow-y-auto p-1 border border-zinc-200/80 rounded-lg bg-gray-50">
                   {galleryPreviews.map((src, index) => (
-                    <div key={index} className="relative group aspect-square rounded-[3px] overflow-hidden border border-gray-300 bg-white">
+                    <div key={index} className="relative group aspect-square rounded-lg overflow-hidden border border-gray-300 bg-white">
                       <img 
                         src={src} 
                         alt={`Gallery ${index + 1}`} 
@@ -391,7 +394,7 @@ export default function NewRoomPage() {
               )}
 
               {/* Upload Drop Area */}
-              <div className="border-2 border-dashed border-[#8c8f94] bg-[#f6f7f7] p-4 text-center rounded-[3px] relative overflow-hidden group hover:bg-[#f0f0f1] hover:border-[#2271b1] transition-colors cursor-pointer">
+              <div className="border-2 border-dashed border-zinc-200 bg-zinc-50 p-4 text-center rounded-lg relative overflow-hidden group hover:bg-[#f0f0f1] hover:border-[#2271b1] transition-colors cursor-pointer">
                 <input 
                   type="file" 
                   accept="image/*"
@@ -400,8 +403,8 @@ export default function NewRoomPage() {
                   className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                 />
                 <div className="flex flex-col items-center justify-center gap-1.5">
-                  <ImagePlus size={24} className="text-[#2271b1]" />
-                  <span className="text-[13px] text-[#2271b1] font-medium underline">
+                  <ImagePlus size={24} className="text-zinc-700" />
+                  <span className="text-[13px] text-zinc-700 font-medium underline">
                     {galleryPreviews.length === 0 ? "Upload Gallery Images" : "Add More Images"}
                   </span>
                 </div>

@@ -1,4 +1,4 @@
-﻿import Link from "next/link";
+import Link from "next/link";
 import { Plus } from "lucide-react";
 import RoomsListClient from "@/components/admin/RoomsListClient";
 
@@ -21,28 +21,28 @@ export default async function RoomsAdminPage() {
 
   if (error) {
     return (
-      <div className="p-6 bg-red-50 border border-red-200 text-red-700 font-jost rounded-md">
+      <div className="p-4 bg-rose-50 border border-rose-200 text-rose-700 text-xs rounded-lg">
         Failed to load rooms: {error.message}
       </div>
     );
   }
 
   return (
-    <div className="max-w-7xl mx-auto">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+    <div className="max-w-7xl mx-auto space-y-6">
+      {/* Page Header */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="font-marcellus text-[36px] sm:text-[44px] text-[#000000] leading-tight">
-            Accommodations & Rooms
-          </h1>
-          <p className="font-jost text-sm text-[#555E63]">
-            Manage physical room inventory, suite amenities, and nightly pricing.
+          <h1 className="text-xl md:text-2xl font-semibold text-zinc-900 tracking-tight">Accommodations</h1>
+          <p className="text-xs md:text-sm text-zinc-500 mt-0.5">
+            Physical room inventory, suite amenities, and nightly pricing.
           </p>
         </div>
         <Link 
           href="/admin/rooms/new" 
-          className="inline-flex items-center gap-2 bg-[#000000] text-white font-jost font-medium text-[15px] sm:text-[16px] px-6 sm:px-[30px] py-3 sm:py-[15px] rounded-full hover:bg-[#d7b56d] transition-all shadow-sm active:scale-95"
+          className="inline-flex items-center gap-1.5 bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-medium px-4 py-2 rounded-lg transition-colors shadow-xs"
         >
-          <Plus size={18} /> Add New Room
+          <Plus size={14} className="text-[#d7b56d]" />
+          <span>Add room</span>
         </Link>
       </div>
 

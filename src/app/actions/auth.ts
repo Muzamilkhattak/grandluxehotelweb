@@ -32,8 +32,8 @@ export interface AuthActionResult {
 
 export async function loginAction(formData: FormData): Promise<AuthActionResult> {
   const startTime = Date.now();
-
-  // 1. Anti-Bot Defense Layer
+  try {
+    // 1. Anti-Bot Defense Layer
   if (await isSuspiciousBotRequest()) {
     await equalizeTiming(startTime, 500);
     return { success: false, error: "Automated activity detected. Access restricted." };
@@ -169,11 +169,18 @@ export async function loginAction(formData: FormData): Promise<AuthActionResult>
 
   revalidatePath("/", "layout");
   return { success: true };
+  } catch (err: any) {
+    console.error("Unhandled loginAction error:", err);
+    return {
+      success: false,
+      error: err?.message || "An unexpected error occurred during login. Please try again.",
+    };
+  }
 }
 
 export async function signupAction(formData: FormData): Promise<AuthActionResult> {
   const startTime = Date.now();
-
+  try {
   // 1. Anti-Bot Defense Layer
   if (await isSuspiciousBotRequest()) {
     await equalizeTiming(startTime, 500);
@@ -330,24 +337,37 @@ export async function signupAction(formData: FormData): Promise<AuthActionResult
 
   revalidatePath("/", "layout");
   return { success: true };
+  } catch (err: any) {
+    console.error("Unhandled signupAction error:", err);
+    return {
+      success: false,
+      error: err?.message || "An unexpected error occurred during signup. Please try again.",
+    };
+  }
 }
 
 export async function logoutAction() {
-  const cookieStore = await cookies();
-  const supabase = await createClient(cookieStore);
+  try {
+    const cookieStore = await cookies();
+    const supabase = await createClient(cookieStore);
 
-  const { error } = await supabase.auth.signOut();
+    const { error } = await supabase.auth.signOut();
 
-  if (error) {
-    return { success: false, error: error.message };
+    if (error) {
+      return { success: false, error: error.message };
+    }
+
+    revalidatePath("/", "layout");
+    return { success: true };
+  } catch (err: any) {
+    console.error("Unhandled logoutAction error:", err);
+    return { success: false, error: err?.message || "An unexpected error occurred during logout." };
   }
-
-  revalidatePath("/", "layout");
-  return { success: true };
 }
 
 export async function deleteAccountAction() {
-  const cookieStore = await cookies();
+  try {
+    const cookieStore = await cookies();
   const supabase = await createClient(cookieStore);
 
   const {
@@ -374,4 +394,8 @@ export async function deleteAccountAction() {
 
   revalidatePath("/", "layout");
   return { success: true };
+  } catch (err: any) {
+    console.error("Unhandled deleteAccountAction error:", err);
+    return { success: false, error: err?.message || "An unexpected error occurred while deleting account." };
+  }
 }

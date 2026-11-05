@@ -40,12 +40,22 @@ export default function ProfileClient({ initialUser }: { initialUser: any }) {
 
   const handleDeleteAccount = async () => {
     setLoading(true);
-    const res = await deleteAccountAction();
-    if (res.success) {
-      router.push("/login");
-      router.refresh();
-    } else {
-      setMessage({ type: "error", text: res.error || "Failed to delete account" });
+    try {
+      const res = await deleteAccountAction();
+      if (!res.success) {
+        setMessage({ type: "error", text: res.error || "Failed to delete account" });
+        setShowDeleteConfirm(false);
+        setLoading(false);
+        return;
+      }
+      try {
+        const supabase = createClient();
+        await supabase.auth.signOut();
+      } catch {}
+      window.dispatchEvent(new Event("supabase-auth-change"));
+      window.location.href = "/login";
+    } catch (err: any) {
+      setMessage({ type: "error", text: err?.message || "Failed to delete account" });
       setShowDeleteConfirm(false);
       setLoading(false);
     }
@@ -137,16 +147,30 @@ export default function ProfileClient({ initialUser }: { initialUser: any }) {
       )}
 
       <div className="space-y-3 pt-6 border-t border-[#d7b56d]">
-        <form action={async () => { 
-          await logoutAction(); 
-          router.push("/");
-          router.refresh();
-        }}>
-          <button type="submit" className="w-full flex items-center justify-center gap-2 py-2.5 border border-[#000000] text-[#000000] hover:bg-[#000000] hover:text-white transition-colors font-jost uppercase tracking-wider text-[12px] font-semibold cursor-pointer">
-            <LogOut size={14} />
-            Sign Out
-          </button>
-        </form>
+        <button 
+          type="button"
+          disabled={loading}
+          onClick={async () => {
+            setLoading(true);
+            try {
+              await logoutAction();
+            } catch (err) {
+              console.error(err);
+            }
+            try {
+              const supabase = createClient();
+              await supabase.auth.signOut();
+            } catch (err) {
+              console.error(err);
+            }
+            window.dispatchEvent(new Event("supabase-auth-change"));
+            window.location.href = "/";
+          }}
+          className="w-full flex items-center justify-center gap-2 py-2.5 border border-[#000000] text-[#000000] hover:bg-[#000000] hover:text-white transition-colors font-jost uppercase tracking-wider text-[12px] font-semibold cursor-pointer disabled:opacity-50"
+        >
+          {loading ? <Loader2 size={14} className="animate-spin" /> : <LogOut size={14} />}
+          Sign Out
+        </button>
         
         {!showDeleteConfirm ? (
           <button 
