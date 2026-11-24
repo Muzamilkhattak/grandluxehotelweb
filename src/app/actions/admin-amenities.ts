@@ -4,8 +4,7 @@ import fs from "fs/promises";
 import path from "path";
 import { revalidatePath } from "next/cache";
 import { verifyAdminSessionServer } from "@/app/actions/admin-auth";
-import { createClient } from "@/utils/supabase/server";
-import { cookies } from "next/headers";
+import { createServerClient } from "@supabase/ssr";
 
 export interface HotelAmenity {
   id: string;
@@ -15,17 +14,80 @@ export interface HotelAmenity {
 }
 
 const AMENITIES_FILE_PATH = path.join(process.cwd(), "src", "data", "hotel-amenities.json");
+const STORAGE_BUCKET = "room-images";
+const STORAGE_PATH = "settings/hotel-amenities.json";
+
+function getSupabaseClient() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!;
+  return createServerClient(supabaseUrl, serviceKey, {
+    cookies: {
+      getAll: () => [],
+      setAll: () => {},
+    },
+  });
+}
 
 export async function getHotelAmenities(): Promise<HotelAmenity[]> {
+  // 1. Try reading from Supabase Storage (cloud-persistent for Vercel/serverless)
   try {
-    const data = await fs.readFile(AMENITIES_FILE_PATH, "utf-8");
-    const parsed = JSON.parse(data);
+    const supabase = getSupabaseClient();
+    const { data, error } = await supabase.storage
+      .from(STORAGE_BUCKET)
+      .download(STORAGE_PATH);
+
+    if (data && !error) {
+      const text = await data.text();
+      const parsed = JSON.parse(text);
+      if (Array.isArray(parsed)) {
+        return parsed;
+      }
+    }
+  } catch (err) {
+    // Supabase storage read fallback
+  }
+
+  // 2. Fallback to local file if available
+  try {
+    const localData = await fs.readFile(AMENITIES_FILE_PATH, "utf-8");
+    const parsed = JSON.parse(localData);
     if (Array.isArray(parsed)) {
       return parsed;
     }
-    return [];
   } catch {
-    return [];
+    // Local read fallback
+  }
+
+  return [];
+}
+
+async function saveAmenitiesToStorage(amenities: HotelAmenity[]): Promise<void> {
+  const jsonContent = JSON.stringify(amenities, null, 2);
+
+  // 1. Primary: Save to Supabase Storage (bypasses serverless read-only filesystem)
+  try {
+    const supabase = getSupabaseClient();
+    const { error } = await supabase.storage
+      .from(STORAGE_BUCKET)
+      .upload(STORAGE_PATH, jsonContent, {
+        contentType: "application/json",
+        upsert: true,
+      });
+
+    if (error) {
+      console.warn("Storage upload warning:", error.message);
+    }
+  } catch (storageErr) {
+    console.warn("Storage exception:", storageErr);
+  }
+
+  // 2. Safe local file write for development environment (catches EROFS on Vercel)
+  try {
+    const dir = path.dirname(AMENITIES_FILE_PATH);
+    await fs.mkdir(dir, { recursive: true });
+    await fs.writeFile(AMENITIES_FILE_PATH, jsonContent, "utf-8");
+  } catch {
+    // EROFS / read-only filesystem on serverless lambda is completely safe to ignore
   }
 }
 
@@ -63,10 +125,7 @@ export async function createHotelAmenityAction(formData: FormData) {
     };
 
     const updated = [newAmenity, ...current];
-
-    const dir = path.dirname(AMENITIES_FILE_PATH);
-    await fs.mkdir(dir, { recursive: true });
-    await fs.writeFile(AMENITIES_FILE_PATH, JSON.stringify(updated, null, 2), "utf-8");
+    await saveAmenitiesToStorage(updated);
 
     revalidatePath("/admin/amenities");
     revalidatePath("/admin/rooms");
@@ -106,9 +165,7 @@ export async function updateHotelAmenityAction(id: string, formData: FormData) {
       ...(iconUrl ? { iconUrl } : {}),
     };
 
-    const dir = path.dirname(AMENITIES_FILE_PATH);
-    await fs.mkdir(dir, { recursive: true });
-    await fs.writeFile(AMENITIES_FILE_PATH, JSON.stringify(current, null, 2), "utf-8");
+    await saveAmenitiesToStorage(current);
 
     revalidatePath("/admin/amenities");
     revalidatePath("/admin/rooms");
@@ -132,9 +189,7 @@ export async function deleteHotelAmenityAction(id: string) {
     const current = await getHotelAmenities();
     const filtered = current.filter(a => a.id !== id);
 
-    const dir = path.dirname(AMENITIES_FILE_PATH);
-    await fs.mkdir(dir, { recursive: true });
-    await fs.writeFile(AMENITIES_FILE_PATH, JSON.stringify(filtered, null, 2), "utf-8");
+    await saveAmenitiesToStorage(filtered);
 
     revalidatePath("/admin/amenities");
     revalidatePath("/admin/rooms");

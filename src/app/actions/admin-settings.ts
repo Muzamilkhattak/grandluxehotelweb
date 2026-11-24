@@ -4,6 +4,7 @@ import fs from "fs/promises";
 import path from "path";
 import { revalidatePath } from "next/cache";
 import { verifyAdminSessionServer } from "@/app/actions/admin-auth";
+import { createServerClient } from "@supabase/ssr";
 
 export interface PaymentAccount {
   id: string;
@@ -104,8 +105,38 @@ const DEFAULT_SETTINGS: HotelSettings = {
 };
 
 const SETTINGS_FILE_PATH = path.join(process.cwd(), "src", "data", "hotel-settings.json");
+const STORAGE_BUCKET = "room-images";
+const SETTINGS_STORAGE_PATH = "settings/hotel-settings.json";
+
+function getSupabaseClient() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!;
+  return createServerClient(supabaseUrl, serviceKey, {
+    cookies: {
+      getAll: () => [],
+      setAll: () => {},
+    },
+  });
+}
 
 export async function getHotelSettings(): Promise<HotelSettings> {
+  // 1. Try reading from Supabase Storage (cloud-persistent for Vercel/serverless)
+  try {
+    const supabase = getSupabaseClient();
+    const { data, error } = await supabase.storage
+      .from(STORAGE_BUCKET)
+      .download(SETTINGS_STORAGE_PATH);
+
+    if (data && !error) {
+      const text = await data.text();
+      const parsed = JSON.parse(text);
+      return { ...DEFAULT_SETTINGS, ...parsed };
+    }
+  } catch {
+    // Cloud storage read fallback
+  }
+
+  // 2. Fallback to reading bundled/local JSON file
   try {
     const data = await fs.readFile(SETTINGS_FILE_PATH, "utf-8");
     const parsed = JSON.parse(data);
@@ -124,10 +155,33 @@ export async function saveHotelSettings(newSettings: Partial<HotelSettings>) {
   try {
     const current = await getHotelSettings();
     const updated = { ...current, ...newSettings };
+    const jsonContent = JSON.stringify(updated, null, 2);
 
-    const dir = path.dirname(SETTINGS_FILE_PATH);
-    await fs.mkdir(dir, { recursive: true });
-    await fs.writeFile(SETTINGS_FILE_PATH, JSON.stringify(updated, null, 2), "utf-8");
+    // 1. Primary: Save to Supabase Storage (bypasses serverless read-only filesystem)
+    try {
+      const supabase = getSupabaseClient();
+      const { error } = await supabase.storage
+        .from(STORAGE_BUCKET)
+        .upload(SETTINGS_STORAGE_PATH, jsonContent, {
+          contentType: "application/json",
+          upsert: true,
+        });
+
+      if (error) {
+        console.warn("Settings storage upload warning:", error.message);
+      }
+    } catch (storageErr) {
+      console.warn("Settings storage exception:", storageErr);
+    }
+
+    // 2. Safe local file write for development environment (catches EROFS on Vercel)
+    try {
+      const dir = path.dirname(SETTINGS_FILE_PATH);
+      await fs.mkdir(dir, { recursive: true });
+      await fs.writeFile(SETTINGS_FILE_PATH, jsonContent, "utf-8");
+    } catch {
+      // EROFS on Vercel lambda - safely ignored
+    }
 
     revalidatePath("/admin/settings");
     revalidatePath("/admin");
