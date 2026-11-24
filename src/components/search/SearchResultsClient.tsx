@@ -17,6 +17,7 @@ import {
   Clock, 
   SlidersHorizontal 
 } from "lucide-react";
+import { parseAmenity, getAmenityIcon } from "@/components/ui/AmenityIcon";
 
 export type SearchRoom = {
   id: string;
@@ -219,11 +220,17 @@ export default function SearchResultsClient({
                   <Maximize size={13} className="text-[#d7b56d]" /> {room.size_sqft} sq ft
                 </span>
               )}
-              {room.amenities && Array.isArray(room.amenities) && room.amenities.slice(0, 3).map((amenity, idx) => (
-                <span key={idx} className="inline-flex items-center gap-1 px-3 py-1 bg-gray-100 rounded-md">
-                  <Check size={12} className="text-green-600" /> {amenity}
-                </span>
-              ))}
+              {room.amenities && Array.isArray(room.amenities) && room.amenities
+                .filter((a: any) => typeof a === 'string' ? (!a.startsWith('total_rooms:') && !a.startsWith('ical_url:')) : true)
+                .slice(0, 3)
+                .map((amenity, idx) => {
+                  const parsed = parseAmenity(amenity);
+                  return (
+                    <span key={idx} className="inline-flex items-center gap-1.5 px-3 py-1 bg-gray-100 rounded-md text-[12px]">
+                      <span className="text-[#d7b56d] flex items-center">{getAmenityIcon(parsed, 13)}</span> {parsed.name}
+                    </span>
+                  );
+                })}
             </div>
 
             {/* Included Perks */}

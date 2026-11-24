@@ -7,6 +7,8 @@ import { ArrowLeft, ImagePlus, Trash2, Star, CheckCircle, AlertCircle, RefreshCw
 import { updateRoomAction, deleteRoomAction } from "@/app/actions/admin-rooms";
 import { syncRoomIcalAction } from "@/app/actions/ical";
 import { createClient } from "@/utils/supabase/client";
+import RoomAmenitiesManager from "@/components/admin/RoomAmenitiesManager";
+import { parseAmenity } from "@/components/ui/AmenityIcon";
 
 export default function EditRoomClient({ initialRoom }: { initialRoom: any }) {
   const router = useRouter();
@@ -224,9 +226,15 @@ export default function EditRoomClient({ initialRoom }: { initialRoom: any }) {
     }
   };
 
-  const amenitiesString = (initialRoom.amenities || [])
-    .filter((a: string) => !a.startsWith("total_rooms:") && !a.startsWith("ical_url:"))
-    .join(", ");
+  const rawAmenitiesList: string[] = Array.isArray(initialRoom.amenities)
+    ? initialRoom.amenities
+    : (typeof initialRoom.amenities === 'string' 
+        ? (initialRoom.amenities.startsWith('[') ? JSON.parse(initialRoom.amenities) : initialRoom.amenities.split(',').map((s: string) => s.trim()))
+        : []);
+
+  const parsedInitialAmenities = rawAmenitiesList
+    .filter((a: any) => typeof a === 'string' ? (!a.startsWith("total_rooms:") && !a.startsWith("ical_url:")) : true)
+    .map(parseAmenity);
 
   return (
     <div className="max-w-5xl mx-auto pb-12 font-jost">
@@ -329,6 +337,19 @@ export default function EditRoomClient({ initialRoom }: { initialRoom: any }) {
 
             </div>
           </div>
+
+          {/* Amenities & Custom Icons Box */}
+          <div className="bg-white border border-zinc-200/80 shadow-sm rounded-sm">
+            <div className="bg-zinc-50 border-b border-zinc-200/80 px-4 py-2.5 flex items-center justify-between">
+              <div>
+                <h3 className="text-[14px] font-semibold text-zinc-900">Room Amenities & Features</h3>
+                <p className="text-[12px] text-zinc-500">Only amenities added here will appear dynamically on the suite's public detail page.</p>
+              </div>
+            </div>
+            <div className="p-4">
+              <RoomAmenitiesManager initialAmenities={parsedInitialAmenities} />
+            </div>
+          </div>
         </div>
 
         <div className="w-full lg:w-[320px] flex flex-col gap-5">
@@ -358,26 +379,10 @@ export default function EditRoomClient({ initialRoom }: { initialRoom: any }) {
 
           <div className="bg-white border border-zinc-200/80 shadow-sm rounded-sm">
             <div className="bg-zinc-50 border-b border-zinc-200/80 px-3 py-2 text-[14px] font-semibold text-zinc-900">
-              Amenities & Tags
-            </div>
-            <div className="p-3">
-              <textarea 
-                name="amenities" 
-                rows={3}
-                defaultValue={amenitiesString}
-                placeholder="Oceanfront, Jacuzzi, Private Balcony, Mini Bar (comma separated)"
-                className="w-full bg-white border border-zinc-200 rounded-lg px-3 py-2 text-[13px] text-zinc-700 focus:outline-none focus:border-zinc-400 focus:ring-1 focus:ring-zinc-400 resize-none"
-              ></textarea>
-              <p className="text-[12px] text-[#646970] mt-1 italic">Separate amenities with commas.</p>
-              <input type="hidden" name="ical_url" value={icalUrl} />
-            </div>
-          </div>
-
-          <div className="bg-white border border-zinc-200/80 shadow-sm rounded-sm">
-            <div className="bg-zinc-50 border-b border-zinc-200/80 px-3 py-2 text-[14px] font-semibold text-zinc-900">
               iCal Sync (External Channels)
             </div>
             <div className="p-3">
+              <input type="hidden" name="ical_url" value={icalUrl} />
               <label className="text-[12px] font-semibold text-zinc-900 mb-1 block">Import Booking.com / Airbnb iCal URL</label>
               <input 
                 type="url"

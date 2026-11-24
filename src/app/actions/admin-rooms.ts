@@ -23,9 +23,28 @@ export async function createRoomAction(formData: FormData) {
   const size_sqft = parseInt(formData.get("size_sqft") as string, 10) || 0;
   const total_rooms = parseInt(formData.get("total_rooms") as string, 10) || 1;
   const ical_url = formData.get("ical_url") as string;
-  const amenitiesStr = formData.get("amenities") as string;
+  const amenitiesDataRaw = formData.get("amenitiesData") as string;
+  let amenities: string[] = [];
   
-  let amenities = (amenitiesStr || "").split(",").map((a) => a.trim()).filter(Boolean);
+  if (amenitiesDataRaw) {
+    try {
+      const parsed = JSON.parse(amenitiesDataRaw);
+      if (Array.isArray(parsed)) {
+        amenities = parsed.map((item: any) => {
+          if (typeof item === 'string') return item.trim();
+          return JSON.stringify(item);
+        }).filter(Boolean);
+      }
+    } catch (e) {
+      console.error("Failed to parse amenitiesData", e);
+    }
+  }
+
+  if (amenities.length === 0) {
+    const amenitiesStr = formData.get("amenities") as string;
+    amenities = (amenitiesStr || "").split(",").map((a) => a.trim()).filter(Boolean);
+  }
+
   // Prepend total_rooms tag for persistent schema-independent availability tracking
   amenities = [`total_rooms:${total_rooms}`, ...amenities.filter(a => !a.startsWith("total_rooms:") && !a.startsWith("ical_url:"))];
   
@@ -91,9 +110,28 @@ export async function updateRoomAction(id: string, formData: FormData) {
   const size_sqft = parseInt(formData.get("size_sqft") as string, 10) || 0;
   const total_rooms = parseInt(formData.get("total_rooms") as string, 10) || 1;
   const ical_url = formData.get("ical_url") as string;
-  const amenitiesStr = formData.get("amenities") as string;
+  const amenitiesDataRaw = formData.get("amenitiesData") as string;
+  let amenities: string[] = [];
   
-  let amenities = (amenitiesStr || "").split(",").map((a) => a.trim()).filter(Boolean);
+  if (amenitiesDataRaw) {
+    try {
+      const parsed = JSON.parse(amenitiesDataRaw);
+      if (Array.isArray(parsed)) {
+        amenities = parsed.map((item: any) => {
+          if (typeof item === 'string') return item.trim();
+          return JSON.stringify(item);
+        }).filter(Boolean);
+      }
+    } catch (e) {
+      console.error("Failed to parse amenitiesData", e);
+    }
+  }
+
+  if (amenities.length === 0) {
+    const amenitiesStr = formData.get("amenities") as string;
+    amenities = (amenitiesStr || "").split(",").map((a) => a.trim()).filter(Boolean);
+  }
+
   // Prepend total_rooms tag for persistent schema-independent availability tracking
   amenities = [`total_rooms:${total_rooms}`, ...amenities.filter(a => !a.startsWith("total_rooms:") && !a.startsWith("ical_url:"))];
   

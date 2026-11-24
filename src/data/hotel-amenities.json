@@ -1,0 +1,14 @@
+[
+  {
+    "id": "amenity-1795502552016-7rtjla",
+    "name": "MiniFridge",
+    "iconUrl": "https://attlpfjouuewvckccpim.supabase.co/storage/v1/object/public/room-images/amenities/icon-1795502550785-m79zzn.webp",
+    "createdAt": "2026-11-24T06:42:32.016Z"
+  },
+  {
+    "id": "amenity-1795501617815-e8n5n4",
+    "name": "KINGSIZEBED",
+    "iconUrl": "https://attlpfjouuewvckccpim.supabase.co/storage/v1/object/public/room-images/amenities/icon-1795501616672-uomjc.webp",
+    "createdAt": "2026-11-24T06:26:57.815Z"
+  }
+]

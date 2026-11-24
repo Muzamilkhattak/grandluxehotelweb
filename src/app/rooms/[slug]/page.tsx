@@ -6,7 +6,7 @@ import Link from "next/link";
 import { ArrowLeft, Check, Coffee, Bath, Shield, Wind, Maximize, Users, BedDouble } from "lucide-react";
 import RoomGallery from "@/components/rooms/RoomGallery";
 import BookingWidget from "@/components/booking/BookingWidget";
-import { getAmenityIcon } from "@/components/ui/AmenityIcon";
+import { AmenityIcon, parseAmenity, AmenityItem } from "@/components/ui/AmenityIcon";
 import { Metadata } from "next";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
@@ -83,9 +83,14 @@ export default async function RoomDetailPage({ params }: { params: Promise<{ slu
 
   const rawAmenities = Array.isArray(room.amenities) 
     ? room.amenities 
-    : (typeof room.amenities === 'string' ? JSON.parse(room.amenities) : ["Luxury Bedding", "Mini Bar", "Room Service"]);
+    : (typeof room.amenities === 'string' 
+        ? (room.amenities.startsWith('[') ? JSON.parse(room.amenities) : room.amenities.split(',').map((s: string) => s.trim()))
+        : []);
 
-  const amenitiesList = rawAmenities.filter((a: string) => !a.startsWith('total_rooms:'));
+  const amenitiesList: AmenityItem[] = (rawAmenities || [])
+    .filter((a: any) => typeof a === 'string' ? (!a.startsWith('total_rooms:') && !a.startsWith('ical_url:')) : true)
+    .map(parseAmenity)
+    .filter((a: AmenityItem) => a.name && a.name.trim().length > 0);
 
   let roomImages: string[] = Array.isArray(room.images) && room.images.length > 0 
     ? [...room.images.filter(Boolean)] 
@@ -109,9 +114,9 @@ export default async function RoomDetailPage({ params }: { params: Promise<{ slu
       "@type": "QuantitativeValue",
       maxValue: room.capacity || 2,
     },
-    amenityFeature: amenitiesList.map((a: string) => ({
+    amenityFeature: amenitiesList.map((a: AmenityItem) => ({
       "@type": "LocationFeatureSpecification",
-      name: a,
+      name: a.name,
       value: true,
     })),
     offers: {
@@ -167,38 +172,35 @@ export default async function RoomDetailPage({ params }: { params: Promise<{ slu
             <p className="text-[18px]">{room.description || "Immerse yourself in unparalleled luxury. This meticulously curated suite offers floor-to-ceiling panoramic views, bespoke designer furnishings, and an ambient tranquility that instantly isolates you from the bustling world outside."}</p>
           </div>
 
-          {/* Highlights Grid */}
-          <div>
-            <h3 className="font-marcellus text-[32px] text-[#000000] mb-8">Signature Features</h3>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {[
-                { icon: <Bath size={32} strokeWidth={1} />, label: "Marble Bath" },
-                { icon: <Shield size={32} strokeWidth={1} />, label: "24/7 Butler" },
-                { icon: <Coffee size={32} strokeWidth={1} />, label: "Espresso Bar" },
-                { icon: <Wind size={32} strokeWidth={1} />, label: "Acoustic Privacy" }
-              ].map((feature, i) => (
-                <div key={i} className="flex flex-col items-center justify-center p-8 bg-white border border-[#d7b56d]/10 text-center hover:border-[#d7b56d]/40 hover:shadow-[0_8px_24px_rgba(126,101,46,0.05)] transition-all duration-500 group">
-                  <div className="text-[#d7b56d] mb-5 group-hover:scale-110 transition-transform duration-500">{feature.icon}</div>
-                  <span className="text-[11px] uppercase tracking-[0.15em] font-medium text-[#000000]">{feature.label}</span>
-                </div>
-              ))}
-            </div>
-          </div>
+          {/* Dynamic Room Amenities Section */}
+          {amenitiesList.length > 0 && (
+            <div className="py-4">
+              <div className="flex items-center justify-between mb-8 pb-4 border-b border-[#d7b56d]/20">
+                <h3 className="font-marcellus text-[26px] md:text-[32px] text-[#000000]">
+                  Suite Amenities & Features
+                </h3>
+                <span className="text-[11.5px] uppercase tracking-[0.2em] font-semibold text-[#d7b56d] bg-black px-4 py-1.5 rounded-full">
+                  {amenitiesList.length} Included
+                </span>
+              </div>
 
-          {/* Full Amenities List */}
-          <div>
-            <h3 className="font-marcellus text-[32px] text-[#000000] mb-8">Suite Amenities</h3>
-            <ul className="grid grid-cols-1 md:grid-cols-2 gap-y-5 gap-x-8">
-              {amenitiesList.map((amenity: string, i: number) => (
-                <li key={i} className="flex items-center gap-4 text-[#000000]/70 text-[16px]">
-                  <div className="w-6 h-6 rounded-full bg-[#FFFFFF] border border-[#d7b56d]/20 flex items-center justify-center flex-shrink-0 text-[#d7b56d]">
-                    {getAmenityIcon(amenity, 12)}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-7 gap-x-12">
+                {amenitiesList.map((amenity, i) => (
+                  <div 
+                    key={i} 
+                    className="flex items-center gap-5"
+                  >
+                    <div className="w-24 h-24 md:w-28 md:h-28 rounded-full bg-white border border-black/15 flex items-center justify-center shrink-0 p-3 shadow-xs">
+                      <AmenityIcon amenity={amenity} size={88} className="w-full h-full object-contain" strokeWidth={1.5} />
+                    </div>
+                    <span className="text-[18px] md:text-[20px] font-jost font-medium text-[#000000] tracking-wide leading-snug">
+                      {amenity.name}
+                    </span>
                   </div>
-                  {amenity}
-                </li>
-              ))}
-            </ul>
-          </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Stay Policies */}
           <div className="bg-white p-10 border border-[#d7b56d]/15 shadow-sm">

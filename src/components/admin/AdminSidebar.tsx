@@ -13,7 +13,8 @@ import {
   LogOut, 
   UserCircle, 
   ImageIcon, 
-  UtensilsCrossed 
+  UtensilsCrossed,
+  Sparkles
 } from "lucide-react";
 import { logoutAdminAction } from "@/app/actions/admin-auth";
 
@@ -25,6 +26,7 @@ export default function AdminSidebar() {
     { href: "/admin/bookings", icon: <CalendarDays size={16} strokeWidth={1.75} />, label: "Reservations" },
     { href: "/admin/rooms", icon: <KeySquare size={16} strokeWidth={1.75} />, label: "Accommodations", exact: true },
     { href: "/admin/rooms/new", icon: <PlusCircle size={16} strokeWidth={1.75} />, label: "Add room" },
+    { href: "/admin/amenities", icon: <Sparkles size={16} strokeWidth={1.75} />, label: "Amenities" },
     { href: "/admin/restaurant", icon: <UtensilsCrossed size={16} strokeWidth={1.75} />, label: "Restaurant & menu" },
     { href: "/admin/gallery", icon: <ImageIcon size={16} strokeWidth={1.75} />, label: "Media gallery" },
     { href: "/admin/guests", icon: <Users size={16} strokeWidth={1.75} />, label: "Guest directory" },

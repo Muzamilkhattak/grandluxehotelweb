@@ -6,6 +6,7 @@ import Link from "next/link";
 import { ArrowLeft, ImagePlus, Trash2, Star, CheckCircle, AlertCircle } from "lucide-react";
 import { createRoomAction } from "@/app/actions/admin-rooms";
 import { createClient } from "@/utils/supabase/client";
+import RoomAmenitiesManager from "@/components/admin/RoomAmenitiesManager";
 
 export default function NewRoomPage() {
   const router = useRouter();
@@ -271,6 +272,19 @@ export default function NewRoomPage() {
 
             </div>
           </div>
+
+          {/* Amenities & Custom Icons Box */}
+          <div className="bg-white border border-zinc-200/80 shadow-sm rounded-sm">
+            <div className="bg-zinc-50 border-b border-zinc-200/80 px-4 py-2.5 flex items-center justify-between">
+              <div>
+                <h3 className="text-[14px] font-semibold text-zinc-900">Room Amenities & Features</h3>
+                <p className="text-[12px] text-zinc-500">Only amenities added here will appear dynamically on the suite's public detail page.</p>
+              </div>
+            </div>
+            <div className="p-4">
+              <RoomAmenitiesManager />
+            </div>
+          </div>
         </div>
 
         {/* Right Sidebar Column */}
@@ -297,22 +311,6 @@ export default function NewRoomPage() {
               >
                 {loading ? "Publishing..." : "Publish Accommodation"}
               </button>
-            </div>
-          </div>
-
-          {/* Amenities Metabox */}
-          <div className="bg-white border border-zinc-200/80 shadow-sm rounded-sm">
-            <div className="bg-zinc-50 border-b border-zinc-200/80 px-3 py-2 text-[14px] font-semibold text-zinc-900">
-              Amenities & Tags
-            </div>
-            <div className="p-3">
-              <textarea 
-                name="amenities" 
-                rows={3}
-                placeholder="Oceanfront, Jacuzzi, Private Balcony, Mini Bar (comma separated)"
-                className="w-full bg-white border border-zinc-200 rounded-lg px-3 py-2 text-[13px] text-zinc-700 focus:outline-none focus:border-zinc-400 focus:ring-1 focus:ring-zinc-400 resize-none"
-              ></textarea>
-              <p className="text-[12px] text-[#646970] mt-1 italic">Separate amenities with commas.</p>
             </div>
           </div>
 

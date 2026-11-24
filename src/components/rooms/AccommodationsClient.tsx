@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Search, SlidersHorizontal, Users } from "lucide-react";
 import BookingModal from "@/components/booking/BookingModal";
-import { getAmenityIcon } from "@/components/ui/AmenityIcon";
+import { getAmenityIcon, parseAmenity } from "@/components/ui/AmenityIcon";
 
 export type Room = {
   id: string;
@@ -130,13 +130,16 @@ export default function AccommodationsClient({ initialRooms }: { initialRooms: R
                 </p>
                 <div className="flex flex-wrap items-center gap-5 text-accent mb-10">
                   {room.amenities
-                      ?.filter((a: string) => !a.startsWith("total_rooms:"))
+                      ?.filter((a: any) => typeof a === 'string' ? (!a.startsWith("total_rooms:") && !a.startsWith("ical_url:")) : true)
                       .slice(0, 4)
-                      .map((amenity: string, idx: number) => (
-                        <div key={idx} title={amenity}>
-                          {getAmenityIcon(amenity, 24)}
-                        </div>
-                  ))}
+                      .map((amenity: any, idx: number) => {
+                        const parsed = parseAmenity(amenity);
+                        return (
+                          <div key={idx} title={parsed.name} className="flex items-center">
+                            {getAmenityIcon(parsed, 24)}
+                          </div>
+                        );
+                      })}
                 </div>
                 <div className="mt-auto flex flex-col gap-4">
                   <Link 

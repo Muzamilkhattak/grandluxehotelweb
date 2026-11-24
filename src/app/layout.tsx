@@ -101,7 +101,7 @@ const jsonLd = {
       url: siteUrl,
       logo: `${siteUrl}/signaturearthotellogo.webp`,
       image: `${siteUrl}/signaturearthotellogo.webp`,
-      telephone: "+47 22 00 55 00",
+      telephone: "+92 333 1942884",
       email: "signaturearthotel@gmail.com",
       priceRange: "$$$$",
       currenciesAccepted: "PKR, NOK, EUR, USD, GBP",
@@ -120,8 +120,9 @@ const jsonLd = {
       },
       address: {
         "@type": "PostalAddress",
-        streetAddress: "F-8",
+        streetAddress: "Plot # 3 Street 64, F-8/4",
         addressLocality: "Islamabad",
+        postalCode: "44220",
         addressCountry: "PK",
       },
       amenityFeature: [
