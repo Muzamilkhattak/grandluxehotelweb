@@ -1,0 +1,18 @@
+🔑 VERCEL ENVIRONMENT VARIABLE - ADD THIS NOW
+
+Click "Create New" button in Vercel Environment Variables
+
+Name (copy this):
+SUPABASE_SERVICE_ROLE_KEY
+
+Value (copy this):
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF0dGxwZmpvdXVld3Zja2NjcGltIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc5MDY3OTc3MCwiZXhwIjoyMTA2MjU1NzcwfQ.86NQfIM1ENKr7mjn1lgXWQ24RjdGZJ8eRWG3Ru5U9DQ
+
+Environments (select all):
+☑ Production
+☑ Preview  
+☑ Development
+
+Then click "Save"
+
+After saving, go to Deployments tab and click "Redeploy" on the latest deployment.
