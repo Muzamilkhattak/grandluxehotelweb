@@ -40,13 +40,13 @@ export default function AdminGalleryClient({ initialImages }: { initialImages: G
 
       const res = await uploadGalleryImageAction(formData);
 
-      if (res.success && res.fileName) {
+      if (res.success && res.fileName && res.url) {
         setStatusMsg({ type: "success", text: "Image uploaded successfully." });
         setImages((prev) => [
           {
             id: res.fileName!,
             name: res.fileName!,
-            url: `/uploads/gallery/${res.fileName}`,
+            url: res.url!,
             isUserUploaded: true,
           },
           ...prev,
@@ -208,7 +208,7 @@ export default function AdminGalleryClient({ initialImages }: { initialImages: G
                     alt={img.name}
                     fill
                     className="object-cover"
-                    unoptimized={img.url.startsWith("/uploads/")}
+                    unoptimized
                   />
                 </div>
 
