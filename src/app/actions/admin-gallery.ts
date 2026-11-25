@@ -10,17 +10,26 @@ const BUCKET_NAME = "gallery-images";
  * Ensures the Supabase storage bucket exists and is publicly accessible
  */
 async function ensureBucketExists() {
-  const supabase = await createSupabaseServerAdmin();
-  
-  const { data: buckets } = await supabase.storage.listBuckets();
-  const bucketExists = buckets?.some(b => b.name === BUCKET_NAME);
-  
-  if (!bucketExists) {
-    await supabase.storage.createBucket(BUCKET_NAME, {
-      public: true,
-      fileSizeLimit: 10485760, // 10MB
-      allowedMimeTypes: ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/avif']
-    });
+  if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    console.warn("Service Role Key not available, skipping bucket creation");
+    return;
+  }
+
+  try {
+    const supabase = await createSupabaseServerAdmin();
+    
+    const { data: buckets } = await supabase.storage.listBuckets();
+    const bucketExists = buckets?.some(b => b.name === BUCKET_NAME);
+    
+    if (!bucketExists) {
+      await supabase.storage.createBucket(BUCKET_NAME, {
+        public: true,
+        fileSizeLimit: 10485760, // 10MB
+        allowedMimeTypes: ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/avif']
+      });
+    }
+  } catch (err) {
+    console.warn("Bucket creation warning:", err);
   }
 }
 
@@ -28,6 +37,10 @@ export async function uploadGalleryImageAction(formData: FormData) {
   const isAdmin = await verifyAdminSessionServer();
   if (!isAdmin) {
     return { success: false, error: "Unauthorized. Admin login required." };
+  }
+
+  if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    return { success: false, error: "Server not configured for uploads. Missing Supabase Service Role Key." };
   }
 
   try {
@@ -92,6 +105,10 @@ export async function deleteGalleryImageAction(fileName: string) {
     return { success: false, error: "Unauthorized. Admin login required." };
   }
 
+  if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    return { success: false, error: "Server not configured for deletions. Missing Supabase Service Role Key." };
+  }
+
   try {
     const supabase = await createSupabaseServerAdmin();
     
@@ -117,6 +134,12 @@ export async function deleteGalleryImageAction(fileName: string) {
 
 export async function getGalleryImages() {
   try {
+    // Check if service role key is available
+    if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
+      console.warn("Service Role Key not available, returning empty gallery");
+      return [];
+    }
+
     await ensureBucketExists();
     
     const supabase = await createSupabaseServerAdmin();
