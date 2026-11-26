@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import Image from "next/image";
-import { Sparkles, X, ChevronLeft, ChevronRight, Maximize2, Compass, ArrowDown } from "lucide-react";
+import Link from "next/link";
+import { Sparkles, X, ChevronLeft, ChevronRight, Maximize2, Compass, ArrowDown, ArrowRight } from "lucide-react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { getGalleryImages } from "@/app/actions/admin-gallery";
@@ -16,95 +17,26 @@ interface GalleryPhoto {
   aspect: string;
 }
 
-const DEFAULT_GALLERY_PHOTOS: GalleryPhoto[] = [
-  {
-    id: "g1",
-    name: "The Presidential Suite Sanctuary",
-    url: "/uploads/gallery/1793168068564-Golden_Hotel_Bedroom_Peek.png",
-    category: "Suites",
-    aspect: "aspect-[4/5]",
-  },
-  {
-    id: "g2",
-    name: "Grand Architectural Colonnade Facade",
-    url: "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?q=75&w=800&auto=format&fit=crop",
-    category: "Architecture",
-    aspect: "aspect-[16/10]",
-  },
-  {
-    id: "g3",
-    name: "Ambassador Master Bedroom",
-    url: "/uploads/gallery/1793168094138-Warm_Golden_Hotel_Bedroom.png",
-    category: "Suites",
-    aspect: "aspect-[1/1]",
-  },
-  {
-    id: "g4",
-    name: "The Hearth Culinary Atelier",
-    url: "/images/resturantherobg.webp",
-    category: "Dining",
-    aspect: "aspect-[16/9]",
-  },
-  {
-    id: "g5",
-    name: "Curated Art & Artisan Lounge",
-    url: "/uploads/gallery/1793168155467-OE_0303-01.jpg",
-    category: "Interior",
-    aspect: "aspect-[4/5]",
-  },
-  {
-    id: "g6",
-    name: "Atrium Reflection Pool & Skylight",
-    url: "https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?q=75&w=800&auto=format&fit=crop",
-    category: "Architecture",
-    aspect: "aspect-[1/1]",
-  },
-  {
-    id: "g7",
-    name: "Bespoke Nordic Furnishings",
-    url: "/uploads/gallery/1793168174775-OE_0303-02.jpg",
-    category: "Interior",
-    aspect: "aspect-[4/3]",
-  },
-  {
-    id: "g8",
-    name: "Margalla Hills Panoramic Vista",
-    url: "/images/why-oslo/margalla-hills-view.jpg",
-    category: "Scenic",
-    aspect: "aspect-[16/10]",
-  },
-  {
-    id: "g9",
-    name: "Executive Reading Chamber",
-    url: "/uploads/gallery/1793168204717-OE_0303-03.jpg",
-    category: "Interior",
-    aspect: "aspect-[4/5]",
-  },
-  {
-    id: "g10",
-    name: "Veranda Sunset Terrace",
-    url: "https://images.unsplash.com/photo-1566073771259-6a8506099945?q=75&w=800&auto=format&fit=crop",
-    category: "Architecture",
-    aspect: "aspect-[16/9]",
-  },
-  {
-    id: "g11",
-    name: "Private Dining Atelier",
-    url: "/images/why-oslo/hotel-restaurant.jpg",
-    category: "Dining",
-    aspect: "aspect-[1/1]",
-  },
-  {
-    id: "g12",
-    name: "Capital Sector F-8 Skyline",
-    url: "/images/why-oslo/heart-of-islamabad-f7.jpg",
-    category: "Scenic",
-    aspect: "aspect-[4/3]",
-  },
-];
+const MAX_HOME_GALLERY_IMAGES = 15;
 
-export default function HomeGallery() {
-  const [photos, setPhotos] = useState<GalleryPhoto[]>(DEFAULT_GALLERY_PHOTOS);
+interface Props {
+  initialImages?: any[];
+}
+
+export default function HomeGallery({ initialImages }: Props) {
+  // Show ONLY images uploaded from admin panel (capped at 15)
+  const [photos, setPhotos] = useState<GalleryPhoto[]>(() => {
+    if (initialImages && initialImages.length > 0) {
+      return initialImages.slice(0, MAX_HOME_GALLERY_IMAGES).map((u: any, idx: number) => ({
+        id: u.id || `uploaded-${idx}`,
+        name: "Signature Gallery Exhibit",
+        url: u.url,
+        category: "Architecture",
+        aspect: idx % 3 === 0 ? "aspect-[4/5]" : idx % 3 === 1 ? "aspect-[16/10]" : "aspect-[1/1]",
+      }));
+    }
+    return [];
+  });
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 
   // References for GSAP ScrollTrigger timeline
@@ -123,17 +55,19 @@ export default function HomeGallery() {
       try {
         const userUploaded = await getGalleryImages();
         if (isMounted && userUploaded && userUploaded.length > 0) {
-          const dynamicPhotos: GalleryPhoto[] = userUploaded.map((u: any, idx: number) => ({
+          // Strictly show only uploaded images, capped at 15
+          const dynamicPhotos: GalleryPhoto[] = userUploaded.slice(0, MAX_HOME_GALLERY_IMAGES).map((u: any, idx: number) => ({
             id: u.id || `uploaded-${idx}`,
             name: "Signature Gallery Exhibit",
             url: u.url,
             category: "Architecture",
             aspect: idx % 3 === 0 ? "aspect-[4/5]" : idx % 3 === 1 ? "aspect-[16/10]" : "aspect-[1/1]",
           }));
-          // Prepend user uploads to the editorial gallery
           if (isMounted) {
-            setPhotos([...dynamicPhotos, ...DEFAULT_GALLERY_PHOTOS]);
+            setPhotos(dynamicPhotos);
           }
+        } else if (isMounted && (!userUploaded || userUploaded.length === 0)) {
+          setPhotos([]);
         }
       } catch (err) {
         console.error("Gallery loading error:", err);
@@ -559,7 +493,7 @@ export default function HomeGallery() {
               <div className={`relative w-full ${photo.aspect} overflow-hidden`}>
                 <Image
                   src={photo.url}
-                  alt="Oslo Elite Hotel Gallery Exhibit"
+                  alt="Signature Art Hotel Gallery Exhibit"
                   fill
                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                   className="object-cover group-hover:scale-108 transition-transform duration-700 ease-out"
@@ -584,11 +518,27 @@ export default function HomeGallery() {
           ))}
         </div>
 
-        {/* Empty state safeguard */}
+        {/* Explore Full Gallery Link for remaining photos */}
+        {photos.length > 0 && (
+          <div className="mt-14 sm:mt-16 text-center">
+            <Link
+              href="/gallery"
+              className="inline-flex items-center gap-3 bg-[#d7b56d] hover:bg-white text-black font-jost uppercase tracking-[0.18em] text-[12.5px] sm:text-[13px] font-bold px-8 sm:px-10 py-3.5 sm:py-4 rounded-full shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105 active:scale-95 group"
+            >
+              <span>Explore Full Gallery</span>
+              <ArrowRight size={15} className="group-hover:translate-x-1.5 transition-transform duration-300" />
+            </Link>
+          </div>
+        )}
+
+        {/* Empty state safeguard if no images uploaded yet */}
         {photos.length === 0 && (
-          <div className="text-center py-20 text-white/60 font-jost">
-            <Compass size={40} className="mx-auto text-[#d7b56d] mb-3 opacity-60" />
-            <p className="text-lg">No photos found in gallery.</p>
+          <div className="text-center py-20 text-white/70 font-jost max-w-md mx-auto">
+            <Sparkles size={36} className="mx-auto text-[#d7b56d] mb-4 opacity-90" />
+            <h3 className="font-marcellus text-2xl text-white mb-2 font-normal">Gallery Exhibits</h3>
+            <p className="text-sm text-gray-400 font-light leading-relaxed">
+              Admin panel se upload hone wali photos yahan showcase hongi.
+            </p>
           </div>
         )}
       </div>

@@ -12,6 +12,7 @@ import BookingEngineBar from "@/components/home/BookingEngineBar";
 import SignatureAmenities from "@/components/home/SignatureAmenities";
 import type { Metadata } from "next";
 import { getRestaurantData } from "@/app/actions/admin-restaurant";
+import { getGalleryImages } from "@/app/actions/admin-gallery";
 import { getRoomTotalCount } from "@/utils/room-inventory";
 
 export const metadata: Metadata = {
@@ -79,7 +80,10 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ [
     }
   }
 
-  const restaurantData = await getRestaurantData();
+  const [restaurantData, galleryImages] = await Promise.all([
+    getRestaurantData(),
+    getGalleryImages(),
+  ]);
 
   return (
     <main suppressHydrationWarning className="flex-1 flex flex-col relative w-full overflow-x-clip">
@@ -132,7 +136,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ [
       <ServicesCarousel />
 
       {/* 8. Modern Animated Gallery with 3D Image Cards */}
-      <HomeGallery />
+      <HomeGallery initialImages={galleryImages} />
 
       {/* 9. Curated Hotel Amenities Grid with 3D Interactive Tiles */}
       <SignatureAmenities />
