@@ -118,7 +118,7 @@ export default function HeroSection({ children }: HeroSectionProps) {
           style={{ transform: "translateZ(50px)" }}
           className="font-marcellus text-4xl sm:text-5xl md:text-[76px] lg:text-[90px] text-white font-light leading-[1.08] md:leading-[0.95] drop-shadow-[0_12px_32px_rgba(0,0,0,0.7)]"
         >
-          A Signature OF <br className="hidden md:block" /> Luxury Living
+          Where Every Stay <br className="hidden md:block" /> Is an Art.
         </motion.h1>
       </motion.div>
 
