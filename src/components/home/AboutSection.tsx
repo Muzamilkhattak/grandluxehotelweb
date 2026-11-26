@@ -178,8 +178,8 @@ export default function AboutSection() {
             <Tilt3D maxTilt={6} scale={1.02} glare={true} glareColor="rgba(215, 181, 109, 0.2)">
               <div className="relative w-full h-[380px] sm:h-[480px] lg:h-[550px] shadow-[0_32px_80px_rgba(54,38,24,0.18)] rounded-2xl overflow-hidden border border-black/5 group">
                 <Image 
-                  src="https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?q=75&w=800&auto=format&fit=crop" 
-                  alt="Hotel Exterior" 
+                  src="/images/about/our-heritage.webp" 
+                  alt="Signature Art Hotel Heritage" 
                   fill
                   sizes="(max-width: 768px) 85vw, 45vw"
                   className="object-cover transition-transform duration-700 ease-out group-hover:scale-106"
@@ -215,8 +215,8 @@ export default function AboutSection() {
             <Tilt3D maxTilt={7} scale={1.03} glare={true}>
               <div className="relative w-full h-[200px] sm:h-[280px]">
                 <Image 
-                  src="https://images.unsplash.com/photo-1566073771259-6a8506099945?q=75&w=600&auto=format&fit=crop" 
-                  alt="Luxury Amenities" 
+                  src="/images/about/Golden Curtain Glow.webp" 
+                  alt="Signature Art Hotel Golden Curtain Glow" 
                   fill
                   sizes="(max-width: 768px) 40vw, 25vw"
                   className="object-cover transition-transform duration-700 ease-out group-hover:scale-108"
@@ -250,8 +250,8 @@ export default function AboutSection() {
             <Tilt3D maxTilt={8} scale={1.03} glare={true}>
               <div className="relative w-full h-[260px] sm:h-[350px]">
                 <Image 
-                  src="https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?q=75&w=750&auto=format&fit=crop" 
-                  alt="Lobby Details" 
+                  src="/images/about/Luxury Amber Hotel Bedroom (1).webp" 
+                  alt="Signature Art Hotel Luxury Amber Bedroom" 
                   fill
                   sizes="(max-width: 768px) 50vw, 30vw"
                   className="object-cover transition-transform duration-700 ease-out group-hover:scale-108"

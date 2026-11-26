@@ -2,16 +2,16 @@ import { Metadata } from "next";
 import AboutClient from "./AboutClient";
 
 export const metadata: Metadata = {
-  title: "About Our Heritage & Hospitality",
+  title: "About Us | Where Art Meets Hospitality | Signature Art Hotel",
   description:
-    "Discover the legacy, architectural design, and 5-star Nordic hospitality philosophy of Oslo Elite Hotel & Suites in Oslo, Norway.",
+    "Signature Art Hotel is a place where comfort and creativity come together. Discover warm hospitality, handcrafted comfort, and cultural elegance in Islamabad.",
   alternates: {
     canonical: "/about",
   },
   openGraph: {
-    title: "About Our Heritage & Hospitality | Oslo Elite Hotel & Suites",
+    title: "About Us | Where Art Meets Hospitality | Signature Art Hotel",
     description:
-      "Discover the story, architectural elegance, and world-class hospitality of Oslo Elite Hotel & Suites.",
+      "Signature Art Hotel is a place where comfort and creativity come together. Discover warm hospitality, handcrafted comfort, and cultural elegance in Islamabad.",
     url: "/about",
   },
 };

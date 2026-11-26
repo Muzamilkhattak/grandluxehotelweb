@@ -5,31 +5,41 @@ import { verifyAdminSessionServer } from "@/app/actions/admin-auth";
 import { createSupabaseServerAdmin } from "@/utils/supabase/server";
 
 const BUCKET_NAME = "gallery-images";
+const FALLBACK_BUCKET = "room-images";
+
+function getServiceKey() {
+  return (
+    process.env.SUPABASE_SERVICE_ROLE_KEY ||
+    process.env.SUPABASE_SERVICE_KEY ||
+    process.env.SUPABASE_SECRET_KEY ||
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  );
+}
 
 /**
  * Ensures the Supabase storage bucket exists and is publicly accessible
  */
 async function ensureBucketExists() {
-  if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
-    console.warn("Service Role Key not available, skipping bucket creation");
+  const serviceKey = getServiceKey();
+  if (!serviceKey) {
     return;
   }
 
   try {
     const supabase = await createSupabaseServerAdmin();
-    
     const { data: buckets } = await supabase.storage.listBuckets();
-    const bucketExists = buckets?.some(b => b.name === BUCKET_NAME);
-    
+    const bucketExists = buckets?.some((b) => b.name === BUCKET_NAME);
+
     if (!bucketExists) {
       await supabase.storage.createBucket(BUCKET_NAME, {
         public: true,
         fileSizeLimit: 10485760, // 10MB
-        allowedMimeTypes: ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/avif']
+        allowedMimeTypes: ["image/jpeg", "image/png", "image/webp", "image/gif", "image/avif"],
       });
     }
   } catch (err) {
-    console.warn("Bucket creation warning:", err);
+    // Silently continue if bucket creation is restricted or already handled
   }
 }
 
@@ -39,13 +49,17 @@ export async function uploadGalleryImageAction(formData: FormData) {
     return { success: false, error: "Unauthorized. Admin login required." };
   }
 
-  if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
-    return { success: false, error: "Server not configured for uploads. Missing Supabase Service Role Key." };
+  const serviceKey = getServiceKey();
+  if (!serviceKey) {
+    return {
+      success: false,
+      error: "Server storage not configured. Please add SUPABASE_SERVICE_ROLE_KEY to your Vercel Environment Variables.",
+    };
   }
 
   try {
     const imageFile = formData.get("image") as File;
-    
+
     if (!imageFile || imageFile.size === 0) {
       return { success: false, error: "Please select an image file to upload" };
     }
@@ -69,30 +83,60 @@ export async function uploadGalleryImageAction(formData: FormData) {
     const fileName = `${Date.now()}-${cleanFileName}`;
 
     const supabase = await createSupabaseServerAdmin();
-    
-    const { data, error } = await supabase.storage
+
+    // 1. Try uploading to primary gallery-images bucket
+    let finalUrl = "";
+    let finalFileName = fileName;
+
+    const { error: primaryError } = await supabase.storage
       .from(BUCKET_NAME)
       .upload(fileName, buffer, {
         contentType: imageFile.type,
-        cacheControl: '3600',
-        upsert: false
+        cacheControl: "3600",
+        upsert: false,
       });
 
-    if (error) {
-      console.error("Supabase upload error:", error);
-      return { success: false, error: error.message };
-    }
+    if (!primaryError) {
+      const {
+        data: { publicUrl },
+      } = supabase.storage.from(BUCKET_NAME).getPublicUrl(fileName);
+      finalUrl = publicUrl;
+    } else {
+      console.warn(`Upload to ${BUCKET_NAME} failed (${primaryError.message}), trying fallback to ${FALLBACK_BUCKET}...`);
 
-    // Get the public URL for the uploaded file
-    const { data: { publicUrl } } = supabase.storage
-      .from(BUCKET_NAME)
-      .getPublicUrl(fileName);
+      // 2. Fallback to room-images bucket (under gallery/ folder)
+      const fallbackPath = `gallery/${fileName}`;
+      const { error: fallbackError } = await supabase.storage
+        .from(FALLBACK_BUCKET)
+        .upload(fallbackPath, buffer, {
+          contentType: imageFile.type,
+          cacheControl: "3600",
+          upsert: false,
+        });
+
+      if (!fallbackError) {
+        const {
+          data: { publicUrl },
+        } = supabase.storage.from(FALLBACK_BUCKET).getPublicUrl(fallbackPath);
+        finalUrl = publicUrl;
+        finalFileName = fallbackPath;
+      } else {
+        console.error("Storage upload error:", primaryError, fallbackError);
+        return {
+          success: false,
+          error:
+            primaryError.message ||
+            fallbackError.message ||
+            "Upload failed. Please ensure SUPABASE_SERVICE_ROLE_KEY is set in Vercel settings.",
+        };
+      }
+    }
 
     revalidatePath("/admin/gallery");
     revalidatePath("/gallery");
     revalidatePath("/");
 
-    return { success: true, fileName, url: publicUrl };
+    return { success: true, fileName: finalFileName, url: finalUrl };
   } catch (err: any) {
     console.error("Upload error:", err);
     return { success: false, error: err?.message || "Failed to upload image" };
@@ -105,20 +149,20 @@ export async function deleteGalleryImageAction(fileName: string) {
     return { success: false, error: "Unauthorized. Admin login required." };
   }
 
-  if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
-    return { success: false, error: "Server not configured for deletions. Missing Supabase Service Role Key." };
+  const serviceKey = getServiceKey();
+  if (!serviceKey) {
+    return { success: false, error: "Server not configured for deletions. Missing Supabase credentials." };
   }
 
   try {
     const supabase = await createSupabaseServerAdmin();
-    
-    const { error } = await supabase.storage
-      .from(BUCKET_NAME)
-      .remove([fileName]);
 
-    if (error) {
-      console.error("Supabase delete error:", error);
-      return { success: false, error: error.message };
+    if (fileName.startsWith("gallery/")) {
+      await supabase.storage.from(FALLBACK_BUCKET).remove([fileName]);
+    } else {
+      await supabase.storage.from(BUCKET_NAME).remove([fileName]);
+      // Also try fallback bucket path just in case
+      await supabase.storage.from(FALLBACK_BUCKET).remove([`gallery/${fileName}`]);
     }
 
     revalidatePath("/admin/gallery");
@@ -134,41 +178,74 @@ export async function deleteGalleryImageAction(fileName: string) {
 
 export async function getGalleryImages() {
   try {
-    // Check if service role key is available
-    if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
-      console.warn("Service Role Key not available, returning empty gallery");
+    const serviceKey = getServiceKey();
+    if (!serviceKey) {
+      console.warn("No Supabase key available, returning empty gallery");
       return [];
     }
 
     await ensureBucketExists();
-    
+
     const supabase = await createSupabaseServerAdmin();
-    
-    const { data: files, error } = await supabase.storage
-      .from(BUCKET_NAME)
-      .list('', {
-        sortBy: { column: 'created_at', order: 'desc' }
+
+    let userImages: any[] = [];
+
+    // 1. Fetch from primary gallery-images bucket
+    try {
+      const { data: files, error } = await supabase.storage.from(BUCKET_NAME).list("", {
+        sortBy: { column: "created_at", order: "desc" },
       });
 
-    if (error) {
-      console.error("Supabase list error:", error);
-      return [];
+      if (!error && Array.isArray(files)) {
+        userImages = files
+          .filter((file) => /\.(jpg|jpeg|png|webp|gif|avif)$/i.test(file.name))
+          .map((file) => {
+            const {
+              data: { publicUrl },
+            } = supabase.storage.from(BUCKET_NAME).getPublicUrl(file.name);
+
+            return {
+              id: file.name,
+              name: file.name,
+              url: publicUrl,
+              isUserUploaded: true,
+            };
+          });
+      }
+    } catch {
+      // Primary bucket listing fallback
     }
 
-    const userImages = files
-      .filter((file) => /\.(jpg|jpeg|png|webp|gif|avif)$/i.test(file.name))
-      .map((file) => {
-        const { data: { publicUrl } } = supabase.storage
-          .from(BUCKET_NAME)
-          .getPublicUrl(file.name);
-        
-        return {
-          id: file.name,
-          name: file.name,
-          url: publicUrl,
-          isUserUploaded: true,
-        };
-      });
+    // 2. Fetch from fallback room-images bucket (gallery/ folder)
+    try {
+      const { data: fallbackFiles, error: fbError } = await supabase.storage
+        .from(FALLBACK_BUCKET)
+        .list("gallery", {
+          sortBy: { column: "created_at", order: "desc" },
+        });
+
+      if (!fbError && Array.isArray(fallbackFiles)) {
+        const fallbackImages = fallbackFiles
+          .filter((file) => /\.(jpg|jpeg|png|webp|gif|avif)$/i.test(file.name))
+          .map((file) => {
+            const pathInBucket = `gallery/${file.name}`;
+            const {
+              data: { publicUrl },
+            } = supabase.storage.from(FALLBACK_BUCKET).getPublicUrl(pathInBucket);
+
+            return {
+              id: `gallery-${file.name}`,
+              name: pathInBucket,
+              url: publicUrl,
+              isUserUploaded: true,
+            };
+          });
+
+        userImages = [...userImages, ...fallbackImages];
+      }
+    } catch {
+      // Fallback bucket listing fallback
+    }
 
     return userImages;
   } catch (err) {
