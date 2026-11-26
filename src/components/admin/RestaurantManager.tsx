@@ -26,6 +26,7 @@ import {
   deleteMenuItemAction,
   uploadRestaurantImageAction
 } from "@/app/actions/admin-restaurant";
+import { RESTAURANT_CATEGORIES, getCategoryBadgeLabel } from "@/data/restaurant-constants";
 
 interface Props {
   initialData: RestaurantData;
@@ -48,7 +49,7 @@ export default function RestaurantManager({ initialData }: Props) {
   const [editingItem, setEditingItem] = useState<MenuItemData | null>(null);
   const [itemToDelete, setItemToDelete] = useState<{ id: string; name: string } | null>(null);
   const [formName, setFormName] = useState("");
-  const [formCategory, setFormCategory] = useState<"starters" | "mains" | "desserts" | "drinks">("mains");
+  const [formCategory, setFormCategory] = useState<string>("pakistani");
   const [formPrice, setFormPrice] = useState("");
   const [formDescription, setFormDescription] = useState("");
   const [formImage, setFormImage] = useState("");
@@ -74,7 +75,7 @@ export default function RestaurantManager({ initialData }: Props) {
   const handleOpenAdd = () => {
     setEditingItem(null);
     setFormName("");
-    setFormCategory("mains");
+    setFormCategory("pakistani");
     setFormPrice("");
     setFormDescription("");
     setFormImage("");
@@ -343,7 +344,7 @@ export default function RestaurantManager({ initialData }: Props) {
               Menu dishes ({items.length})
             </h2>
             <p className="text-xs text-zinc-500 mt-0.5">
-              Individual offerings categorized by starters, mains, desserts, and beverages.
+              Individual offerings categorized by breakfast, Pakistani specialties, continental grills, chinese, desserts, and beverages.
             </p>
           </div>
 
@@ -367,10 +368,14 @@ export default function RestaurantManager({ initialData }: Props) {
               className="h-9 px-3 border border-zinc-200 text-xs rounded-lg bg-white text-zinc-700 focus:outline-none focus:border-zinc-400 cursor-pointer"
             >
               <option value="all">All categories</option>
-              <option value="starters">Starters</option>
-              <option value="mains">Mains</option>
+              <option value="breakfast">Breakfast Selection</option>
+              <option value="soups-appetizers">Soups & Appetizers</option>
+              <option value="bbq-grill">Grilled Specialities (BBQ)</option>
+              <option value="chinese-rice">Chinese & Noodles</option>
+              <option value="continental">Continental & Steaks</option>
+              <option value="pakistani">Pakistani & Karahi</option>
               <option value="desserts">Desserts</option>
-              <option value="drinks">Drinks & cocktails</option>
+              <option value="beverages">Beverages & Drinks</option>
             </select>
           </div>
         </div>
@@ -418,7 +423,7 @@ export default function RestaurantManager({ initialData }: Props) {
                     {/* Category Badge */}
                     <td className="py-3 px-4">
                       <span className="px-2 py-0.5 text-[11px] capitalize font-medium rounded-md bg-zinc-100 text-zinc-700 border border-zinc-200">
-                        {item.category}
+                        {getCategoryBadgeLabel(item.category)}
                       </span>
                     </td>
 
@@ -514,13 +519,17 @@ export default function RestaurantManager({ initialData }: Props) {
                   </label>
                   <select
                     value={formCategory}
-                    onChange={(e) => setFormCategory(e.target.value as any)}
+                    onChange={(e) => setFormCategory(e.target.value)}
                     className="w-full h-9 px-3 border border-zinc-200 rounded-lg text-xs bg-white text-zinc-700 focus:outline-none focus:border-zinc-400 cursor-pointer"
                   >
-                    <option value="starters">Starters</option>
-                    <option value="mains">Mains</option>
+                    <option value="breakfast">Breakfast Selection</option>
+                    <option value="soups-appetizers">Soups & Appetizers</option>
+                    <option value="bbq-grill">Grilled Specialities (BBQ)</option>
+                    <option value="chinese-rice">Chinese & Noodles</option>
+                    <option value="continental">Continental & Steaks</option>
+                    <option value="pakistani">Pakistani Dishes & Karahi</option>
                     <option value="desserts">Desserts</option>
-                    <option value="drinks">Drinks & cocktails</option>
+                    <option value="beverages">Hot & Cold Beverages</option>
                   </select>
                 </div>
 
@@ -533,7 +542,7 @@ export default function RestaurantManager({ initialData }: Props) {
                     required
                     value={formPrice}
                     onChange={(e) => setFormPrice(e.target.value)}
-                    placeholder="e.g. PKR 3,800"
+                    placeholder="e.g. Rs 1200 or Half: Rs 1200 | Full: Rs 2400"
                     className="w-full h-9 px-3 border border-zinc-200 rounded-lg text-xs text-zinc-900 focus:outline-none focus:border-zinc-400 focus:ring-1 focus:ring-zinc-400"
                   />
                 </div>

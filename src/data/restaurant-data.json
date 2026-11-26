@@ -1,91 +1,571 @@
 {
   "settings": {
-    "tagline": "Restaurant & Dining",
-    "heading": "Our Restaurant",
-    "subheading": "Crafted with fresh seasonal Nordic ingredients and woodfire mastery.",
+    "tagline": "Culinary Art & Dining",
+    "heading": "Signature Art Hotel Restaurant",
+    "subheading": "Artisanal breakfast spreads, authentic Pakistani Karahi, Continental grills, and handcrafted beverages in Islamabad.",
     "backgroundImage": "/images/resturantherobg.webp",
     "buttonText": "Explore Full Menu & Book Table"
   },
   "items": [
     {
-      "id": "2",
-      "name": "Barents Red King Crab Consommé",
-      "category": "starters",
-      "price": "NOK 390",
-      "description": "Steamed red king crab cluster in clarified golden saffron broth with sea fennel.",
-      "image": "https://images.unsplash.com/photo-1544148103-0773bf10d330?q=80&w=800&auto=format&fit=crop"
+      "id": "bf-1",
+      "name": "Continental Breakfast",
+      "category": "breakfast",
+      "price": "Rs. 1799",
+      "description": "Bread Basket, Jam, Butter, and Seasonal Fruit Juice, Tea, Coffee.",
+      "image": "https://images.unsplash.com/photo-1533089860892-a7c6f0a88666?q=80&w=800&auto=format&fit=crop"
     },
     {
-      "id": "3",
-      "name": "Smoked Fjord Trout Tartare",
-      "category": "starters",
-      "price": "NOK 290",
-      "description": "Cold-smoked fjord trout, shallot crisps, mountain horseradish creme & dill oil.",
+      "id": "bf-2",
+      "name": "American Breakfast",
+      "category": "breakfast",
+      "price": "Rs. 1999",
+      "description": "Bread Basket Served With Choice of Egg (Omelette, Boiled, Fried or Scrambled), Chicken Sausage, Cereal, Fruit Yogurt, Jam and Butter Tea, Coffee.",
+      "image": "https://images.unsplash.com/photo-1525351484163-7529414344d8?q=80&w=800&auto=format&fit=crop"
+    },
+    {
+      "id": "bf-3",
+      "name": "Pakistani Breakfast",
+      "category": "breakfast",
+      "price": "Rs. 1999",
+      "description": "Paratha or Naan Served With Aloo bhujia/chana, Gravy of the Day, Pakistani Omelette and Lassi. Tea or Coffee.",
+      "image": "https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?q=80&w=800&auto=format&fit=crop"
+    },
+    {
+      "id": "soup-1",
+      "name": "Hot & Sour Soup",
+      "category": "soups-appetizers",
+      "price": "Rs 600",
+      "description": "Classic hot & sour soup with shredded chicken, mushrooms, egg drops, and savory spices.",
+      "image": "https://images.unsplash.com/photo-1547592166-23ac45744acd?q=80&w=800&auto=format&fit=crop"
+    },
+    {
+      "id": "soup-2",
+      "name": "Soup of the Day",
+      "category": "soups-appetizers",
+      "price": "Rs 600",
+      "description": "Chef's daily special slow-simmered soup prepared fresh with premium seasonal ingredients.",
+      "image": "https://images.unsplash.com/photo-1603105037880-880cd4edfb0d?q=80&w=800&auto=format&fit=crop"
+    },
+    {
+      "id": "salad-1",
+      "name": "Chicken Caesar Salad",
+      "category": "soups-appetizers",
+      "price": "Rs 1600",
+      "description": "Crisp romaine lettuce, grilled chicken breast, garlic herb croutons, parmesan flakes, Caesar dressing.",
+      "image": "https://images.unsplash.com/photo-1550304943-4f24f54ddde9?q=80&w=800&auto=format&fit=crop"
+    },
+    {
+      "id": "salad-2",
+      "name": "Fresh Green Salad",
+      "category": "soups-appetizers",
+      "price": "Rs 350",
+      "description": "Crisp garden cucumbers, tomatoes, carrots, onion rings, and fresh lemon wedges.",
+      "image": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?q=80&w=800&auto=format&fit=crop"
+    },
+    {
+      "id": "salad-3",
+      "name": "Russian Salad",
+      "category": "soups-appetizers",
+      "price": "Rs 600",
+      "description": "Traditional diced potatoes, green peas, carrots, apples, and pineapple dressed in creamy dressing.",
+      "image": "https://images.unsplash.com/photo-1540420773420-3366772f4999?q=80&w=800&auto=format&fit=crop"
+    },
+    {
+      "id": "salad-4",
+      "name": "Chef’s Salad",
+      "category": "soups-appetizers",
+      "price": "Rs 1300",
+      "description": "Mixed fresh leaves, fresh vegetables, boiled egg, sliced chicken breast, cheese and roasted beef.",
       "image": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?q=80&w=800&auto=format&fit=crop"
     },
     {
-      "id": "4",
-      "name": "Hardangerfjord Wild King Salmon",
-      "category": "mains",
-      "price": "NOK 460",
-      "description": "Crispy-skin wild salmon, cold-pressed dill oil emulsion, smoked parsnip puree & gold leaf.",
-      "image": "/restaurant/salmon.jpg"
+      "id": "app-1",
+      "name": "Buffalo Wings (06 Pcs)",
+      "category": "soups-appetizers",
+      "price": "Rs 1400",
+      "description": "Crispy chicken wings tossed in zesty buffalo sauce. Served with French fries and coleslaw.",
+      "image": "https://images.unsplash.com/photo-1567620832903-9fc6debc209f?q=80&w=800&auto=format&fit=crop"
     },
     {
-      "id": "5",
-      "name": "Birch-Charred Wagyu Tenderloin",
-      "category": "mains",
-      "price": "NOK 620",
-      "description": "45-day dry-aged Wagyu tenderloin over birch coals, black winter truffle glaze & king oyster.",
-      "image": "/restaurant/wagyu.jpg"
+      "id": "app-2",
+      "name": "Finger Fish (06 Pcs)",
+      "category": "soups-appetizers",
+      "price": "Rs 2600",
+      "description": "Golden crumbed delicate fish fingers fried to perfection. Served with French fries and coleslaw.",
+      "image": "https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?q=80&w=800&auto=format&fit=crop"
     },
     {
-      "id": "6",
-      "name": "Pan-Roasted Atlantic Halibut",
-      "category": "mains",
-      "price": "NOK 480",
-      "description": "Lofoten halibut loin basted in noisette butter, golden chanterelles & asparagus spears.",
-      "image": "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?q=80&w=800&auto=format&fit=crop"
+      "id": "bbq-1",
+      "name": "Chicken Boti (08pcs)",
+      "category": "bbq-grill",
+      "price": "Rs 1199",
+      "description": "Tender boneless chicken cubes marinated in signature spices and chargrilled over hot embers.",
+      "image": "https://images.unsplash.com/photo-1599488615731-7e5c2823ff28?q=80&w=800&auto=format&fit=crop"
     },
     {
-      "id": "7",
-      "name": "Alder-Smoked Telemark Venison",
-      "category": "mains",
-      "price": "RS 540",
-      "description": "Forest venison loin roasted over alder coals, lingonberry reduction & Jerusalem artichoke.",
+      "id": "bbq-2",
+      "name": "Chicken Malai Boti (08pcs)",
+      "category": "bbq-grill",
+      "price": "Rs 1199",
+      "description": "Melt-in-mouth chicken cubes marinated in rich fresh cream, cheese, cardamom, and gentle herbs.",
+      "image": "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?q=80&w=800&auto=format&fit=crop"
+    },
+    {
+      "id": "bbq-3",
+      "name": "Beef Seekh Kebab (04pcs)",
+      "category": "bbq-grill",
+      "price": "Rs 1199",
+      "description": "Juicy minced prime beef skewers seasoned with aromatic roasted spices, mint, and flame-grilled.",
       "image": "https://images.unsplash.com/photo-1544025162-d76694265947?q=80&w=800&auto=format&fit=crop"
     },
     {
-      "id": "8",
-      "name": "Smoked Valrhona Cloudberry Sphere",
-      "category": "desserts",
-      "price": "NOK 240",
-      "description": "Dark Valrhona chocolate dome, Arctic cloudberry sorbet, warm raspberry coulis & gold.",
-      "image": "/restaurant/dessert.jpg"
+      "id": "bbq-4",
+      "name": "Chicken Reshmi Kebab (04pcs)",
+      "category": "bbq-grill",
+      "price": "Rs 1199",
+      "description": "Silky texture minced chicken skewers infused with cream, saffron, coriander, and mild spices.",
+      "image": "https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?q=80&w=800&auto=format&fit=crop"
     },
     {
-      "id": "9",
-      "name": "Nordic Lingonberry Mille-Feuille",
+      "id": "ch-1",
+      "name": "Chicken Kung Pao",
+      "category": "chinese-rice",
+      "price": "Rs 1599",
+      "description": "Diced chicken, peanuts, chili peppers, and scallions in savory sauce. Served with vegetable/egg fried rice.",
+      "image": "https://images.unsplash.com/photo-1525755662778-989d0524087e?q=80&w=800&auto=format&fit=crop"
+    },
+    {
+      "id": "ch-2",
+      "name": "Chicken Manchurian",
+      "category": "chinese-rice",
+      "price": "Rs 1599",
+      "description": "Succulent chicken chunks in tangy ginger-garlic tomato gravy. Served with vegetable/egg fried rice.",
+      "image": "https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?q=80&w=800&auto=format&fit=crop"
+    },
+    {
+      "id": "ch-3",
+      "name": "Chicken Szechuan",
+      "category": "chinese-rice",
+      "price": "Rs 1599",
+      "description": "Spicy chicken stir-fry with Szechuan peppers, crisp vegetables, and fiery chili sauce. Served with fried rice.",
+      "image": "https://images.unsplash.com/photo-1569058242253-92a9c755a0ec?q=80&w=800&auto=format&fit=crop"
+    },
+    {
+      "id": "ch-4",
+      "name": "Chicken Chilli Dry",
+      "category": "chinese-rice",
+      "price": "Rs 1599",
+      "description": "Crisp chicken tossed with green chilies, onions, capsicum, and oriental glaze. Served with fried rice.",
+      "image": "https://images.unsplash.com/photo-1585032226651-759b368d7246?q=80&w=800&auto=format&fit=crop"
+    },
+    {
+      "id": "ch-5",
+      "name": "Beef Chilli Dry",
+      "category": "chinese-rice",
+      "price": "Rs 1699",
+      "description": "Tender beef slices wok-tossed with fresh green chilies, ginger, and soy sauce. Served with fried rice.",
+      "image": "https://images.unsplash.com/photo-1544025162-d76694265947?q=80&w=800&auto=format&fit=crop"
+    },
+    {
+      "id": "ch-6",
+      "name": "Fish in Hot Garlic Sauce",
+      "category": "chinese-rice",
+      "price": "Rs 2600",
+      "description": "Pan-fried fish fillet glazed in fragrant spicy garlic red sauce. Served with vegetable/egg fried rice.",
+      "image": "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?q=80&w=800&auto=format&fit=crop"
+    },
+    {
+      "id": "ch-7",
+      "name": "Egg or Vegetable Fried Rice",
+      "category": "chinese-rice",
+      "price": "Rs 800",
+      "description": "Fragrant basmati rice stir-fried in a hot wok with fresh vegetables, egg ribbon, and light soy.",
+      "image": "https://images.unsplash.com/photo-1603133872878-684f208fb84b?q=80&w=800&auto=format&fit=crop"
+    },
+    {
+      "id": "ch-8",
+      "name": "Chicken Chowmein",
+      "category": "chinese-rice",
+      "price": "Rs 1500",
+      "description": "Wok-tossed noodles with tender shredded chicken, julienne vegetables, and savory Chinese spices.",
+      "image": "https://images.unsplash.com/photo-1585032226651-759b368d7246?q=80&w=800&auto=format&fit=crop"
+    },
+    {
+      "id": "ch-9",
+      "name": "Vegetable Noodle",
+      "category": "chinese-rice",
+      "price": "Rs 1000",
+      "description": "Classic stir-fried egg noodles with bell peppers, cabbage, carrots, scallions, and soy dressing.",
+      "image": "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?q=80&w=800&auto=format&fit=crop"
+    },
+    {
+      "id": "ch-10",
+      "name": "Garlic Rice",
+      "category": "chinese-rice",
+      "price": "Rs 1000",
+      "description": "Golden toasted garlic tossed with long grain steamed basmati rice and butter seasoning.",
+      "image": "https://images.unsplash.com/photo-1512058564366-18510be2db19?q=80&w=800&auto=format&fit=crop"
+    },
+    {
+      "id": "con-1",
+      "name": "Chicken Steak",
+      "category": "continental",
+      "price": "Rs 1800",
+      "description": "Grilled chicken steak with black pepper or mushroom sauce. Served with French fries and sautéed vegetables.",
+      "image": "https://images.unsplash.com/photo-1544025162-d76694265947?q=80&w=800&auto=format&fit=crop"
+    },
+    {
+      "id": "con-2",
+      "name": "Peri Peri Chicken",
+      "category": "continental",
+      "price": "Rs 1999",
+      "description": "Flame-grilled chicken infused with fiery peri peri glaze. Served with sautéed vegetables and French fries.",
+      "image": "https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?q=80&w=800&auto=format&fit=crop"
+    },
+    {
+      "id": "con-3",
+      "name": "Signature Club Sandwich",
+      "category": "continental",
+      "price": "Rs 1199",
+      "description": "Filled with grilled chicken, roasted beef, fried egg, cucumber, tomatoes and lettuce. Served with French fries and coleslaw.",
+      "image": "https://images.unsplash.com/photo-1528735602780-2552fd46c7af?q=80&w=800&auto=format&fit=crop"
+    },
+    {
+      "id": "con-4",
+      "name": "Grilled Chicken Sandwich",
+      "category": "continental",
+      "price": "Rs 1099",
+      "description": "Filled with seasoned grilled chicken, cucumber and crisp lettuce. Served with French fries and coleslaw.",
+      "image": "https://images.unsplash.com/photo-1553909489-cd47e0907980?q=80&w=800&auto=format&fit=crop"
+    },
+    {
+      "id": "con-5",
+      "name": "Steak Sandwich",
+      "category": "continental",
+      "price": "Rs 1799",
+      "description": "Juicy steak sandwich piled high with tender slices of beef, caramelized onions, tomatoes and lettuce. Served with French fries and coleslaw.",
+      "image": "https://images.unsplash.com/photo-1509722747041-616f39b57569?q=80&w=800&auto=format&fit=crop"
+    },
+    {
+      "id": "con-6",
+      "name": "Chicken Zinger Burger",
+      "category": "continental",
+      "price": "Rs 1099",
+      "description": "Pan-fried chicken patty with melted cheese, lettuce, tomatoes, jalapeno and onion. Served with French fries and coleslaw.",
+      "image": "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?q=80&w=800&auto=format&fit=crop"
+    },
+    {
+      "id": "con-7",
+      "name": "Beef Burger",
+      "category": "continental",
+      "price": "Rs 1199",
+      "description": "Juicy beef patty topped with melted cheese, lettuce, tomatoes, jalapeno and onion. Served with French fries and coleslaw.",
+      "image": "https://images.unsplash.com/photo-1586190848861-99aa4a171e90?q=80&w=800&auto=format&fit=crop"
+    },
+    {
+      "id": "con-8",
+      "name": "French Fries",
+      "category": "continental",
+      "price": "Rs 699",
+      "description": "Crispy golden fried potato sticks served with ketchup and mayonnaise.",
+      "image": "https://images.unsplash.com/photo-1576107232684-1279f3908594?q=80&w=800&auto=format&fit=crop"
+    },
+    {
+      "id": "con-9",
+      "name": "Chicken Nuggets (08 pcs)",
+      "category": "continental",
+      "price": "Rs 1299",
+      "description": "Crispy breaded golden chicken nuggets served hot with ketchup and mayonnaise.",
+      "image": "https://images.unsplash.com/photo-1562967914-608f82629710?q=80&w=800&auto=format&fit=crop"
+    },
+    {
+      "id": "con-10",
+      "name": "Fish and Chips",
+      "category": "continental",
+      "price": "Rs 2600",
+      "description": "Batter fried fish fillet served with golden French fries and tartar sauce.",
+      "image": "https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?q=80&w=800&auto=format&fit=crop"
+    },
+    {
+      "id": "con-11",
+      "name": "Spaghetti Bolognese",
+      "category": "continental",
+      "price": "Rs 1500",
+      "description": "Spaghetti with minced beef in rich slow-simmered tomato sauce and grated cheese.",
+      "image": "https://images.unsplash.com/photo-1621996346565-e3d5d6281724?q=80&w=800&auto=format&fit=crop"
+    },
+    {
+      "id": "con-12",
+      "name": "Fettuccini Alfredo",
+      "category": "continental",
+      "price": "Rs 1299",
+      "description": "Pasta with chicken and mushroom in creamy sauce topped with grated cheese.",
+      "image": "https://images.unsplash.com/photo-1645112411341-6c4fd023714a?q=80&w=800&auto=format&fit=crop"
+    },
+    {
+      "id": "pak-1",
+      "name": "Chicken Black Pepper Karahi",
+      "category": "pakistani",
+      "price": "Half: Rs 1200 | Full: Rs 2400",
+      "description": "Tender chicken cooked with freshly crushed black pepper, ginger, and yogurt.",
+      "image": "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?q=80&w=800&auto=format&fit=crop"
+    },
+    {
+      "id": "pak-2",
+      "name": "Chicken White Karahi",
+      "category": "pakistani",
+      "price": "Half: Rs 1200 | Full: Rs 2400",
+      "description": "Creamy mild chicken karahi prepared with white pepper, cream, green chilies, and yogurt.",
+      "image": "https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?q=80&w=800&auto=format&fit=crop"
+    },
+    {
+      "id": "pak-3",
+      "name": "Chicken Ginger Handi",
+      "category": "pakistani",
+      "price": "Half: Rs 1200 | Full: Rs 2400",
+      "description": "Boneless chicken handi infused with aromatic fresh ginger gravy and butter.",
+      "image": "https://images.unsplash.com/photo-1546833999-b9f581a1996d?q=80&w=800&auto=format&fit=crop"
+    },
+    {
+      "id": "pak-4",
+      "name": "Lahori Karahi",
+      "category": "pakistani",
+      "price": "Half: Rs 1200 | Full: Rs 2400",
+      "description": "Classic spicy Lahori chicken wok cooked in fresh tomatoes, green chilies, and desi spices.",
+      "image": "https://images.unsplash.com/photo-1565557623262-b51c2513a641?q=80&w=800&auto=format&fit=crop"
+    },
+    {
+      "id": "pak-5",
+      "name": "Chicken Jalfrezi / Malai Karahi",
+      "category": "pakistani",
+      "price": "Half: Rs 1200 | Full: Rs 2400",
+      "description": "Tender chicken with bell peppers and onions, or ultra-creamy velvety Malai Karahi.",
+      "image": "https://images.unsplash.com/photo-1589302168068-964664d93dc0?q=80&w=800&auto=format&fit=crop"
+    },
+    {
+      "id": "pak-6",
+      "name": "Chicken Mughlai Handi",
+      "category": "pakistani",
+      "price": "Half: Rs 1200 | Full: Rs 2400",
+      "description": "Royal boneless chicken handi simmered in nutty cream gravy with rich spices.",
+      "image": "https://images.unsplash.com/photo-1610057099443-fde8c4d50f91?q=80&w=800&auto=format&fit=crop"
+    },
+    {
+      "id": "pak-7",
+      "name": "Mutton Karahi",
+      "category": "pakistani",
+      "price": "Half: Rs 3500 | Full: Rs 6500",
+      "description": "Tender succulent mutton pieces cooked in karahi with rich tomatoes and freshly ground spices.",
+      "image": "https://images.unsplash.com/photo-1544025162-d76694265947?q=80&w=800&auto=format&fit=crop"
+    },
+    {
+      "id": "pak-8",
+      "name": "Chicken Qorma (Single Serving)",
+      "category": "pakistani",
+      "price": "Rs 1099",
+      "description": "Aromatic Mughlai chicken qorma slow-cooked with browned onions, yogurt, and whole spices.",
+      "image": "https://images.unsplash.com/photo-1589302168068-964664d93dc0?q=80&w=800&auto=format&fit=crop"
+    },
+    {
+      "id": "pak-9",
+      "name": "Lahori Style Spicy Marinated Fish",
+      "category": "pakistani",
+      "price": "Rs 2600",
+      "description": "Fish fillet coated in spicy Lahori gram-flour batter and fried crisp to perfection.",
+      "image": "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?q=80&w=800&auto=format&fit=crop"
+    },
+    {
+      "id": "pak-10",
+      "name": "Chicken Biryani (Single Serving)",
+      "category": "pakistani",
+      "price": "Rs 999",
+      "description": "Fragrant basmati rice layered with spiced chicken, mint, and saffron steam.",
+      "image": "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?q=80&w=800&auto=format&fit=crop"
+    },
+    {
+      "id": "pak-11",
+      "name": "Mutton Biryani (Single Serving)",
+      "category": "pakistani",
+      "price": "Rs 1699",
+      "description": "Rich dum cooked biryani with tender mutton pieces and fragrant spiced basmati rice.",
+      "image": "https://images.unsplash.com/photo-1589302168068-964664d93dc0?q=80&w=800&auto=format&fit=crop"
+    },
+    {
+      "id": "pak-12",
+      "name": "Vegetable of the Day",
+      "category": "pakistani",
+      "price": "Rs 799",
+      "description": "Freshly cooked seasonal vegetables tempered with aromatic cumin and mild herbs.",
+      "image": "https://images.unsplash.com/photo-1540420773420-3366772f4999?q=80&w=800&auto=format&fit=crop"
+    },
+    {
+      "id": "pak-13",
+      "name": "Daal of the Day",
+      "category": "pakistani",
+      "price": "Rs 799",
+      "description": "Daily specialty lentil slow-cooked and tempered with garlic and cumin ghee tadka.",
+      "image": "https://images.unsplash.com/photo-1546833999-b9f581a1996d?q=80&w=800&auto=format&fit=crop"
+    },
+    {
+      "id": "pak-14",
+      "name": "Special Naan",
+      "category": "pakistani",
+      "price": "Rs 250",
+      "description": "Freshly baked tandoori naan. Choice of Kalonji, Garlic, or butter-glazed Roghni.",
+      "image": "https://images.unsplash.com/photo-1565557623262-b51c2513a641?q=80&w=800&auto=format&fit=crop"
+    },
+    {
+      "id": "pak-15",
+      "name": "Roti",
+      "category": "pakistani",
+      "price": "Rs 70",
+      "description": "Hot and wholesome tandoori whole-wheat roti.",
+      "image": "https://images.unsplash.com/photo-1509722747041-616f39b57569?q=80&w=800&auto=format&fit=crop"
+    },
+    {
+      "id": "pak-16",
+      "name": "Raita",
+      "category": "pakistani",
+      "price": "Rs 250",
+      "description": "Cool whipped spiced yogurt with cumin, mint, and cucumber.",
+      "image": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?q=80&w=800&auto=format&fit=crop"
+    },
+    {
+      "id": "des-1",
+      "name": "Kheer",
       "category": "desserts",
-      "price": "NOK 210",
-      "description": "Caramelized flaky pastry, vanilla bean chantilly, wild mountain lingonberry & cardamom.",
+      "price": "Rs 900",
+      "description": "Traditional slow-simmered rice pudding with milk, cardamom, saffron, and nuts.",
       "image": "https://images.unsplash.com/photo-1587314168485-3236d6710814?q=80&w=800&auto=format&fit=crop"
     },
     {
-      "id": "10",
-      "name": "Smoked Fjord Old Fashioned",
-      "category": "drinks",
-      "price": "NOK 220",
-      "description": "Sherry-cask Linie Aquavit, single malt, torched rosemary & hand-carved monogram ice.",
-      "image": "/restaurant/cocktail.jpg"
+      "id": "des-2",
+      "name": "Fruit Trifle",
+      "category": "desserts",
+      "price": "Rs 900",
+      "description": "Chilled layered dessert with soft sponge, fruit cocktail, creamy custard, and fruit jelly.",
+      "image": "https://images.unsplash.com/photo-1551024709-8f23befc6f87?q=80&w=800&auto=format&fit=crop"
     },
     {
-      "id": "11",
-      "name": "Arctic Cloudberry Botanical Spritz",
-      "category": "drinks",
-      "price": "NOK 160",
-      "description": "Distilled sea buckthorn, lemon thyme, pressed wild cloudberries & elderflower tonic.",
+      "id": "des-3",
+      "name": "Choice of Ice Cream",
+      "category": "desserts",
+      "price": "Rs 700",
+      "description": "Premium ice cream scoops in classic vanilla, rich chocolate, or fruit flavors.",
+      "image": "https://images.unsplash.com/photo-1501443762994-82bd5dace89a?q=80&w=800&auto=format&fit=crop"
+    },
+    {
+      "id": "bev-1",
+      "name": "Mineral Water",
+      "category": "beverages",
+      "price": "Small: Rs 100 | Large: Rs 200",
+      "description": "Chilled purified mineral water.",
+      "image": "https://images.unsplash.com/photo-1548839140-29a749e1bc4e?q=80&w=800&auto=format&fit=crop"
+    },
+    {
+      "id": "bev-2",
+      "name": "Seasonal Fresh Juice",
+      "category": "beverages",
+      "price": "Rs 800",
+      "description": "Freshly squeezed seasonal fruits juice served chilled.",
+      "image": "https://images.unsplash.com/photo-1613478223719-2ab802602423?q=80&w=800&auto=format&fit=crop"
+    },
+    {
+      "id": "bev-3",
+      "name": "Soft Drinks / Juice (Canned)",
+      "category": "beverages",
+      "price": "Rs 250",
+      "description": "Choice of chilled canned carbonated soft drinks or canned fruit juice.",
+      "image": "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?q=80&w=800&auto=format&fit=crop"
+    },
+    {
+      "id": "bev-4",
+      "name": "Fresh Lime",
+      "category": "beverages",
+      "price": "Rs 350",
+      "description": "Freshly squeezed lime with chilled soda or water, sweet or salted.",
+      "image": "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?q=80&w=800&auto=format&fit=crop"
+    },
+    {
+      "id": "bev-5",
+      "name": "Red Bull",
+      "category": "beverages",
+      "price": "Rs 899",
+      "description": "Chilled premium energy drink can served over ice.",
+      "image": "https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=800&auto=format&fit=crop"
+    },
+    {
+      "id": "bev-6",
+      "name": "Mixed Tea / Green Tea / English Tea",
+      "category": "beverages",
+      "price": "Rs 300",
+      "description": "Freshly brewed Pakistani Karak Doodh Patti, Green Tea, or English Breakfast Tea.",
+      "image": "https://images.unsplash.com/photo-1544787219-7f47ccb76574?q=80&w=800&auto=format&fit=crop"
+    },
+    {
+      "id": "bev-7",
+      "name": "Coffee",
+      "category": "beverages",
+      "price": "Rs 550",
+      "description": "Freshly brewed hot coffee made with rich roasted coffee beans.",
+      "image": "https://images.unsplash.com/photo-1509042239860-f550ce710b93?q=80&w=800&auto=format&fit=crop"
+    },
+    {
+      "id": "bev-8",
+      "name": "Cappuccino",
+      "category": "beverages",
+      "price": "Rs 550",
+      "description": "Fresh espresso topped with steamed milk and rich velvety foam.",
+      "image": "https://images.unsplash.com/photo-1572442388796-11668a67e53d?q=80&w=800&auto=format&fit=crop"
+    },
+    {
+      "id": "bev-9",
+      "name": "Espresso",
+      "category": "beverages",
+      "price": "Rs 550",
+      "description": "Intense and aromatic shot of pure extracted coffee with thick crema.",
+      "image": "https://images.unsplash.com/photo-1510591509098-f4fdc6d0ff04?q=80&w=800&auto=format&fit=crop"
+    },
+    {
+      "id": "bev-10",
+      "name": "Milk",
+      "category": "beverages",
+      "price": "Rs 500",
+      "description": "Served warm or chilled whole milk.",
+      "image": "https://images.unsplash.com/photo-1550583724-b2692b85b150?q=80&w=800&auto=format&fit=crop"
+    },
+    {
+      "id": "bev-11",
+      "name": "Mint Margarita",
+      "category": "beverages",
+      "price": "Rs 600",
+      "description": "Crushed mint leaves, fresh lemon juice, black salt, and sparkling soda over ice.",
       "image": "https://images.unsplash.com/photo-1551024709-8f23befc6f87?q=80&w=800&auto=format&fit=crop"
+    },
+    {
+      "id": "bev-12",
+      "name": "Milk Shake (Apple, Mango, Banana, Avocado)",
+      "category": "beverages",
+      "price": "Rs 750",
+      "description": "Creamy thick shake with choice of Apple, Mango, Banana, or Avocado.",
+      "image": "https://images.unsplash.com/photo-1572490122747-3968b75cc699?q=80&w=800&auto=format&fit=crop"
+    },
+    {
+      "id": "bev-13",
+      "name": "Smoothie (Banana, Apple, Avocado)",
+      "category": "beverages",
+      "price": "Rs 750",
+      "description": "Refreshing blended fruit smoothie with yogurt and honey. Choice of Banana, Apple, Avocado.",
+      "image": "https://images.unsplash.com/photo-1502741224143-90386d7f8c82?q=80&w=800&auto=format&fit=crop"
+    },
+    {
+      "id": "bev-14",
+      "name": "Cold Coffee",
+      "category": "beverages",
+      "price": "Rs 550",
+      "description": "Rich chilled blended coffee with milk, chocolate drizzle, and ice cream.",
+      "image": "https://images.unsplash.com/photo-1517701550927-30cf4ba1dba5?q=80&w=800&auto=format&fit=crop"
     }
   ]
 }

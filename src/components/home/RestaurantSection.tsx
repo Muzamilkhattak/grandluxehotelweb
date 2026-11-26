@@ -17,61 +17,61 @@ export default function RestaurantSection({ settings: propSettings, items: propI
   const [activeTab, setActiveTab] = useState<string>("all");
 
   const settings = propSettings || {
-    tagline: "Restaurant & Dining",
+    tagline: "Culinary Art & Dining",
     heading: "Our Restaurant",
-    subheading: "Discover a curated symphony of wild coastal catches, birch hearth woodfire cuts, and handcrafted Nordic patisserie.",
-    backgroundImage: "/restaurant/interior.jpg",
+    subheading: "Discover artisanal breakfast spreads, authentic Pakistani Karahi, Continental grills, and handcrafted beverages in Islamabad.",
+    backgroundImage: "/images/resturantherobg.webp",
     buttonText: "Explore Full Menu & Book Table"
   };
 
   const allItems = propItems && propItems.length > 0 ? propItems : [
     {
-      id: "1",
-      name: "Hitra Sea Scallop & Royal Caviar",
-      category: "starters" as const,
-      price: "NOK 380",
-      description: "Pan-seared Arctic scallops, royal caviar, sweet pea reduction & sea water emulsion.",
-      image: "/restaurant/starter.jpg",
+      id: "pak-1",
+      name: "Chicken Black Pepper Karahi",
+      category: "pakistani",
+      price: "Half: Rs 1200 | Full: Rs 2400",
+      description: "Tender chicken cooked with freshly crushed black pepper, ginger, and yogurt.",
+      image: "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?q=80&w=800&auto=format&fit=crop",
     },
     {
-      id: "2",
-      name: "Hardangerfjord Wild King Salmon",
-      category: "mains" as const,
-      price: "NOK 460",
-      description: "Crispy-skin wild salmon, cold-pressed dill oil emulsion, smoked parsnip puree & gold leaf.",
-      image: "/restaurant/salmon.jpg",
+      id: "bbq-2",
+      name: "Chicken Malai Boti (08pcs)",
+      category: "bbq-grill",
+      price: "Rs 1199",
+      description: "Melt-in-mouth chicken cubes marinated in rich fresh cream, cheese, and herbs.",
+      image: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?q=80&w=800&auto=format&fit=crop",
     },
     {
-      id: "3",
-      name: "Birch-Charred Wagyu Tenderloin",
-      category: "mains" as const,
-      price: "NOK 620",
-      description: "45-day dry-aged Wagyu tenderloin over birch coals, winter truffle glaze & king oyster.",
-      image: "/restaurant/wagyu.jpg",
+      id: "con-1",
+      name: "Chicken Steak",
+      category: "continental",
+      price: "Rs 1800",
+      description: "Grilled chicken steak with black pepper sauce, French fries and sautéed vegetables.",
+      image: "https://images.unsplash.com/photo-1544025162-d76694265947?q=80&w=800&auto=format&fit=crop",
     },
     {
-      id: "4",
-      name: "Barents Red King Crab Consommé",
-      category: "starters" as const,
-      price: "NOK 390",
-      description: "Arctic king crab cluster steamed over seaweed broth with golden saffron & sea fennel.",
-      image: "https://images.unsplash.com/photo-1544148103-0773bf10d330?q=75&w=300&auto=format&fit=crop",
+      id: "ch-8",
+      name: "Chicken Chowmein",
+      category: "chinese-rice",
+      price: "Rs 1500",
+      description: "Wok-tossed noodles with tender shredded chicken, julienne vegetables, and spices.",
+      image: "https://images.unsplash.com/photo-1585032226651-759b368d7246?q=80&w=800&auto=format&fit=crop",
     },
     {
-      id: "5",
-      name: "Smoked Valrhona Cloudberry Sphere",
-      category: "desserts" as const,
-      price: "NOK 240",
-      description: "Valrhona dark chocolate dome, wild Arctic cloudberry sorbet, warm raspberry coulis & gold.",
-      image: "/restaurant/dessert.jpg",
+      id: "des-1",
+      name: "Kheer",
+      category: "desserts",
+      price: "Rs 900",
+      description: "Traditional slow-simmered rice pudding with milk, cardamom, saffron, and nuts.",
+      image: "https://images.unsplash.com/photo-1587314168485-3236d6710814?q=80&w=800&auto=format&fit=crop",
     },
     {
-      id: "6",
-      name: "Smoked Fjord Old Fashioned",
-      category: "drinks" as const,
-      price: "NOK 220",
-      description: "Sherry-cask Linie Aquavit & single malt, torched rosemary, monogram hand-carved ice.",
-      image: "/restaurant/cocktail.jpg",
+      id: "bev-11",
+      name: "Mint Margarita",
+      category: "beverages",
+      price: "Rs 600",
+      description: "Crushed mint leaves, fresh lemon juice, black salt, and sparkling soda over ice.",
+      image: "https://images.unsplash.com/photo-1551024709-8f23befc6f87?q=80&w=800&auto=format&fit=crop",
     },
   ];
 
@@ -129,9 +129,10 @@ export default function RestaurantSection({ settings: propSettings, items: propI
           <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 mt-6 sm:mt-8">
             {[
               { id: "all", label: "All Curations" },
-              { id: "starters", label: "Starters & Raw Bar" },
-              { id: "mains", label: "Signature Mains" },
-              { id: "desserts", label: "Desserts & Cellar" },
+              { id: "pakistani", label: "Pakistani & Karahi" },
+              { id: "bbq-grill", label: "BBQ & Grills" },
+              { id: "continental", label: "Continental & Steaks" },
+              { id: "beverages", label: "Beverages" },
             ].map((tab) => (
               <button
                 key={tab.id}
@@ -180,15 +181,15 @@ export default function RestaurantSection({ settings: propSettings, items: propI
 
                     {/* Item Details */}
                     <div className="flex-1 min-w-0">
-                      {/* Name & Price with Dotted Leader */}
-                      <div className="flex items-baseline justify-between gap-3 mb-1.5">
-                        <h3 className="font-marcellus text-[18px] sm:text-[21px] text-white group-hover:text-[#d7b56d] transition-colors truncate">
+                      {/* Name & Price with Responsive Formatting */}
+                      <div className="flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-1 sm:gap-2 mb-1.5">
+                        <h3 className="font-marcellus text-[17px] sm:text-[20px] text-white group-hover:text-[#d7b56d] transition-colors truncate">
                           {item.name}
                         </h3>
                         
-                        <span className="flex-1 border-b border-dotted border-white/25 hidden sm:inline-block mx-1" />
+                        <span className="flex-1 border-b border-dotted border-white/25 hidden md:inline-block mx-1" />
 
-                        <span className="font-marcellus text-[18px] sm:text-[20px] text-[#d7b56d] group-hover:text-[#d7b56d] shrink-0 font-bold drop-shadow-[0_2px_8px_rgba(215,181,109,0.35)]">
+                        <span className="font-marcellus text-[14px] sm:text-[17px] text-[#d7b56d] group-hover:text-[#d7b56d] shrink-0 font-bold drop-shadow-[0_2px_8px_rgba(215,181,109,0.35)] whitespace-nowrap">
                           {item.price}
                         </span>
                       </div>

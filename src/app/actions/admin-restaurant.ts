@@ -4,6 +4,7 @@ import fs from "fs/promises";
 import path from "path";
 import { revalidatePath } from "next/cache";
 import { verifyAdminSessionServer } from "@/app/actions/admin-auth";
+import { createServerClient } from "@supabase/ssr";
 
 export interface RestaurantSettings {
   tagline: string;
@@ -13,10 +14,13 @@ export interface RestaurantSettings {
   buttonText: string;
 }
 
+export type { RestaurantCategory } from "@/data/restaurant-constants";
+import type { RestaurantCategory } from "@/data/restaurant-constants";
+
 export interface MenuItemData {
   id: string;
   name: string;
-  category: "starters" | "mains" | "desserts" | "drinks";
+  category: RestaurantCategory;
   price: string;
   description: string;
   image: string;
@@ -27,133 +31,106 @@ export interface RestaurantData {
   items: MenuItemData[];
 }
 
-const DEFAULT_RESTAURANT_DATA: RestaurantData = {
-  settings: {
-    tagline: "Restaurant & Dining",
-    heading: "Our Restaurant",
-    subheading: "Crafted with fresh seasonal Nordic ingredients and woodfire mastery.",
-    backgroundImage: "/images/resturantherobg.webp",
-    buttonText: "Explore Full Menu & Book Table",
-  },
-  items: [
-    {
-      id: "1",
-      name: "Hitra Sea Scallop & Royal Caviar",
-      category: "starters",
-      price: "NOK 380",
-      description: "Pan-seared Arctic scallops, royal caviar, sweet pea reduction & sea water emulsion.",
-      image: "/restaurant/starter.jpg",
-    },
-    {
-      id: "2",
-      name: "Barents Red King Crab Consommé",
-      category: "starters",
-      price: "NOK 390",
-      description: "Steamed red king crab cluster in clarified golden saffron broth with sea fennel.",
-      image: "https://images.unsplash.com/photo-1544148103-0773bf10d330?q=80&w=800&auto=format&fit=crop",
-    },
-    {
-      id: "3",
-      name: "Smoked Fjord Trout Tartare",
-      category: "starters",
-      price: "NOK 290",
-      description: "Cold-smoked fjord trout, shallot crisps, mountain horseradish creme & dill oil.",
-      image: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?q=80&w=800&auto=format&fit=crop",
-    },
-    {
-      id: "4",
-      name: "Hardangerfjord Wild King Salmon",
-      category: "mains",
-      price: "NOK 460",
-      description: "Crispy-skin wild salmon, cold-pressed dill oil emulsion, smoked parsnip puree & gold leaf.",
-      image: "/restaurant/salmon.jpg",
-    },
-    {
-      id: "5",
-      name: "Birch-Charred Wagyu Tenderloin",
-      category: "mains",
-      price: "NOK 620",
-      description: "45-day dry-aged Wagyu tenderloin over birch coals, black winter truffle glaze & king oyster.",
-      image: "/restaurant/wagyu.jpg",
-    },
-    {
-      id: "6",
-      name: "Pan-Roasted Atlantic Halibut",
-      category: "mains",
-      price: "NOK 480",
-      description: "Lofoten halibut loin basted in noisette butter, golden chanterelles & asparagus spears.",
-      image: "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?q=80&w=800&auto=format&fit=crop",
-    },
-    {
-      id: "7",
-      name: "Alder-Smoked Telemark Venison",
-      category: "mains",
-      price: "NOK 540",
-      description: "Forest venison loin roasted over alder coals, lingonberry reduction & Jerusalem artichoke.",
-      image: "https://images.unsplash.com/photo-1544025162-d76694265947?q=80&w=800&auto=format&fit=crop",
-    },
-    {
-      id: "8",
-      name: "Smoked Valrhona Cloudberry Sphere",
-      category: "desserts",
-      price: "NOK 240",
-      description: "Dark Valrhona chocolate dome, Arctic cloudberry sorbet, warm raspberry coulis & gold.",
-      image: "/restaurant/dessert.jpg",
-    },
-    {
-      id: "9",
-      name: "Nordic Lingonberry Mille-Feuille",
-      category: "desserts",
-      price: "NOK 210",
-      description: "Caramelized flaky pastry, vanilla bean chantilly, wild mountain lingonberry & cardamom.",
-      image: "https://images.unsplash.com/photo-1587314168485-3236d6710814?q=80&w=800&auto=format&fit=crop",
-    },
-    {
-      id: "10",
-      name: "Smoked Fjord Old Fashioned",
-      category: "drinks",
-      price: "NOK 220",
-      description: "Sherry-cask Linie Aquavit, single malt, torched rosemary & hand-carved monogram ice.",
-      image: "/restaurant/cocktail.jpg",
-    },
-    {
-      id: "11",
-      name: "Arctic Cloudberry Botanical Spritz",
-      category: "drinks",
-      price: "NOK 160",
-      description: "Distilled sea buckthorn, lemon thyme, pressed wild cloudberries & elderflower tonic.",
-      image: "https://images.unsplash.com/photo-1551024709-8f23befc6f87?q=80&w=800&auto=format&fit=crop",
-    },
-  ],
-};
-
 const DATA_FILE_PATH = path.join(process.cwd(), "src", "data", "restaurant-data.json");
 const UPLOAD_DIR = path.join(process.cwd(), "public", "uploads", "restaurant");
+const STORAGE_BUCKET = "room-images";
+const STORAGE_PATH = "settings/restaurant-data.json";
 
-async function ensureDir(dirPath: string) {
-  try {
-    await fs.access(dirPath);
-  } catch {
-    await fs.mkdir(dirPath, { recursive: true });
-  }
+function getSupabaseClient() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!;
+  return createServerClient(supabaseUrl, serviceKey, {
+    cookies: {
+      getAll: () => [],
+      setAll: () => {},
+    },
+  });
 }
 
 export async function getRestaurantData(): Promise<RestaurantData> {
+  // 1. Try reading from Supabase Storage (cloud-persistent for Vercel/serverless)
+  try {
+    const supabase = getSupabaseClient();
+    const { data, error } = await supabase.storage
+      .from(STORAGE_BUCKET)
+      .download(STORAGE_PATH);
+
+    if (data && !error) {
+      const text = await data.text();
+      const parsed = JSON.parse(text);
+      if (parsed && typeof parsed === "object") {
+        return {
+          settings: parsed.settings || {
+            tagline: "Culinary Art & Dining",
+            heading: "Signature Art Hotel Restaurant",
+            subheading: "Artisanal breakfast spreads, authentic Pakistani Karahi, Continental grills, and handcrafted beverages in Islamabad.",
+            backgroundImage: "/images/resturantherobg.webp",
+            buttonText: "Explore Full Menu & Book Table",
+          },
+          items: Array.isArray(parsed.items) && parsed.items.length > 0 ? parsed.items : [],
+        };
+      }
+    }
+  } catch (err) {
+    // Supabase read fallback
+  }
+
+  // 2. Fallback to local file if available
   try {
     const fileContent = await fs.readFile(DATA_FILE_PATH, "utf-8");
     const parsed = JSON.parse(fileContent);
     return {
-      settings: { ...DEFAULT_RESTAURANT_DATA.settings, ...(parsed.settings || {}) },
-      items: Array.isArray(parsed.items) && parsed.items.length > 0 ? parsed.items : DEFAULT_RESTAURANT_DATA.items,
+      settings: parsed.settings || {
+        tagline: "Culinary Art & Dining",
+        heading: "Signature Art Hotel Restaurant",
+        subheading: "Artisanal breakfast spreads, authentic Pakistani Karahi, Continental grills, and handcrafted beverages in Islamabad.",
+        backgroundImage: "/images/resturantherobg.webp",
+        buttonText: "Explore Full Menu & Book Table",
+      },
+      items: Array.isArray(parsed.items) && parsed.items.length > 0 ? parsed.items : [],
     };
   } catch {
-    return DEFAULT_RESTAURANT_DATA;
+    return {
+      settings: {
+        tagline: "Culinary Art & Dining",
+        heading: "Signature Art Hotel Restaurant",
+        subheading: "Artisanal breakfast spreads, authentic Pakistani Karahi, Continental grills, and handcrafted beverages in Islamabad.",
+        backgroundImage: "/images/resturantherobg.webp",
+        buttonText: "Explore Full Menu & Book Table",
+      },
+      items: [],
+    };
   }
 }
 
 async function writeRestaurantData(data: RestaurantData) {
-  await ensureDir(path.dirname(DATA_FILE_PATH));
-  await fs.writeFile(DATA_FILE_PATH, JSON.stringify(data, null, 2), "utf-8");
+  const jsonContent = JSON.stringify(data, null, 2);
+
+  // 1. Primary: Save to Supabase Storage (bypasses serverless read-only filesystem)
+  try {
+    const supabase = getSupabaseClient();
+    const { error } = await supabase.storage
+      .from(STORAGE_BUCKET)
+      .upload(STORAGE_PATH, jsonContent, {
+        contentType: "application/json",
+        upsert: true,
+      });
+
+    if (error) {
+      console.warn("Storage upload warning (restaurant-data.json):", error.message);
+    }
+  } catch (storageErr) {
+    console.warn("Storage exception (restaurant-data.json):", storageErr);
+  }
+
+  // 2. Safe local file write for local development environment (catches EROFS on Vercel)
+  try {
+    const dir = path.dirname(DATA_FILE_PATH);
+    await fs.mkdir(dir, { recursive: true });
+    await fs.writeFile(DATA_FILE_PATH, jsonContent, "utf-8");
+  } catch {
+    // EROFS / read-only filesystem on serverless lambda is completely safe to ignore
+  }
 }
 
 export async function saveRestaurantSettingsAction(newSettings: RestaurantSettings) {
@@ -272,19 +249,44 @@ export async function uploadRestaurantImageAction(formData: FormData) {
       return { success: false, error: "Uploaded file must be an image." };
     }
 
-    await ensureDir(UPLOAD_DIR);
-
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
-
     const cleanName = file.name.replace(/[^a-zA-Z0-9.-]/g, "_");
-    const fileName = `${Date.now()}-${cleanName}`;
-    const filePath = path.join(UPLOAD_DIR, fileName);
+    const fileName = `restaurant-${Date.now()}-${cleanName}`;
 
-    await fs.writeFile(filePath, buffer);
+    // 1. Primary: Upload to Supabase Storage
+    try {
+      const supabase = getSupabaseClient();
+      const storagePath = `restaurant/${fileName}`;
+      const { error: uploadError } = await supabase.storage
+        .from(STORAGE_BUCKET)
+        .upload(storagePath, buffer, {
+          contentType: file.type,
+          upsert: true,
+        });
 
-    const publicUrl = `/uploads/restaurant/${fileName}`;
-    return { success: true, url: publicUrl };
+      if (!uploadError) {
+        const { data: publicUrlData } = supabase.storage
+          .from(STORAGE_BUCKET)
+          .getPublicUrl(storagePath);
+
+        if (publicUrlData?.publicUrl) {
+          return { success: true, url: publicUrlData.publicUrl };
+        }
+      }
+    } catch (storageErr) {
+      console.warn("Storage upload failed, trying local fallback:", storageErr);
+    }
+
+    // 2. Local fallback if storage failed and running in local environment
+    try {
+      await fs.mkdir(UPLOAD_DIR, { recursive: true });
+      const filePath = path.join(UPLOAD_DIR, fileName);
+      await fs.writeFile(filePath, buffer);
+      return { success: true, url: `/uploads/restaurant/${fileName}` };
+    } catch (fsErr: any) {
+      return { success: false, error: "Could not save image to cloud storage or local disk." };
+    }
   } catch (err: any) {
     console.error("Image upload error:", err);
     return { success: false, error: err?.message || "Failed to upload image." };

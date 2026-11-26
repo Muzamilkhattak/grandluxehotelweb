@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Sparkles, ArrowLeft, UtensilsCrossed, Phone, CalendarCheck } from "lucide-react";
 import { RestaurantSettings, MenuItemData } from "@/app/actions/admin-restaurant";
+import { RESTAURANT_CATEGORIES, getCategoryBadgeLabel } from "@/data/restaurant-constants";
 import RestaurantDiningIntro from "@/components/restaurant/RestaurantDiningIntro";
 
 interface Props {
@@ -12,22 +13,16 @@ interface Props {
   initialItems?: MenuItemData[];
 }
 
-const CATEGORIES = [
-  { id: "all", label: "All Curations" },
-  { id: "starters", label: "Starters & Raw Bar" },
-  { id: "mains", label: "Woodfire Mains" },
-  { id: "desserts", label: "Artisan Desserts" },
-  { id: "drinks", label: "Cellar & Cocktails" },
-];
+const CATEGORIES = RESTAURANT_CATEGORIES;
 
 export default function RestaurantClient({ initialSettings, initialItems }: Props) {
   const [activeCategory, setActiveCategory] = useState<string>("all");
 
   const items = initialItems || [];
   const settings = initialSettings || {
-    tagline: "Restaurant & Dining",
+    tagline: "Culinary Art & Dining",
     heading: "Our Restaurant Menu",
-    subheading: "Crafted with fresh seasonal Nordic ingredients and woodfire mastery.",
+    subheading: "Artisanal breakfast spreads, authentic Pakistani Karahi, Continental grills, and handcrafted beverages in Islamabad.",
     backgroundImage: "/images/resturantherobg.webp",
     buttonText: "Explore Full Menu & Book Table"
   };
@@ -41,21 +36,6 @@ export default function RestaurantClient({ initialSettings, initialItems }: Prop
   const getCategoryCount = (catId: string) => {
     if (catId === "all") return items.length;
     return items.filter((item) => item.category === catId).length;
-  };
-
-  const getCategoryBadgeLabel = (cat: string) => {
-    switch (cat) {
-      case "starters":
-        return "Starter";
-      case "mains":
-        return "Main Course";
-      case "desserts":
-        return "Dessert";
-      case "drinks":
-        return "Drink & Cellar";
-      default:
-        return "Signature";
-    }
   };
 
   return (
@@ -162,16 +142,16 @@ export default function RestaurantClient({ initialSettings, initialItems }: Prop
                   </span>
                 </div>
 
-                {/* Name & Price with Dotted Leader */}
-                <div className="flex items-baseline justify-between gap-3 mb-1.5">
-                  <h3 className="font-marcellus text-[18px] sm:text-[20px] text-white group-hover:text-[#d7b56d] transition-colors duration-200 truncate font-normal">
+                {/* Name & Price with Responsive Formatting */}
+                <div className="flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-1 sm:gap-2 mb-1.5">
+                  <h3 className="font-marcellus text-[17px] sm:text-[19px] text-white group-hover:text-[#d7b56d] transition-colors duration-200 font-normal">
                     {item.name}
                   </h3>
                   
                   {/* Subtle dotted line */}
-                  <span className="flex-1 border-b border-dotted border-white/20 hidden sm:inline-block mx-1" />
+                  <span className="flex-1 border-b border-dotted border-white/20 hidden md:inline-block mx-1" />
 
-                  <span className="font-marcellus text-[17px] sm:text-[19px] text-[#d7b56d] group-hover:text-[#d7b56d] shrink-0 font-bold tracking-wide drop-shadow-[0_2px_8px_rgba(215,181,109,0.35)]">
+                  <span className="font-marcellus text-[14.5px] sm:text-[16.5px] text-[#d7b56d] group-hover:text-[#d7b56d] shrink-0 font-bold tracking-wide drop-shadow-[0_2px_8px_rgba(215,181,109,0.35)] whitespace-nowrap">
                     {item.price}
                   </span>
                 </div>
@@ -201,10 +181,10 @@ export default function RestaurantClient({ initialSettings, initialItems }: Prop
               <span>Private Dining & Tasting Reservations</span>
             </div>
             <h2 className="font-marcellus text-2xl sm:text-3xl text-white mb-2 font-normal">
-              Reserve Your Table for a Michelin-Standard Journey
+              Reserve Your Table at Signature Art Hotel
             </h2>
             <p className="font-jost text-sm sm:text-base text-gray-300 font-light">
-              We welcome walk-ins for cocktails and raw bar dining. For multi-course hearth tasting menus and private celebrations, advance booking is recommended.
+              We welcome walk-ins for breakfast, afternoon tea, and all-day dining. For family dinners, corporate gatherings, and private celebrations, advance reservations are recommended.
             </p>
           </div>
 
@@ -216,13 +196,13 @@ export default function RestaurantClient({ initialSettings, initialItems }: Prop
               <CalendarCheck size={16} />
               <span>Reserve Table</span>
             </Link>
-            <a
-              href="tel:+4722005500"
+            <Link
+              href="/contact"
               className="inline-flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 text-white border border-white/20 hover:border-[#d7b56d] font-jost uppercase tracking-[0.18em] text-[12.5px] font-semibold px-6 py-3.5 rounded-full transition-all duration-300"
             >
               <Phone size={16} className="text-[#d7b56d]" />
-              <span>Call Cellar</span>
-            </a>
+              <span>Contact Us</span>
+            </Link>
           </div>
         </div>
 

@@ -3,16 +3,16 @@ import { getRestaurantData } from "@/app/actions/admin-restaurant";
 import RestaurantClient from "./RestaurantClient";
 
 export const metadata: Metadata = {
-  title: "Michelin-Inspired Nordic Restaurant & Cellar",
+  title: "Restaurant & Fine Dining Menu | Signature Art Hotel",
   description:
-    "Experience Michelin-inspired Nordic gastronomy, woodfire hearth specialties, and fine vintage cellar pairings at Oslo Elite Hotel in Oslo, Norway.",
+    "Explore the culinary menu at Signature Art Hotel Islamabad. Featuring lavish breakfast selections, authentic Pakistani Karahi, Continental grills, and artisanal beverages.",
   alternates: {
     canonical: "/restaurant",
   },
   openGraph: {
-    title: "Michelin-Inspired Nordic Restaurant & Cellar | Oslo Elite Hotel & Suites",
+    title: "Restaurant & Fine Dining Menu | Signature Art Hotel",
     description:
-      "Savor artisanal Scandinavian gastronomy, woodfire dishes, and sommelier-curated wine flights at Oslo Elite Hotel.",
+      "Explore the culinary menu at Signature Art Hotel Islamabad. Featuring lavish breakfast selections, authentic Pakistani Karahi, Continental grills, and artisanal beverages.",
     url: "/restaurant",
   },
 };
@@ -20,25 +20,25 @@ export const metadata: Metadata = {
 const restaurantJsonLd = {
   "@context": "https://schema.org",
   "@type": "Restaurant",
-  name: "Oslo Elite Hearth & Cellar",
-  description: "Michelin-inspired Nordic dining featuring wild seasonal ingredients, woodfire hearth preparations, and rare European vintage pairings.",
-  url: "https://osloelitehotel.com/restaurant",
-  telephone: "+47 22 00 55 00",
-  priceRange: "$$$$",
-  servesCuisine: ["Nordic", "Scandinavian", "Modern European"],
+  name: "Signature Art Hotel Restaurant & Dining",
+  description: "Fine dining featuring breakfast spreads, Pakistani Karahi specialties, Chinese dishes, Continental grills, and handcrafted beverages in Islamabad.",
+  url: "https://signaturearthotel.com/restaurant",
+  telephone: "+92 51 8899888",
+  priceRange: "$$$",
+  servesCuisine: ["Pakistani", "Continental", "Chinese", "Grill"],
   address: {
     "@type": "PostalAddress",
-    streetAddress: "Karl Johans gate 37",
-    addressLocality: "Oslo",
-    postalCode: "0162",
-    addressCountry: "NO",
+    streetAddress: "Islamabad Club Road",
+    addressLocality: "Islamabad",
+    postalCode: "44000",
+    addressCountry: "PK",
   },
   openingHoursSpecification: [
     {
       "@type": "OpeningHoursSpecification",
       dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
-      opens: "06:30",
-      closes: "23:30",
+      opens: "07:00",
+      closes: "23:59",
     },
   ],
 };
