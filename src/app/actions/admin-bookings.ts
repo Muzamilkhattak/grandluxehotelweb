@@ -55,9 +55,7 @@ export async function updateBookingStatus(bookingId: string, newStatus: string) 
         notes: bookingData.notes || undefined,
       };
 
-      sendGuestConfirmation(emailData).catch((mailErr) => {
-        console.error("Failed to send guest confirmation email:", mailErr);
-      });
+      await sendGuestConfirmation(emailData);
     } catch (emailErr) {
       console.error("Error triggering guest confirmation email on booking status update:", emailErr);
     }

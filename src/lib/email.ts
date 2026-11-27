@@ -178,8 +178,10 @@ export async function sendGuestConfirmation(data: BookingEmailData) {
 export async function sendAdminAlert(data: BookingEmailData) {
   if (!process.env.RESEND_API_KEY) {
     console.warn("[Resend Warning]: RESEND_API_KEY is missing. Email not sent.");
-    return;
+    return { success: false, error: "RESEND_API_KEY missing" };
   }
+
+  const targetEmail = process.env.ADMIN_EMAIL || 'signaturearthotel@gmail.com';
 
   const html = `
     <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: 0 auto; border: 1px solid #ddd; padding: 20px;">
@@ -205,39 +207,17 @@ export async function sendAdminAlert(data: BookingEmailData) {
   try {
     const result = await resend.emails.send({
       from: `Signature Art Hotel System <${FROM_EMAIL}>`,
-      to: RECEPTION_EMAIL,
+      to: targetEmail,
       subject: `[New Reservation] ${data.roomName} - ${data.guestName}`,
       html,
     });
 
     if (result.error) {
       console.warn("[Resend Warning - Admin Alert Direct Send Failed]:", result.error.message);
-
-      // If Resend gives 403 sandbox limitation
-      if (result.error.message?.includes("only send testing emails") || (result.error as any).statusCode === 403) {
-        const fallbackTarget = RESEND_ACCOUNT_OWNER;
-        console.log(`[Resend Sandbox Notice]: Forwarding reservation alert to registered Resend account email: ${fallbackTarget}`);
-        const fallbackResult = await resend.emails.send({
-          from: `Signature Art Hotel System <${FROM_EMAIL}>`,
-          to: fallbackTarget,
-          subject: `[Test Mode - For ${RECEPTION_EMAIL}] [New Reservation] ${data.roomName} - ${data.guestName}`,
-          html: `
-            <div style="background-color: #FEF3C7; border: 2px solid #F59E0B; padding: 15px; margin-bottom: 20px; font-family: sans-serif; font-size: 13px; color: #92400E;">
-              <strong>ℹ️ Resend Sandbox Mode Notice:</strong><br>
-              In Resend free test mode (using <code>onboarding@resend.dev</code>), emails can only be sent to the verified account owner (<code>${fallbackTarget}</code>).<br>
-              This reservation alert was intended directly for <strong>${RECEPTION_EMAIL}</strong>.<br>
-              <em>To send directly to ${RECEPTION_EMAIL}, verify your custom domain <strong>signaturearthotel.com</strong> at <a href="https://resend.com/domains" target="_blank">resend.com/domains</a>.</em>
-            </div>
-            ${html}
-          `,
-        });
-        return { success: true, forwardedToAdmin: true, data: fallbackResult.data };
-      }
-
       return { success: false, error: result.error };
     }
 
-    console.log(`[Resend Success - Admin Alert]: Reservation alert sent to ${RECEPTION_EMAIL} (${result.data?.id})`);
+    console.log(`[Resend Success - Admin Alert]: Reservation alert sent to ${targetEmail} (${result.data?.id})`);
     return { success: true, data: result.data };
   } catch (err: any) {
     console.error("[Resend Exception - Admin Email]:", err);

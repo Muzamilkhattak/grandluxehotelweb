@@ -168,7 +168,7 @@ export async function createBookingAction(payload: BookingPayload) {
       return { success: false, error: insertError?.message || "Failed to create booking. Please try again." };
     }
 
-    // 6. Directly notify hotel reception at reception@signaturearthotel.com
+    // 6. Directly notify hotel at signaturearthotel@gmail.com
     if (booking) {
       const emailData = {
         bookingId: booking.id,
@@ -183,9 +183,11 @@ export async function createBookingAction(payload: BookingPayload) {
         notes: notes || undefined,
       };
 
-      sendAdminAlert(emailData).catch((err) => {
-        console.error("Failed to dispatch reception reservation alert:", err);
-      });
+      try {
+        await sendAdminAlert(emailData);
+      } catch (err) {
+        console.error("Failed to dispatch reservation alert:", err);
+      }
     }
 
     // 7. Call revalidatePath
