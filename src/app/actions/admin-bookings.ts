@@ -15,74 +15,49 @@ export async function updateBookingStatus(bookingId: string, newStatus: string) 
 
   const cookieStore = await cookies();
   const supabase = await createClient(cookieStore);
+  const adminSupabase = createAdminClient();
+  const client = adminSupabase || supabase;
 
-  let { error } = await supabase
+  // Use admin client with service role key to bypass RLS and persist update
+  const { data: updatedBookings, error } = await client
     .from('bookings')
     .update({ status: newStatus })
-    .eq('id', bookingId);
+    .eq('id', bookingId)
+    .select(`
+      *,
+      rooms ( title )
+    `);
 
   if (error) {
-    const adminSupabase = createAdminClient();
-    if (adminSupabase) {
-      const res = await adminSupabase
-        .from('bookings')
-        .update({ status: newStatus })
-        .eq('id', bookingId);
-      error = res.error;
-    }
-  }
-
-  if (error) {
+    console.error("Error updating booking status:", error);
     return { success: false, error: error.message };
   }
 
+  if (!updatedBookings || updatedBookings.length === 0) {
+    return { success: false, error: "Booking record not found or could not be updated." };
+  }
+
+  const bookingData = updatedBookings[0];
+
   // When admin confirms reservation, automatically send confirmation email with details to guest
-  if (newStatus === 'confirmed') {
+  if (newStatus === 'confirmed' && bookingData.guest_email) {
     try {
-      let bookingData: any = null;
-      const { data, error: fetchErr } = await supabase
-        .from('bookings')
-        .select(`
-          *,
-          rooms ( title )
-        `)
-        .eq('id', bookingId)
-        .single();
+      const emailData: BookingEmailData = {
+        bookingId: bookingData.id,
+        guestName: bookingData.guest_name,
+        guestEmail: bookingData.guest_email,
+        guestPhone: bookingData.guest_phone || '',
+        roomName: bookingData.rooms?.title || 'Luxury Suite',
+        checkIn: bookingData.check_in,
+        checkOut: bookingData.check_out,
+        totalNights: bookingData.total_nights,
+        totalAmount: bookingData.total_amount || 0,
+        notes: bookingData.notes || undefined,
+      };
 
-      bookingData = data;
-      if (fetchErr && !bookingData) {
-        const adminSupabase = createAdminClient();
-        if (adminSupabase) {
-          const res = await adminSupabase
-            .from('bookings')
-            .select(`
-              *,
-              rooms ( title )
-            `)
-            .eq('id', bookingId)
-            .single();
-          bookingData = res.data;
-        }
-      }
-
-      if (bookingData && bookingData.guest_email) {
-        const emailData: BookingEmailData = {
-          bookingId: bookingData.id,
-          guestName: bookingData.guest_name,
-          guestEmail: bookingData.guest_email,
-          guestPhone: bookingData.guest_phone || '',
-          roomName: bookingData.rooms?.title || 'Luxury Suite',
-          checkIn: bookingData.check_in,
-          checkOut: bookingData.check_out,
-          totalNights: bookingData.total_nights,
-          totalAmount: bookingData.total_amount || 0,
-          notes: bookingData.notes || undefined,
-        };
-
-        sendGuestConfirmation(emailData).catch((mailErr) => {
-          console.error("Failed to send guest confirmation email:", mailErr);
-        });
-      }
+      sendGuestConfirmation(emailData).catch((mailErr) => {
+        console.error("Failed to send guest confirmation email:", mailErr);
+      });
     } catch (emailErr) {
       console.error("Error triggering guest confirmation email on booking status update:", emailErr);
     }
@@ -90,7 +65,8 @@ export async function updateBookingStatus(bookingId: string, newStatus: string) 
 
   revalidatePath("/admin/bookings");
   revalidatePath("/admin");
-  return { success: true };
+  revalidatePath("/admin/guests");
+  return { success: true, booking: bookingData };
 }
 
 export async function toggleBookingStatus(bookingId: string, currentStatus: string) {

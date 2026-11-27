@@ -37,6 +37,9 @@ export default function RecentBookingsTable({ initialBookings }: { initialBookin
       setBookings(prev => prev.map(b => b.id === id ? { ...b, status: newStatus } : b));
       setToast(`Booking status updated to ${newStatus}`);
       setTimeout(() => setToast(null), 3000);
+    } else {
+      setToast(`Error: ${result.error || "Failed to update status"}`);
+      setTimeout(() => setToast(null), 4000);
     }
     setProcessingId(null);
   };
