@@ -151,7 +151,7 @@ export default function CookieConsentBanner() {
               </h4>
               <span className="text-[10px] text-[#d7b56d] uppercase tracking-widest font-semibold flex items-center gap-1">
                 <ShieldCheck size={11} />
-                Oslo Elite Privacy Standard
+                Signature Art Privacy Standard
               </span>
             </div>
           </div>
