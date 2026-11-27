@@ -1,8 +1,9 @@
-﻿import { Resend } from 'resend';
+import { Resend } from 'resend';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'techa5174@gmail.com';
+const RECEPTION_EMAIL = 'reception@signaturearthotel.com';
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || RECEPTION_EMAIL;
 const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev';
 
 export type BookingEmailData = {
@@ -90,7 +91,7 @@ export async function sendGuestConfirmation(data: BookingEmailData) {
                     </tr>
                     <tr>
                       <td style="color: #000000; padding-top: 12px;"><strong>Total Amount:</strong></td>
-                      <td style="padding-top: 12px; font-size: 18px; font-weight: bold; color: #d7b56d;">$${data.totalAmount.toLocaleString()}</td>
+                      <td style="padding-top: 12px; font-size: 18px; font-weight: bold; color: #d7b56d;">PKR ${data.totalAmount.toLocaleString()}</td>
                     </tr>
                   </table>
 
@@ -121,8 +122,8 @@ export async function sendGuestConfirmation(data: BookingEmailData) {
         <tr>
           <td style="background-color: #FFFFFF; padding: 25px 30px; border-top: 1px solid #d7b56d; font-size: 12.5px; color: #000000; text-align: center; line-height: 1.6;">
             <strong style="color: #000000;">Signature Art Hotel</strong><br>
-            F-8, Islamabad, Pakistan<br>
-            Direct Concierge: <a href="tel:+4722000000" style="color: #d7b56d; text-decoration: none;">+47 22 00 00 00</a> &bull; Email: <a href="mailto:concierge@grandluxe.com" style="color: #d7b56d; text-decoration: none;">concierge@grandluxe.com</a>
+            Plot # 3 Street 64, F-8/4, Islamabad, Pakistan<br>
+            Direct Concierge: <a href="tel:03331942884" style="color: #d7b56d; text-decoration: none;">0333 1942884</a> &bull; Email: <a href="mailto:reception@signaturearthotel.com" style="color: #d7b56d; text-decoration: none;">reception@signaturearthotel.com</a>
           </td>
         </tr>
 
@@ -191,10 +192,11 @@ export async function sendAdminAlert(data: BookingEmailData) {
         <tr><td style="padding: 10px; border-bottom: 1px solid #eee;"><strong>Suite:</strong></td><td style="padding: 10px; border-bottom: 1px solid #eee;">${data.roomName}</td></tr>
         <tr><td style="padding: 10px; border-bottom: 1px solid #eee;"><strong>Check-In:</strong></td><td style="padding: 10px; border-bottom: 1px solid #eee;">${data.checkIn}</td></tr>
         <tr><td style="padding: 10px; border-bottom: 1px solid #eee;"><strong>Check-Out:</strong></td><td style="padding: 10px; border-bottom: 1px solid #eee;">${data.checkOut}</td></tr>
-        <tr><td style="padding: 10px; border-bottom: 1px solid #eee;"><strong>Total Revenue:</strong></td><td style="padding: 10px; border-bottom: 1px solid #eee; font-weight: bold; color: #d7b56d;">$${data.totalAmount.toLocaleString()}</td></tr>
+        <tr><td style="padding: 10px; border-bottom: 1px solid #eee;"><strong>Total Revenue:</strong></td><td style="padding: 10px; border-bottom: 1px solid #eee; font-weight: bold; color: #d7b56d;">PKR ${data.totalAmount.toLocaleString()}</td></tr>
+        ${data.notes ? `<tr><td style="padding: 10px; border-bottom: 1px solid #eee;"><strong>Special Requests / Notes:</strong></td><td style="padding: 10px; border-bottom: 1px solid #eee;">${data.notes}</td></tr>` : ''}
       </table>
       <div style="text-align: center; margin-top: 25px;">
-        <a href="https://osloelitehotel.com/admin/bookings" style="display: inline-block; padding: 12px 24px; background-color: #000000; color: #ffffff; text-decoration: none; border-radius: 2px; font-weight: bold;">View Reservation in Admin Dashboard</a>
+        <p style="font-size: 13px; color: #666;">Please verify and confirm this reservation in the Admin Dashboard to notify the guest.</p>
       </div>
     </div>
   `;
@@ -202,18 +204,42 @@ export async function sendAdminAlert(data: BookingEmailData) {
   try {
     const result = await resend.emails.send({
       from: `Signature Art Hotel System <${FROM_EMAIL}>`,
-      to: ADMIN_EMAIL,
+      to: RECEPTION_EMAIL,
       subject: `[New Reservation] ${data.roomName} - ${data.guestName}`,
       html,
     });
 
     if (result.error) {
-      console.error("[Resend Error - Admin Email]:", result.error);
-    } else {
-      console.log(`[Resend Success - Admin Alert]: Sent to ${ADMIN_EMAIL} (${result.data?.id})`);
+      console.warn("[Resend Warning - Admin Alert Direct Send Failed]:", result.error.message);
+
+      // If Resend gives 403 sandbox limitation
+      if (result.error.message?.includes("only send testing emails") || (result.error as any).statusCode === 403) {
+        const fallbackTarget = process.env.ADMIN_EMAIL || 'techa5174@gmail.com';
+        console.log(`[Resend Sandbox Notice]: Forwarding reservation alert to registered Resend account email: ${fallbackTarget}`);
+        const fallbackResult = await resend.emails.send({
+          from: `Signature Art Hotel System <${FROM_EMAIL}>`,
+          to: fallbackTarget,
+          subject: `[Test Mode - For ${RECEPTION_EMAIL}] [New Reservation] ${data.roomName} - ${data.guestName}`,
+          html: `
+            <div style="background-color: #FEF3C7; border: 2px solid #F59E0B; padding: 15px; margin-bottom: 20px; font-family: sans-serif; font-size: 13px; color: #92400E;">
+              <strong>ℹ️ Resend Sandbox Mode Notice:</strong><br>
+              In Resend free test mode (using <code>onboarding@resend.dev</code>), emails can only be sent to the verified account owner (<code>${fallbackTarget}</code>).<br>
+              This reservation alert was intended directly for <strong>${RECEPTION_EMAIL}</strong>.<br>
+              <em>To send directly to ${RECEPTION_EMAIL}, verify the domain at <a href="https://resend.com/domains" target="_blank">resend.com/domains</a>.</em>
+            </div>
+            ${html}
+          `,
+        });
+        return { success: true, forwardedToAdmin: true, data: fallbackResult.data };
+      }
+
+      return { success: false, error: result.error };
     }
-    return result;
-  } catch (err) {
+
+    console.log(`[Resend Success - Admin Alert]: Reservation alert sent to ${RECEPTION_EMAIL} (${result.data?.id})`);
+    return { success: true, data: result.data };
+  } catch (err: any) {
     console.error("[Resend Exception - Admin Email]:", err);
+    return { success: false, error: err?.message || err };
   }
 }

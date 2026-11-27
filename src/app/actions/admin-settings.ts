@@ -60,7 +60,7 @@ const DEFAULT_SETTINGS: HotelSettings = {
   maxBookingWindowDays: 365,
   taxRatePercent: 12,
   cancellationPolicy: "Free cancellation up to 48 hours prior to check-in time.",
-  adminAlertEmail: "admin@signaturearthotel.com",
+  adminAlertEmail: "reception@signaturearthotel.com",
   sendGuestConfirmationEmail: true,
   sendAdminAlertEmail: true,
   emailFooterText: "Thank you for choosing Signature Art Hotel. We look forward to welcoming you.",

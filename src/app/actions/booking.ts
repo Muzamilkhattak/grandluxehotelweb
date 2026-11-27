@@ -128,7 +128,7 @@ export async function createBookingAction(payload: BookingPayload) {
         total_nights: totalNights,
         notes: formattedNotes || null,
         total_amount: totalAmount,
-        status: "confirmed",
+        status: "pending",
         payment_status: paymentStatus,
         user_id: user ? user.id : null,
       })
@@ -151,7 +151,7 @@ export async function createBookingAction(payload: BookingPayload) {
             total_nights: totalNights,
             notes: formattedNotes || null,
             total_amount: totalAmount,
-            status: "confirmed",
+            status: "pending",
             payment_status: paymentStatus,
             user_id: user ? user.id : null,
           })
@@ -168,7 +168,7 @@ export async function createBookingAction(payload: BookingPayload) {
       return { success: false, error: insertError?.message || "Failed to create booking. Please try again." };
     }
 
-    // 6. Dispatch emails asynchronously
+    // 6. Directly notify hotel reception at reception@signaturearthotel.com
     if (booking) {
       const emailData = {
         bookingId: booking.id,
@@ -183,10 +183,9 @@ export async function createBookingAction(payload: BookingPayload) {
         notes: notes || undefined,
       };
 
-      Promise.allSettled([
-        sendGuestConfirmation(emailData),
-        sendAdminAlert(emailData)
-      ]).catch(console.error);
+      sendAdminAlert(emailData).catch((err) => {
+        console.error("Failed to dispatch reception reservation alert:", err);
+      });
     }
 
     // 7. Call revalidatePath
