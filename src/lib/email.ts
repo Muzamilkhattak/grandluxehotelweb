@@ -3,8 +3,8 @@ import { Resend } from 'resend';
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 const RECEPTION_EMAIL = 'reception@signaturearthotel.com';
-const RESEND_ACCOUNT_OWNER = 'techa5174@gmail.com';
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL || RECEPTION_EMAIL;
+const RESEND_ACCOUNT_OWNER = 'signaturearthotel@gmail.com';
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'signaturearthotel@gmail.com';
 const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev';
 
 export type BookingEmailData = {
@@ -144,7 +144,7 @@ export async function sendGuestConfirmation(data: BookingEmailData) {
     if (result.error) {
       console.warn("[Resend Warning - Direct Guest Send Failed]:", result.error.message);
 
-      // If Resend gives 403 sandbox limitation (can only send to account owner's email techa5174@gmail.com)
+      // If Resend gives 403 sandbox limitation (can only send to account owner's email signaturearthotel@gmail.com)
       if (result.error.message?.includes("only send testing emails") || (result.error as any).statusCode === 403) {
         console.log(`[Resend Sandbox Notice]: Forwarding guest confirmation to registered Resend account email: ${RESEND_ACCOUNT_OWNER}`);
         const fallbackResult = await resend.emails.send({
@@ -215,7 +215,7 @@ export async function sendAdminAlert(data: BookingEmailData) {
 
       // If Resend gives 403 sandbox limitation
       if (result.error.message?.includes("only send testing emails") || (result.error as any).statusCode === 403) {
-        const fallbackTarget = 'techa5174@gmail.com';
+        const fallbackTarget = RESEND_ACCOUNT_OWNER;
         console.log(`[Resend Sandbox Notice]: Forwarding reservation alert to registered Resend account email: ${fallbackTarget}`);
         const fallbackResult = await resend.emails.send({
           from: `Signature Art Hotel System <${FROM_EMAIL}>`,
