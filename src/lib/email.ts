@@ -3,6 +3,7 @@ import { Resend } from 'resend';
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 const RECEPTION_EMAIL = 'reception@signaturearthotel.com';
+const RESEND_ACCOUNT_OWNER = 'techa5174@gmail.com';
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || RECEPTION_EMAIL;
 const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev';
 
@@ -145,17 +146,17 @@ export async function sendGuestConfirmation(data: BookingEmailData) {
 
       // If Resend gives 403 sandbox limitation (can only send to account owner's email techa5174@gmail.com)
       if (result.error.message?.includes("only send testing emails") || (result.error as any).statusCode === 403) {
-        console.log(`[Resend Sandbox Notice]: Forwarding guest confirmation to registered Resend account email: ${ADMIN_EMAIL}`);
+        console.log(`[Resend Sandbox Notice]: Forwarding guest confirmation to registered Resend account email: ${RESEND_ACCOUNT_OWNER}`);
         const fallbackResult = await resend.emails.send({
           from: `Signature Art Hotel <${FROM_EMAIL}>`,
-          to: ADMIN_EMAIL,
+          to: RESEND_ACCOUNT_OWNER,
           subject: `[Test Mode - Guest Folio: ${recipient}] Reservation Confirmed: ${data.roomName} (${data.bookingId.slice(0, 8)})`,
           html: `
             <div style="background-color: #FEF3C7; border: 2px solid #F59E0B; padding: 15px; margin-bottom: 20px; font-family: sans-serif; font-size: 13px; color: #92400E;">
               <strong>ℹ️ Resend Sandbox Mode Notice:</strong><br>
-              In Resend free test mode (using <code>onboarding@resend.dev</code>), emails can only be sent to the verified account owner (<code>${ADMIN_EMAIL}</code>).<br>
+              In Resend free test mode (using <code>onboarding@resend.dev</code>), emails can only be sent to the verified account owner (<code>${RESEND_ACCOUNT_OWNER}</code>).<br>
               This is a full copy of the confirmation email intended for <strong>${recipient}</strong>.<br>
-              <em>To send directly to external guest emails in production, verify your custom domain at <a href="https://resend.com/domains" target="_blank">resend.com/domains</a>.</em>
+              <em>To send directly to external guest emails in production, verify your custom domain <strong>signaturearthotel.com</strong> at <a href="https://resend.com/domains" target="_blank">resend.com/domains</a>.</em>
             </div>
             ${html}
           `,
@@ -214,7 +215,7 @@ export async function sendAdminAlert(data: BookingEmailData) {
 
       // If Resend gives 403 sandbox limitation
       if (result.error.message?.includes("only send testing emails") || (result.error as any).statusCode === 403) {
-        const fallbackTarget = process.env.ADMIN_EMAIL || 'techa5174@gmail.com';
+        const fallbackTarget = 'techa5174@gmail.com';
         console.log(`[Resend Sandbox Notice]: Forwarding reservation alert to registered Resend account email: ${fallbackTarget}`);
         const fallbackResult = await resend.emails.send({
           from: `Signature Art Hotel System <${FROM_EMAIL}>`,
@@ -225,7 +226,7 @@ export async function sendAdminAlert(data: BookingEmailData) {
               <strong>ℹ️ Resend Sandbox Mode Notice:</strong><br>
               In Resend free test mode (using <code>onboarding@resend.dev</code>), emails can only be sent to the verified account owner (<code>${fallbackTarget}</code>).<br>
               This reservation alert was intended directly for <strong>${RECEPTION_EMAIL}</strong>.<br>
-              <em>To send directly to ${RECEPTION_EMAIL}, verify the domain at <a href="https://resend.com/domains" target="_blank">resend.com/domains</a>.</em>
+              <em>To send directly to ${RECEPTION_EMAIL}, verify your custom domain <strong>signaturearthotel.com</strong> at <a href="https://resend.com/domains" target="_blank">resend.com/domains</a>.</em>
             </div>
             ${html}
           `,

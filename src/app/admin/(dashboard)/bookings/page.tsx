@@ -1,12 +1,18 @@
 import { createClient } from "@/utils/supabase/server";
+import { createAdminClient } from "@/utils/supabase/admin";
 import { cookies } from "next/headers";
 import RecentBookingsTable from "@/components/admin/RecentBookingsTable";
+
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export default async function BookingsPage() {
   const cookieStore = await cookies();
   const supabase = await createClient(cookieStore);
+  const adminSupabase = createAdminClient();
+  const client = adminSupabase || supabase;
 
-  const { data: bookings, error } = await supabase
+  const { data: bookings, error } = await client
     .from("bookings")
     .select(`
       *,

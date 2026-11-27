@@ -1,14 +1,20 @@
 import { createClient } from "@/utils/supabase/server";
+import { createAdminClient } from "@/utils/supabase/admin";
 import { cookies } from "next/headers";
 import { Percent, CalendarCheck, Clock, TrendingUp } from "lucide-react";
 import RecentBookingsTable from "@/components/admin/RecentBookingsTable";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export default async function AdminDashboardPage() {
   const cookieStore = await cookies();
   const supabase = await createClient(cookieStore);
+  const adminSupabase = createAdminClient();
+  const client = adminSupabase || supabase;
 
   // Fetch all bookings for the table and KPI calculation
-  const { data: bookings } = await supabase
+  const { data: bookings } = await client
     .from("bookings")
     .select(`
       *,

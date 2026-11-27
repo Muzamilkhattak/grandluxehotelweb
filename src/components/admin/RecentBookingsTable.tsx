@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Search, ChevronDown, CheckCircle2, Clock, CalendarX, User } from "lucide-react";
 import Image from "next/image";
 import { updateBookingStatus } from "@/app/actions/admin-bookings";
@@ -11,6 +11,10 @@ export default function RecentBookingsTable({ initialBookings }: { initialBookin
   const [searchQuery, setSearchQuery] = useState("");
   const [processingId, setProcessingId] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
+
+  useEffect(() => {
+    setBookings(initialBookings);
+  }, [initialBookings]);
 
   const tabs = ["All", "Confirmed", "Pending", "Cancelled"];
 
