@@ -103,18 +103,53 @@ const RoomCardItem = React.memo(function RoomCardItem({
   searchedDates,
   onSelect,
 }: RoomCardItemProps) {
-  const diff = index - active;
-  const isCenter = diff === 0;
-  const isVisible = Math.abs(diff) <= 2;
+  let diff = index - active;
+  if (totalItems >= 3) {
+    const half = Math.floor(totalItems / 2);
+    while (diff > half) diff -= totalItems;
+    while (diff < -half) diff += totalItems;
+  }
 
-  // CodePen fanned carousel math with calibrated step per card:
-  // Each step away shifts by 85% X, 22% Y, and 13° rotation
-  const xPercent = diff * 85;
-  const yPercent = diff * 22;
-  const rotDeg = diff * 13;
-  const zIndex = totalItems - Math.abs(diff);
-  const rawOpacity = (zIndex / totalItems) * 3 - 2;
-  const opacity = Math.max(0, Math.min(1, rawOpacity));
+  const isCenter = diff === 0;
+  const absDiff = Math.abs(diff);
+  const isVisible = absDiff <= 2;
+
+  // Calibrated fanned 3D carousel metrics:
+  // Center card: scale 1, opacity 1, 0 rotation
+  // Immediate neighbors (diff = -1 or +1): visible at 88% opacity, slightly tilted and scaled
+  let xPercent = 0;
+  let yPercent = 0;
+  let rotDeg = 0;
+  let scale = 1;
+  let opacity = 0;
+
+  if (isCenter) {
+    xPercent = 0;
+    yPercent = 0;
+    rotDeg = 0;
+    scale = 1;
+    opacity = 1;
+  } else if (absDiff === 1) {
+    xPercent = diff * 86;
+    yPercent = 8;
+    rotDeg = diff * 8;
+    scale = 0.92;
+    opacity = 0.88;
+  } else if (absDiff === 2) {
+    xPercent = diff * 155;
+    yPercent = 18;
+    rotDeg = diff * 14;
+    scale = 0.82;
+    opacity = 0.35;
+  } else {
+    xPercent = diff * 200;
+    yPercent = 30;
+    rotDeg = diff * 18;
+    scale = 0.7;
+    opacity = 0;
+  }
+
+  const zIndex = 30 - absDiff * 10;
 
   // Hover slideshow for room photos
   const images = getRoomPreviewImages(room);
@@ -165,12 +200,12 @@ const RoomCardItem = React.memo(function RoomCardItem({
         position: "absolute",
         top: "50%",
         left: "50%",
-        transformOrigin: "0% 100%",
-        zIndex: Math.max(1, Math.round(zIndex * 10)),
+        transformOrigin: "50% 100%",
+        zIndex: Math.max(1, zIndex),
         opacity: opacity,
         visibility: isVisible ? "visible" : "hidden",
         pointerEvents: opacity <= 0.05 ? "none" : "auto",
-        transform: `translate3d(${xPercent}%, ${yPercent}%, 0) rotate(${rotDeg}deg)`,
+        transform: `translate3d(${xPercent}%, ${yPercent}%, 0) rotate(${rotDeg}deg) scale(${scale})`,
         willChange: isVisible ? "transform, opacity" : "auto",
         transition: "transform 0.45s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease-out",
       }}
@@ -399,17 +434,13 @@ export default function RoomsSection({
   const handlePrev = useCallback((e?: React.MouseEvent) => {
     e?.preventDefault();
     e?.stopPropagation();
-    if (activeIndexRef.current > 0) {
-      goToCard(activeIndexRef.current - 1);
-    }
-  }, [goToCard]);
+    goToCard((activeIndexRef.current - 1 + totalCards) % totalCards);
+  }, [totalCards, goToCard]);
 
   const handleNext = useCallback((e?: React.MouseEvent) => {
     e?.preventDefault();
     e?.stopPropagation();
-    if (activeIndexRef.current < totalCards - 1) {
-      goToCard(activeIndexRef.current + 1);
-    }
+    goToCard((activeIndexRef.current + 1) % totalCards);
   }, [totalCards, goToCard]);
 
   // Mouse Wheel scroll listener:
@@ -587,13 +618,8 @@ export default function RoomsSection({
           <button
             type="button"
             onClick={handlePrev}
-            disabled={activeIndex === 0}
             aria-label="Previous suite"
-            className={`absolute left-2 sm:left-6 md:left-12 top-1/2 -translate-y-1/2 z-[100] w-11 h-11 sm:w-13 sm:h-13 rounded-full border border-[#d7b56d] flex items-center justify-center shadow-2xl transition-all duration-300 pointer-events-auto ${
-              activeIndex === 0
-                ? "opacity-35 cursor-not-allowed bg-black/70 text-[#d7b56d]"
-                : "bg-[#d7b56d] hover:bg-white text-black cursor-pointer active:scale-95"
-            }`}
+            className="absolute left-2 sm:left-6 md:left-12 top-1/2 -translate-y-1/2 z-[100] w-11 h-11 sm:w-13 sm:h-13 rounded-full border border-[#d7b56d] flex items-center justify-center shadow-2xl transition-all duration-300 pointer-events-auto bg-[#d7b56d] hover:bg-white text-black cursor-pointer active:scale-95"
           >
             <ChevronLeft size={22} className="sm:w-6 sm:h-6" />
           </button>
@@ -602,13 +628,8 @@ export default function RoomsSection({
           <button
             type="button"
             onClick={handleNext}
-            disabled={activeIndex === totalCards - 1}
             aria-label="Next suite"
-            className={`absolute right-2 sm:right-6 md:right-12 top-1/2 -translate-y-1/2 z-[100] w-11 h-11 sm:w-13 sm:h-13 rounded-full border border-[#d7b56d] flex items-center justify-center shadow-2xl transition-all duration-300 pointer-events-auto ${
-              activeIndex === totalCards - 1
-                ? "opacity-35 cursor-not-allowed bg-black/70 text-[#d7b56d]"
-                : "bg-[#d7b56d] hover:bg-white text-black cursor-pointer active:scale-95"
-            }`}
+            className="absolute right-2 sm:right-6 md:right-12 top-1/2 -translate-y-1/2 z-[100] w-11 h-11 sm:w-13 sm:h-13 rounded-full border border-[#d7b56d] flex items-center justify-center shadow-2xl transition-all duration-300 pointer-events-auto bg-[#d7b56d] hover:bg-white text-black cursor-pointer active:scale-95"
           >
             <ChevronRight size={22} className="sm:w-6 sm:h-6" />
           </button>
