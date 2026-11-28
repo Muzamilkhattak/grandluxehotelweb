@@ -1,20 +1,45 @@
 "use client";
 
-import { MapPin, Phone, Mail, Clock, Send, Check, ExternalLink, Navigation } from "lucide-react";
+import { MapPin, Phone, Mail, Clock, Send, Check, ExternalLink, Navigation, AlertCircle } from "lucide-react";
 import { useState } from "react";
+import { submitContactFormAction } from "@/app/actions/contact";
 
 export default function ContactClient() {
   const [loading, setLoading] = useState(false);
   const [messageSent, setMessageSent] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+    message: "",
+  });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setFormData((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    // Simulate sending email
-    setTimeout(() => {
+    setErrorMessage("");
+
+    try {
+      const res = await submitContactFormAction(formData);
+      if (res.success) {
+        setMessageSent(true);
+      } else {
+        setErrorMessage(res.error || "Failed to send message. Please try again or call us directly.");
+      }
+    } catch (err: any) {
+      setErrorMessage(err.message || "An unexpected error occurred. Please try again.");
+    } finally {
       setLoading(false);
-      setMessageSent(true);
-    }, 1500);
+    }
   };
 
   const fullAddress = "Plot # 3 Street 64, F-8/4 F 8/4 F-8, Islamabad, 44220";
@@ -141,11 +166,21 @@ export default function ContactClient() {
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-6">
+                {errorMessage && (
+                  <div className="p-3 bg-red-950/60 border border-red-500/50 rounded flex items-center gap-2 text-red-300 text-sm font-jost">
+                    <AlertCircle size={16} className="shrink-0 text-red-400" />
+                    <span>{errorMessage}</span>
+                  </div>
+                )}
+
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                   <div>
                     <label className="text-[11px] font-jost uppercase tracking-widest text-[#d7b56d] mb-2 block">First Name *</label>
                     <input 
                       type="text" 
+                      name="firstName"
+                      value={formData.firstName}
+                      onChange={handleChange}
                       required
                       className="w-full bg-[#000000] border-b-2 border-[#5A4332] focus:border-[#d7b56d] px-4 py-3 text-[15px] font-jost text-[#FFFFFF] placeholder:text-neutral-500 outline-none transition-colors"
                       placeholder="Jane"
@@ -155,6 +190,9 @@ export default function ContactClient() {
                     <label className="text-[11px] font-jost uppercase tracking-widest text-[#d7b56d] mb-2 block">Last Name *</label>
                     <input 
                       type="text" 
+                      name="lastName"
+                      value={formData.lastName}
+                      onChange={handleChange}
                       required
                       className="w-full bg-[#000000] border-b-2 border-[#5A4332] focus:border-[#d7b56d] px-4 py-3 text-[15px] font-jost text-[#FFFFFF] placeholder:text-neutral-500 outline-none transition-colors"
                       placeholder="Doe"
@@ -166,6 +204,9 @@ export default function ContactClient() {
                   <label className="text-[11px] font-jost uppercase tracking-widest text-[#d7b56d] mb-2 block">Email Address *</label>
                   <input 
                     type="email" 
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
                     required
                     className="w-full bg-[#000000] border-b-2 border-[#5A4332] focus:border-[#d7b56d] px-4 py-3 text-[15px] font-jost text-[#FFFFFF] placeholder:text-neutral-500 outline-none transition-colors"
                     placeholder="jane@example.com"
@@ -176,6 +217,9 @@ export default function ContactClient() {
                   <label className="text-[11px] font-jost uppercase tracking-widest text-[#d7b56d] mb-2 block">Phone Number</label>
                   <input 
                     type="tel" 
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleChange}
                     className="w-full bg-[#000000] border-b-2 border-[#5A4332] focus:border-[#d7b56d] px-4 py-3 text-[15px] font-jost text-[#FFFFFF] placeholder:text-neutral-500 outline-none transition-colors"
                     placeholder={phoneNumber}
                   />
@@ -184,6 +228,9 @@ export default function ContactClient() {
                 <div>
                   <label className="text-[11px] font-jost uppercase tracking-widest text-[#d7b56d] mb-2 block">Your Message *</label>
                   <textarea 
+                    name="message"
+                    value={formData.message}
+                    onChange={handleChange}
                     required
                     rows={4}
                     className="w-full bg-[#000000] border-2 border-[#5A4332] focus:border-[#d7b56d] p-4 text-[15px] font-jost text-[#FFFFFF] placeholder:text-neutral-500 outline-none transition-colors resize-none"
