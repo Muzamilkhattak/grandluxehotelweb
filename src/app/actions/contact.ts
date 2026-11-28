@@ -25,8 +25,11 @@ export async function submitContactFormAction(data: ContactFormData) {
     }
 
     if (!process.env.RESEND_API_KEY) {
-      console.warn("[Resend Warning]: RESEND_API_KEY is missing. Contact message logged but email not sent.");
-      return { success: true };
+      console.error("[Contact Form]: RESEND_API_KEY is missing in server environment variables.");
+      return { 
+        success: false, 
+        error: "Email service is not configured on hosting. Please add RESEND_API_KEY to Vercel environment variables." 
+      };
     }
 
     const resend = new Resend(process.env.RESEND_API_KEY);
