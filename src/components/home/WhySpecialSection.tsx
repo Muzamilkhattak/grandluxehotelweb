@@ -9,8 +9,8 @@ import Tilt3D from "@/components/ui/Tilt3D";
 
 const features = [
   {
-    title: "Located in Heart of Islamabad F-7",
-    description: "Ideally situated in the prestigious F-7 sector, combining unbeatable central convenience with tranquil proximity and stunning views of the Margalla Hills.",
+    title: "Located in Heart of Islamabad F-8",
+    description: "Ideally situated in the prestigious F-8 sector, combining unbeatable central convenience with tranquil proximity and stunning views of the Margalla Hills.",
     icon: <MapPin strokeWidth={1} size={32} />,
     image: "/images/why-oslo/heart-of-islamabad-f7.jpg",
     colSpan: "md:col-span-2",
