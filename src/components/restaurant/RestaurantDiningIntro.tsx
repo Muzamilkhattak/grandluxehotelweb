@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { Utensils, Phone } from "lucide-react";
+import { Utensils } from "lucide-react";
 
 export default function RestaurantDiningIntro() {
   return (
@@ -27,64 +27,13 @@ export default function RestaurantDiningIntro() {
             </h2>
 
             {/* Descriptive Paragraphs (Website's Jost font) */}
-            <div className="space-y-4 text-[#555555] font-jost text-[15px] sm:text-[16px] leading-relaxed mb-8 max-w-xl font-normal">
+            <div className="space-y-4 text-[#555555] font-jost text-[15px] sm:text-[16px] leading-relaxed max-w-xl font-normal">
               <p>
                 The Mist introduces guests to a memorable experience in dining out, fast becoming a preferred choice in dining out.
               </p>
               <p>
                 The Mist offers a choice of dining options available to our guests with a zest for the good life. Unwind at our wellness center or explore nearby attractions easily.
               </p>
-            </div>
-
-            {/* Timings and Reservation Call Card */}
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 pt-2 max-w-xl">
-              
-              {/* Service Timings */}
-              <div className="space-y-3 font-jost">
-                <div>
-                  <span className="text-[12px] font-medium text-gray-400 block leading-tight font-jost uppercase tracking-wider">
-                    Breakfast:
-                  </span>
-                  <span className="text-[16px] sm:text-[17px] font-marcellus font-normal text-[#111111] mt-0.5 block">
-                    7.00am – 10.30am
-                  </span>
-                </div>
-                <div>
-                  <span className="text-[12px] font-medium text-gray-400 block leading-tight font-jost uppercase tracking-wider">
-                    Lunch:
-                  </span>
-                  <span className="text-[16px] sm:text-[17px] font-marcellus font-normal text-[#111111] mt-0.5 block">
-                    11.00am – 3.00pm
-                  </span>
-                </div>
-                <div>
-                  <span className="text-[12px] font-medium text-gray-400 block leading-tight font-jost uppercase tracking-wider">
-                    Dinner:
-                  </span>
-                  <span className="text-[16px] sm:text-[17px] font-marcellus font-normal text-[#111111] mt-0.5 block">
-                    7.00pm – 11.00pm
-                  </span>
-                </div>
-              </div>
-
-              {/* Call for Reservation Box */}
-              <div className="bg-white border border-[#EAE5DE] shadow-[0_10px_30px_rgba(0,0,0,0.06)] rounded-[22px] px-5 py-4 flex items-center gap-3.5 self-start sm:self-center">
-                <div className="w-12 h-12 rounded-full bg-[#FAF5EB] border border-[#d7b56d]/30 flex items-center justify-center shrink-0">
-                  <Phone className="w-5 h-5 text-[#d7b56d]" />
-                </div>
-                <div>
-                  <span className="text-[11px] sm:text-[12px] font-medium text-gray-400 block leading-tight font-jost uppercase tracking-wider">
-                    Call for Reservation:
-                  </span>
-                  <a
-                    href="tel:+0604445346"
-                    className="text-[17px] sm:text-[18px] font-marcellus font-bold text-[#111111] hover:text-[#d7b56d] transition-colors leading-snug block tracking-tight mt-0.5"
-                  >
-                    (+060) 444 5346
-                  </a>
-                </div>
-              </div>
-
             </div>
 
           </div>
