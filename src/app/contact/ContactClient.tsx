@@ -2,7 +2,6 @@
 
 import { MapPin, Phone, Mail, Clock, Send, Check, ExternalLink, Navigation, AlertCircle } from "lucide-react";
 import { useState } from "react";
-import { submitContactFormAction } from "@/app/actions/contact";
 
 export default function ContactClient() {
   const [loading, setLoading] = useState(false);
@@ -29,11 +28,31 @@ export default function ContactClient() {
     setErrorMessage("");
 
     try {
-      const res = await submitContactFormAction(formData);
-      if (res.success) {
+      const response = await fetch("https://formsubmit.co/ajax/signaturearthotel@gmail.com", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+        },
+        body: JSON.stringify({
+          "First Name": formData.firstName,
+          "Last Name": formData.lastName,
+          email: formData.email,
+          "Phone Number": formData.phone || "Not provided",
+          Message: formData.message,
+          _subject: `New Contact Inquiry from ${formData.firstName} ${formData.lastName}`,
+          _template: "table",
+          _captcha: "false",
+        }),
+      });
+
+      const data = await response.json();
+      if (data.success === "true" || data.success === true) {
         setMessageSent(true);
+      } else if (data.message && data.message.includes("Activation")) {
+        setErrorMessage("Form activation required: An 'Activate Form' link has been sent to signaturearthotel@gmail.com. Please open Gmail and click it once!");
       } else {
-        setErrorMessage(res.error || "Failed to send message. Please try again or call us directly.");
+        setErrorMessage(data.message || "Failed to send message. Please try again.");
       }
     } catch (err: any) {
       setErrorMessage(err.message || "An unexpected error occurred. Please try again.");
@@ -174,11 +193,22 @@ export default function ContactClient() {
                 </button>
               </div>
             ) : (
-              <form onSubmit={handleSubmit} className="space-y-6">
+              <form 
+                action="https://formsubmit.co/signaturearthotel@gmail.com" 
+                method="POST"
+                onSubmit={handleSubmit} 
+                className="space-y-6"
+              >
+                {/* FormSubmit Configurations */}
+                <input type="hidden" name="_subject" value="New Contact Inquiry - Signature Art Hotel" />
+                <input type="hidden" name="_template" value="table" />
+                <input type="hidden" name="_captcha" value="false" />
+                <input type="text" name="_honey" style={{ display: "none" }} />
+
                 {errorMessage && (
-                  <div className="p-3 bg-red-950/60 border border-red-500/50 rounded flex items-center gap-2 text-red-300 text-sm font-jost">
-                    <AlertCircle size={16} className="shrink-0 text-red-400" />
-                    <span>{errorMessage}</span>
+                  <div className="p-4 bg-amber-950/60 border border-amber-500/60 rounded flex items-start gap-3 text-amber-200 text-sm font-jost">
+                    <AlertCircle size={18} className="shrink-0 text-amber-400 mt-0.5" />
+                    <span className="leading-relaxed">{errorMessage}</span>
                   </div>
                 )}
 
