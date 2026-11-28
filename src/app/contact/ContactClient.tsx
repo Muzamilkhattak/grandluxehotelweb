@@ -1,20 +1,46 @@
 "use client";
 
-import { MapPin, Phone, Mail, Clock, Send, Check, ExternalLink, Navigation } from "lucide-react";
-import { useState, useEffect } from "react";
+import { MapPin, Phone, Mail, Clock, Send, Check, ExternalLink, Navigation, AlertCircle } from "lucide-react";
+import { useState } from "react";
+import { submitContactFormAction } from "@/app/actions/contact";
 
 export default function ContactClient() {
   const [loading, setLoading] = useState(false);
   const [messageSent, setMessageSent] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+    message: "",
+  });
 
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const params = new URLSearchParams(window.location.search);
-      if (params.get("submitted") === "true") {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setFormData((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setErrorMessage("");
+
+    try {
+      const res = await submitContactFormAction(formData);
+      if (res.success) {
         setMessageSent(true);
+      } else {
+        setErrorMessage(res.error || "Failed to send message. Please try again or call us directly.");
       }
+    } catch (err: any) {
+      setErrorMessage(err.message || "An unexpected error occurred. Please try again.");
+    } finally {
+      setLoading(false);
     }
-  }, []);
+  };
 
   const fullAddress = "Plot # 3 Street 64, F-8/4 F 8/4 F-8, Islamabad, 44220";
   const phoneNumber = "+923337660360";
@@ -134,9 +160,13 @@ export default function ContactClient() {
                 <button 
                   onClick={() => {
                     setMessageSent(false);
-                    if (typeof window !== "undefined") {
-                      window.history.replaceState({}, "", "/contact");
-                    }
+                    setFormData({
+                      firstName: "",
+                      lastName: "",
+                      email: "",
+                      phone: "",
+                      message: "",
+                    });
                   }}
                   className="bg-[#d7b56d] hover:bg-[#000000] text-[#000000] hover:text-white px-8 py-3 uppercase tracking-widest text-[12px] font-jost font-semibold transition-all duration-300 cursor-pointer border border-[#d7b56d]"
                 >
@@ -144,25 +174,22 @@ export default function ContactClient() {
                 </button>
               </div>
             ) : (
-              <form 
-                action="https://formsubmit.co/signaturearthotel@gmail.com" 
-                method="POST"
-                onSubmit={() => setLoading(true)}
-                className="space-y-6"
-              >
-                {/* FormSubmit Configurations */}
-                <input type="hidden" name="_subject" value="New Contact Inquiry - Signature Art Hotel" />
-                <input type="hidden" name="_template" value="table" />
-                <input type="hidden" name="_captcha" value="false" />
-                <input type="hidden" name="_next" value="https://signaturearthotel.com/contact?submitted=true" />
-                <input type="text" name="_honey" style={{ display: "none" }} />
+              <form onSubmit={handleSubmit} className="space-y-6">
+                {errorMessage && (
+                  <div className="p-3 bg-red-950/60 border border-red-500/50 rounded flex items-center gap-2 text-red-300 text-sm font-jost">
+                    <AlertCircle size={16} className="shrink-0 text-red-400" />
+                    <span>{errorMessage}</span>
+                  </div>
+                )}
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                   <div>
                     <label className="text-[11px] font-jost uppercase tracking-widest text-[#d7b56d] mb-2 block">First Name *</label>
                     <input 
                       type="text" 
-                      name="First Name"
+                      name="firstName"
+                      value={formData.firstName}
+                      onChange={handleChange}
                       required
                       className="w-full bg-[#000000] border-b-2 border-[#5A4332] focus:border-[#d7b56d] px-4 py-3 text-[15px] font-jost text-[#FFFFFF] placeholder:text-neutral-500 outline-none transition-colors"
                       placeholder="Jane"
@@ -172,7 +199,9 @@ export default function ContactClient() {
                     <label className="text-[11px] font-jost uppercase tracking-widest text-[#d7b56d] mb-2 block">Last Name *</label>
                     <input 
                       type="text" 
-                      name="Last Name"
+                      name="lastName"
+                      value={formData.lastName}
+                      onChange={handleChange}
                       required
                       className="w-full bg-[#000000] border-b-2 border-[#5A4332] focus:border-[#d7b56d] px-4 py-3 text-[15px] font-jost text-[#FFFFFF] placeholder:text-neutral-500 outline-none transition-colors"
                       placeholder="Doe"
@@ -185,6 +214,8 @@ export default function ContactClient() {
                   <input 
                     type="email" 
                     name="email"
+                    value={formData.email}
+                    onChange={handleChange}
                     required
                     className="w-full bg-[#000000] border-b-2 border-[#5A4332] focus:border-[#d7b56d] px-4 py-3 text-[15px] font-jost text-[#FFFFFF] placeholder:text-neutral-500 outline-none transition-colors"
                     placeholder="jane@example.com"
@@ -195,7 +226,9 @@ export default function ContactClient() {
                   <label className="text-[11px] font-jost uppercase tracking-widest text-[#d7b56d] mb-2 block">Phone Number</label>
                   <input 
                     type="tel" 
-                    name="Phone Number"
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleChange}
                     className="w-full bg-[#000000] border-b-2 border-[#5A4332] focus:border-[#d7b56d] px-4 py-3 text-[15px] font-jost text-[#FFFFFF] placeholder:text-neutral-500 outline-none transition-colors"
                     placeholder={phoneNumber}
                   />
@@ -204,7 +237,9 @@ export default function ContactClient() {
                 <div>
                   <label className="text-[11px] font-jost uppercase tracking-widest text-[#d7b56d] mb-2 block">Your Message *</label>
                   <textarea 
-                    name="Message"
+                    name="message"
+                    value={formData.message}
+                    onChange={handleChange}
                     required
                     rows={4}
                     className="w-full bg-[#000000] border-2 border-[#5A4332] focus:border-[#d7b56d] p-4 text-[15px] font-jost text-[#FFFFFF] placeholder:text-neutral-500 outline-none transition-colors resize-none"
