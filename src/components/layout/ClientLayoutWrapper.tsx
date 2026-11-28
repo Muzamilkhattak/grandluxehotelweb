@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import CookieConsentBanner from "@/components/common/CookieConsentBanner";
+import WhatsAppFloatingButton from "@/components/common/WhatsAppFloatingButton";
 
 export default function ClientLayoutWrapper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -17,6 +18,7 @@ export default function ClientLayoutWrapper({ children }: { children: React.Reac
       </div>
       {!isAdmin && <Footer />}
       {!isAdmin && <CookieConsentBanner />}
+      {!isAdmin && <WhatsAppFloatingButton />}
     </>
   );
 }
