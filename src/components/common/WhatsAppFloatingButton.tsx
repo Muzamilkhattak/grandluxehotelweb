@@ -29,8 +29,7 @@ export default function WhatsAppFloatingButton() {
         }`}
       >
         <span className="w-2 h-2 rounded-full bg-[#25D366] animate-pulse"></span>
-        <span className="font-medium">Chat with Concierge</span>
-        <span className="text-[#d7b56d] text-xs font-semibold">(24/7)</span>
+        <span className="font-medium text-[#FFFFFF] tracking-wider uppercase text-[12px]">Chat Now</span>
       </a>
 
       {/* Floating Action Button */}
