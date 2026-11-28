@@ -18,8 +18,8 @@ export default function ContactClient() {
   };
 
   const fullAddress = "Plot # 3 Street 64, F-8/4 F 8/4 F-8, Islamabad, 44220";
-  const phoneNumber = "03331942884";
-  const displayPhone = "0333 1942884";
+  const phoneNumber = "+923337660360";
+  const displayPhone = "+92 333 7660360";
   const googleMapsShareUrl = "https://share.google/lhnGJVyAvI3DnKIFZ";
   const googleMapsEmbedUrl =
     "https://maps.google.com/maps?q=Signature+Art+Hotel,+Plot+3+Street+64,+F-8/4,+Islamabad&t=&z=16&ie=UTF8&iwloc=&output=embed";
@@ -98,14 +98,17 @@ export default function ContactClient() {
 
             <div className="mt-12 pt-8 border-t border-[#d7b56d]/30">
               <h3 className="font-jost font-semibold text-[#000000] uppercase tracking-widest text-[13px] mb-4">Follow Us</h3>
-              <div className="flex items-center gap-4">
-                <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="font-jost text-[14px] text-[#000000] hover:text-[#d7b56d] uppercase tracking-widest transition-colors duration-300">
+              <div className="flex flex-wrap items-center gap-4 sm:gap-6">
+                <a href="https://www.facebook.com/siganturearthotel/" target="_blank" rel="noopener noreferrer" className="font-jost text-[14px] text-[#000000] hover:text-[#d7b56d] uppercase tracking-widest transition-colors duration-300">
                   Facebook
                 </a>
-                <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="font-jost text-[14px] text-[#000000] hover:text-[#d7b56d] uppercase tracking-widest transition-colors duration-300">
+                <a href="https://www.instagram.com/signatureart_hotel/" target="_blank" rel="noopener noreferrer" className="font-jost text-[14px] text-[#000000] hover:text-[#d7b56d] uppercase tracking-widest transition-colors duration-300">
                   Instagram
                 </a>
-                <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="font-jost text-[14px] text-[#000000] hover:text-[#d7b56d] uppercase tracking-widest transition-colors duration-300">
+                <a href="https://www.tiktok.com/@signaturearthotel" target="_blank" rel="noopener noreferrer" className="font-jost text-[14px] text-[#000000] hover:text-[#d7b56d] uppercase tracking-widest transition-colors duration-300">
+                  TikTok
+                </a>
+                <a href="https://www.linkedin.com/company/signature-art-hotel/" target="_blank" rel="noopener noreferrer" className="font-jost text-[14px] text-[#000000] hover:text-[#d7b56d] uppercase tracking-widest transition-colors duration-300">
                   LinkedIn
                 </a>
               </div>

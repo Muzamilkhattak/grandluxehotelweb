@@ -50,7 +50,7 @@ const DEFAULT_SETTINGS: HotelSettings = {
   hotelName: "Signature Art Hotel",
   tagline: "Unmatched Luxury & Comfort in Islamabad",
   contactEmail: "reservations@signaturearthotel.com",
-  contactPhone: "03331942884",
+  contactPhone: "+92 333 7660360",
   address: "Plot # 3 Street 64, F-8/4 F 8/4 F-8, Islamabad, 44220",
   currency: "PKR (₨)",
   timezone: "Asia/Karachi (GMT+5)",

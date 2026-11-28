@@ -124,7 +124,7 @@ export async function sendGuestConfirmation(data: BookingEmailData) {
           <td style="background-color: #FFFFFF; padding: 25px 30px; border-top: 1px solid #d7b56d; font-size: 12.5px; color: #000000; text-align: center; line-height: 1.6;">
             <strong style="color: #000000;">Signature Art Hotel</strong><br>
             Plot # 3 Street 64, F-8/4, Islamabad, Pakistan<br>
-            Direct Concierge: <a href="tel:03331942884" style="color: #d7b56d; text-decoration: none;">0333 1942884</a> &bull; Email: <a href="mailto:reception@signaturearthotel.com" style="color: #d7b56d; text-decoration: none;">reception@signaturearthotel.com</a>
+            Direct Concierge: <a href="tel:+923337660360" style="color: #d7b56d; text-decoration: none;">+92 333 7660360</a> &bull; Email: <a href="mailto:reception@signaturearthotel.com" style="color: #d7b56d; text-decoration: none;">reception@signaturearthotel.com</a>
           </td>
         </tr>
 

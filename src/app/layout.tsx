@@ -107,7 +107,7 @@ const jsonLd = {
       url: siteUrl,
       logo: `${siteUrl}/signaturearthotellogo.webp`,
       image: `${siteUrl}/signaturearthotellogo.webp`,
-      telephone: "+92 333 1942884",
+      telephone: "+92 333 7660360",
       email: "signaturearthotel@gmail.com",
       priceRange: "$$$$",
       currenciesAccepted: "PKR, NOK, EUR, USD, GBP",
