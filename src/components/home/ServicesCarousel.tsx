@@ -8,7 +8,6 @@ import {
   ArrowRight, 
   Sparkles,
   MousePointerClick,
-  CalendarRange,
   UtensilsCrossed,
   MonitorCog,
   BedDouble,
@@ -42,16 +41,8 @@ const servicesData: ServiceItem[] = [
     icon: MousePointerClick,
   },
   {
-    id: "event-conference-room",
-    tag: "02 / SUMMITS & GALAS",
-    title: "Event & Conference Rooms",
-    description: "Reserve state-of-the-art corporate venues and bespoke banquet halls equipped with premium acoustics and custom catering.",
-    href: "/services",
-    icon: CalendarRange,
-  },
-  {
     id: "in-house-restaurant",
-    tag: "03 / HAUTE CUISINE",
+    tag: "02 / HAUTE CUISINE",
     title: "In-House Fine Dining",
     description: "Discover an exquisite culinary journey crafted by master chefs, featuring seasonal Nordic delicacies and fine vintage pairings.",
     href: "/restaurant",
@@ -59,7 +50,7 @@ const servicesData: ServiceItem[] = [
   },
   {
     id: "24-7-guest-assistance",
-    tag: "04 / WHITE GLOVE",
+    tag: "03 / WHITE GLOVE",
     title: "24/7 Butler Assistance",
     description: "Our dedicated concierge and butler team is at your command around the clock to ensure an effortless and tailored residency.",
     href: "/services",
@@ -67,7 +58,7 @@ const servicesData: ServiceItem[] = [
   },
   {
     id: "daily-housekeeping",
-    tag: "05 / IMPECCABLE CARE",
+    tag: "04 / IMPECCABLE CARE",
     title: "Curated Housekeeping",
     description: "Experience discrete daily turndown service, organic Egyptian cotton linens, and meticulous attention to every sensorial detail.",
     href: "/services",
@@ -75,7 +66,7 @@ const servicesData: ServiceItem[] = [
   },
   {
     id: "secure-parking",
-    tag: "06 / PRIVATE VALET",
+    tag: "05 / PRIVATE VALET",
     title: "Private Valet & Parking",
     description: "Discreet on-site underground parking featuring 24/7 security surveillance and complimentary EV supercharging facilities.",
     href: "/services",

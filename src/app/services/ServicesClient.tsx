@@ -5,7 +5,6 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import {
   MousePointerClick,
-  CalendarRange,
   UtensilsCrossed,
   MonitorCog,
   BedDouble,
@@ -36,18 +35,8 @@ const tailoredServices: ServiceCard[] = [
     icon: MousePointerClick,
   },
   {
-    id: "event-conference-room",
-    tag: "02 / SUMMITS & GALAS",
-    title: "Event & Conference Rooms",
-    description:
-      "Reserve state-of-the-art corporate venues and bespoke banquet halls equipped with premium acoustics and custom catering.",
-    href: "/contact",
-    image: "https://images.unsplash.com/photo-1517457373958-b7bdd4587205?w=1200&q=80",
-    icon: CalendarRange,
-  },
-  {
     id: "in-house-restaurant",
-    tag: "03 / HAUTE CUISINE",
+    tag: "02 / HAUTE CUISINE",
     title: "In-House Fine Dining",
     description:
       "Discover an exquisite culinary journey crafted by master chefs, featuring seasonal Nordic delicacies and fine vintage pairings.",
@@ -57,7 +46,7 @@ const tailoredServices: ServiceCard[] = [
   },
   {
     id: "24-7-guest-assistance",
-    tag: "04 / WHITE GLOVE",
+    tag: "03 / WHITE GLOVE",
     title: "24/7 Butler Assistance",
     description:
       "Our dedicated concierge and butler team is at your command around the clock to ensure an effortless and tailored residency.",
@@ -67,7 +56,7 @@ const tailoredServices: ServiceCard[] = [
   },
   {
     id: "daily-housekeeping",
-    tag: "05 / IMPECCABLE CARE",
+    tag: "04 / IMPECCABLE CARE",
     title: "Curated Housekeeping",
     description:
       "Experience discrete daily turndown service, organic Egyptian cotton linens, and meticulous attention to every sensorial detail.",
@@ -77,7 +66,7 @@ const tailoredServices: ServiceCard[] = [
   },
   {
     id: "secure-parking",
-    tag: "06 / PRIVATE VALET",
+    tag: "05 / PRIVATE VALET",
     title: "Private Valet & Parking",
     description:
       "Discreet on-site underground parking featuring 24/7 security surveillance and complimentary EV supercharging facilities.",

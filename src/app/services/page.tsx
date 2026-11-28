@@ -4,14 +4,14 @@ import ServicesClient from "./ServicesClient";
 export const metadata: Metadata = {
   title: "Tailored Privileges & Services",
   description:
-    "Explore our signature hotel services: Online Room Booking, Event & Conference Rooms, In-House Fine Dining, 24/7 Butler Assistance, Curated Housekeeping, and Private Valet & Parking at Oslo Elite Hotel.",
+    "Explore our signature hotel services: Online Room Booking, In-House Fine Dining, 24/7 Butler Assistance, Curated Housekeeping, and Private Valet & Parking at Signature Art Hotel.",
   alternates: {
     canonical: "/services",
   },
   openGraph: {
-    title: "Tailored Privileges & Services | Oslo Elite Hotel & Suites",
+    title: "Tailored Privileges & Services | Signature Art Hotel",
     description:
-      "Explore our signature hotel services: Online Room Booking, Event & Conference Rooms, In-House Fine Dining, 24/7 Butler Assistance, Curated Housekeeping, and Private Valet & Parking at Oslo Elite Hotel.",
+      "Explore our signature hotel services: Online Room Booking, In-House Fine Dining, 24/7 Butler Assistance, Curated Housekeeping, and Private Valet & Parking at Signature Art Hotel.",
     url: "/services",
   },
 };
