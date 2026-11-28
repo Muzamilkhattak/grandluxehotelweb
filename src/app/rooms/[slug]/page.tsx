@@ -124,7 +124,7 @@ export default async function RoomDetailPage({ params }: { params: Promise<{ slu
       price: room.price_per_night,
       priceCurrency: "PKR",
       availability: "https://schema.org/InStock",
-      url: `https://osloelitehotel.com/rooms/${room.slug}`,
+      url: `${process.env.NEXT_PUBLIC_SITE_URL || "https://signaturearthotel.com"}/rooms/${room.slug}`,
     },
   };
 

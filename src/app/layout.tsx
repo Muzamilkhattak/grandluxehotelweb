@@ -19,7 +19,7 @@ const playfair = Playfair_Display({
   subsets: ["latin"],
 });
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://osloelitehotel.com";
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://signaturearthotel.com";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -84,8 +84,11 @@ export const metadata: Metadata = {
     },
   },
   icons: {
-    icon: "/signaturearthotellogo.webp",
-    apple: "/signaturearthotellogo.webp",
+    icon: [
+      { url: "/favicon.ico", sizes: "48x48" },
+      { url: "/icon.png", type: "image/png", sizes: "192x192" },
+    ],
+    apple: "/apple-icon.png",
   },
   verification: {
     google: "hb4td9cFzhs_biGHDP_MtErwudgN4-U8DuS_mgfVdug",

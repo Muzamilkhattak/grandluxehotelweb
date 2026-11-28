@@ -2,7 +2,7 @@ import { MetadataRoute } from "next";
 import { createClient } from "@supabase/supabase-js";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://osloelitehotel.com";
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://signaturearthotel.com";
 
   const staticPages: MetadataRoute.Sitemap = [
     {

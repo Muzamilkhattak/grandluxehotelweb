@@ -22,11 +22,40 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "/",
   },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
   openGraph: {
+    type: "website",
+    locale: "en_US",
+    siteName: "Signature Art Hotel",
     title: "Signature Art Hotel | Luxury 5-Star Boutique Hotel",
     description:
       "Book your stay at Signature Art Hotel. Opulent accommodations, fine dining, and white-glove hospitality.",
     url: "/",
+    images: [
+      {
+        url: "/signaturearthotellogo.webp",
+        width: 800,
+        height: 600,
+        alt: "Signature Art Hotel Logo",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Signature Art Hotel | Luxury 5-Star Boutique Hotel",
+    description:
+      "Book your stay at Signature Art Hotel. Opulent accommodations, fine dining, and white-glove hospitality.",
+    images: ["/signaturearthotellogo.webp"],
   },
 };
 
