@@ -1,17 +1,17 @@
-﻿import { Metadata } from "next";
+import { Metadata } from "next";
 import Link from "next/link";
 import { ArrowLeft, ShieldCheck } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Privacy Policy",
   description:
-    "Review the privacy policy and data protection practices of Oslo Elite Hotel & Suites. Committed to GDPR compliance and guest confidentiality.",
+    "Review the privacy policy and data protection practices of Signature Art Hotel. Committed to guest confidentiality and secure booking experiences.",
   alternates: {
     canonical: "/privacy",
   },
   openGraph: {
-    title: "Privacy Policy | Oslo Elite Hotel & Suites",
-    description: "Learn about how Oslo Elite Hotel & Suites protects your personal information and privacy.",
+    title: "Privacy Policy | Signature Art Hotel",
+    description: "Learn about how Signature Art Hotel protects your personal information and privacy.",
     url: "/privacy",
   },
 };
@@ -41,7 +41,7 @@ export default function PrivacyPolicyPage() {
             Privacy Policy
           </h1>
           <p className="font-jost text-sm text-gray-500">
-            Last updated: October 2026 • Effective Date: January 1, 2026
+            Last updated: October 2026 • Signature Art Hotel
           </p>
         </div>
 
@@ -52,7 +52,7 @@ export default function PrivacyPolicyPage() {
               1. Our Commitment to Your Confidentiality
             </h2>
             <p>
-              At Oslo Elite Hotel & Suites, safeguarding the confidentiality and integrity of your personal information is foundational to our philosophy of white-glove hospitality. This Privacy Policy details how we collect, process, and protect your information when booking suites, dining in our restaurants, or utilizing our concierge services.
+              At Signature Art Hotel, safeguarding the confidentiality and integrity of your personal information is foundational to our philosophy of hospitable and personalized care. This Privacy Policy details how we collect, process, and protect your information when booking suites, dining in our restaurant, or utilizing our concierge services.
             </p>
           </section>
 
@@ -104,7 +104,7 @@ export default function PrivacyPolicyPage() {
               <li>The right to data portability and immediate withdrawal of consent.</li>
             </ul>
             <p className="mt-3">
-              To exercise any of these rights, contact our Data Protection Officer directly at <strong className="text-[#000000]">privacy@osloelitehotel.com</strong>.
+              To exercise any of these rights, contact our Data Protection and Concierge team directly at <strong className="text-[#000000]">reception@signaturearthotel.com</strong>.
             </p>
           </section>
 
@@ -113,7 +113,7 @@ export default function PrivacyPolicyPage() {
               Contact Us Regarding Privacy
             </h2>
             <p className="text-sm text-gray-600">
-              Oslo Elite Hotel & Suites • Karl Johans gate 37, 0162 Oslo, Norway • Telephone: +47 22 00 55 00
+              Signature Art Hotel • Plot # 3 Street 64, F-8/4, Islamabad, Pakistan • Telephone: +92 333 7660360 • Email: signaturearthotel@gmail.com
             </p>
           </section>
         </div>

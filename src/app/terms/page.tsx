@@ -1,17 +1,17 @@
-﻿import { Metadata } from "next";
+import { Metadata } from "next";
 import Link from "next/link";
 import { ArrowLeft, FileText } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Terms & Conditions",
   description:
-    "Review the reservation terms, cancellation policies, and residency guidelines for staying at Oslo Elite Hotel & Suites in Oslo, Norway.",
+    "Review the reservation terms, cancellation policies, and residency guidelines for staying at Signature Art Hotel in Islamabad, Pakistan.",
   alternates: {
     canonical: "/terms",
   },
   openGraph: {
-    title: "Terms & Conditions | Oslo Elite Hotel & Suites",
-    description: "Reservation terms, check-in policies, and cancellation guidelines for Oslo Elite Hotel & Suites.",
+    title: "Terms & Conditions | Signature Art Hotel",
+    description: "Reservation terms, check-in policies, and cancellation guidelines for Signature Art Hotel.",
     url: "/terms",
   },
 };
@@ -41,7 +41,7 @@ export default function TermsAndConditionsPage() {
             Terms & Conditions
           </h1>
           <p className="font-jost text-sm text-gray-500">
-            Last updated: October 2026 • Oslo Elite Hotel & Suites
+            Last updated: October 2026 • Signature Art Hotel
           </p>
         </div>
 
@@ -95,7 +95,7 @@ export default function TermsAndConditionsPage() {
               Questions Regarding Terms
             </h2>
             <p className="text-sm text-gray-600">
-              Please direct any inquiries regarding reservation terms to <strong className="text-[#000000]">reservations@osloelitehotel.com</strong> or call our front desk at +47 22 00 55 00.
+              Please direct any inquiries regarding reservation terms to <strong className="text-[#000000]">reception@signaturearthotel.com</strong> or call our front desk at +92 333 7660360.
             </p>
           </section>
         </div>
