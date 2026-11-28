@@ -87,6 +87,9 @@ export const metadata: Metadata = {
     icon: "/signaturearthotellogo.webp",
     apple: "/signaturearthotellogo.webp",
   },
+  verification: {
+    google: "hb4td9cFzhs_biGHDP_MtErwudgN4-U8DuS_mgfVdug",
+  },
 };
 
 const jsonLd = {
