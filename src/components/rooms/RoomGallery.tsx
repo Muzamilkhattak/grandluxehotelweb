@@ -32,7 +32,7 @@ export default function RoomGallery({ images, title }: RoomGalleryProps) {
   return (
     <div className="w-full flex flex-col gap-4">
       {/* Main Image View */}
-      <div className="relative w-full h-[450px] md:h-[550px] bg-black/5 rounded-none overflow-hidden group border border-[#d7b56d]/20 shadow-lg">
+      <div className="relative w-full aspect-[16/10] sm:aspect-[16/9] md:aspect-auto md:h-[550px] bg-black/5 rounded-none overflow-hidden group border border-[#d7b56d]/20 shadow-lg">
         <Image
           src={currentImage}
           alt={`${title} - Photo ${activeIndex + 1}`}
@@ -44,8 +44,8 @@ export default function RoomGallery({ images, title }: RoomGalleryProps) {
         <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-60" />
 
         {/* Counter Badge */}
-        <div className="absolute top-4 left-4 bg-[#000000]/80 backdrop-blur-md text-[#FFFFFF] text-[11px] font-jost uppercase tracking-[0.2em] px-4 py-2 border border-[#d7b56d]/30 flex items-center gap-2">
-          <Sparkles size={12} className="text-[#d7b56d]" />
+        <div className="absolute top-3 left-3 sm:top-4 sm:left-4 bg-[#000000]/80 backdrop-blur-md text-[#FFFFFF] text-[10px] sm:text-[11px] font-jost uppercase tracking-[0.2em] px-3 py-1.5 sm:px-4 sm:py-2 border border-[#d7b56d]/30 flex items-center gap-1.5 sm:gap-2">
+          <Sparkles size={11} className="text-[#d7b56d]" />
           <span>Photo {activeIndex + 1} of {galleryImages.length}</span>
         </div>
 
@@ -54,17 +54,19 @@ export default function RoomGallery({ images, title }: RoomGalleryProps) {
           <>
             <button
               onClick={handlePrev}
-              className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-[#000000]/70 hover:bg-[#000000] text-white flex items-center justify-center transition-all opacity-80 group-hover:opacity-100 hover:scale-105 border border-[#d7b56d]/40"
+              className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 w-9 h-9 sm:w-12 sm:h-12 bg-[#000000]/70 hover:bg-[#000000] text-white flex items-center justify-center transition-all opacity-80 group-hover:opacity-100 hover:scale-105 border border-[#d7b56d]/40"
               aria-label="Previous Image"
             >
-              <ChevronLeft size={24} />
+              <ChevronLeft size={20} className="sm:hidden" />
+              <ChevronLeft size={24} className="hidden sm:block" />
             </button>
             <button
               onClick={handleNext}
-              className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-[#000000]/70 hover:bg-[#000000] text-white flex items-center justify-center transition-all opacity-80 group-hover:opacity-100 hover:scale-105 border border-[#d7b56d]/40"
+              className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 w-9 h-9 sm:w-12 sm:h-12 bg-[#000000]/70 hover:bg-[#000000] text-white flex items-center justify-center transition-all opacity-80 group-hover:opacity-100 hover:scale-105 border border-[#d7b56d]/40"
               aria-label="Next Image"
             >
-              <ChevronRight size={24} />
+              <ChevronRight size={20} className="sm:hidden" />
+              <ChevronRight size={24} className="hidden sm:block" />
             </button>
           </>
         )}
