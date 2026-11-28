@@ -155,6 +155,7 @@ export default function ContactClient() {
                 <input type="hidden" name="_template" value="table" />
                 <input type="hidden" name="_captcha" value="false" />
                 <input type="hidden" name="_next" value="https://signaturearthotel.com/contact?submitted=true" />
+                <input type="text" name="_honey" style={{ display: "none" }} />
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                   <div>
